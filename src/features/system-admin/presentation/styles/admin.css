@@ -1,0 +1,180 @@
+/* Shared presentation primitives for the SYSTEM admin list/detail pages. Each
+   page includes this scoped, so the classes never leak across features. */
+
+.admin-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+  align-items: center;
+}
+
+.admin-toolbar__input {
+  flex: 1 1 14rem;
+  min-width: 0;
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-surface);
+  color: var(--color-text);
+  font: inherit;
+}
+
+.admin-toolbar__input:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.admin-state {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+  align-items: flex-start;
+}
+
+.admin-state__empty {
+  margin: 0;
+  color: var(--color-text-muted);
+}
+
+.admin-table-wrap {
+  overflow-x: auto;
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+}
+
+.admin-table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: var(--font-size-sm);
+}
+
+.admin-table th,
+.admin-table td {
+  padding: var(--space-3);
+  border-bottom: 1px solid var(--color-border);
+  text-align: left;
+  vertical-align: top;
+}
+
+.admin-table th {
+  color: var(--color-text-muted);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.admin-table tbody tr:last-child td {
+  border-bottom: 0;
+}
+
+.admin-table__desc {
+  display: block;
+  font-weight: 600;
+  overflow-wrap: anywhere;
+}
+
+.admin-table__muted {
+  color: var(--color-text-muted);
+}
+
+.admin-table__mono {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  overflow-wrap: anywhere;
+}
+
+.admin-table__sub {
+  display: block;
+  color: var(--color-text-muted);
+}
+
+.admin-table__actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-1);
+  justify-content: flex-end;
+}
+
+.admin-badge {
+  display: inline-flex;
+  padding: 0.125rem var(--space-2);
+  border-radius: 999px;
+  font-size: var(--font-size-sm);
+  font-weight: 600;
+  white-space: nowrap;
+}
+
+.admin-badge--active {
+  background-color: var(--color-success-surface, var(--color-info-surface));
+  color: var(--color-success, var(--color-info));
+}
+
+.admin-badge--blocked {
+  background-color: var(--color-danger-surface);
+  color: var(--color-danger);
+}
+
+.admin-row-notice {
+  display: block;
+  max-width: 16rem;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.admin-detail {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-3) var(--space-4);
+  margin: 0;
+  padding: var(--space-4);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-md);
+  background-color: var(--color-surface);
+}
+
+.admin-detail__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.admin-detail__item--wide {
+  grid-column: 1 / -1;
+}
+
+.admin-detail__item dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.admin-detail__item dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.admin-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-2);
+}
+
+.admin-checkbox-list {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+  margin: 0;
+  padding: 0;
+  list-style: none;
+}
+
+.admin-checkbox {
+  display: flex;
+  gap: var(--space-2);
+  align-items: flex-start;
+}
+
+@media (max-width: 48rem) {
+  .admin-detail {
+    grid-template-columns: minmax(0, 1fr);
+  }
+}

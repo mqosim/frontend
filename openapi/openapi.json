@@ -1,0 +1,5788 @@
+{
+  "openapi": "3.1.0",
+  "info": {
+    "title": "backend HTTP API",
+    "version": "1.0.0",
+    "description": "JSON API served under /api/v1 plus two unauthenticated probes at the root. Protected routes expect `Authorization: Bearer <access_token>`; refresh tokens travel only in httpOnly cookies. All examples use fake values."
+  },
+  "servers": [
+    {
+      "url": "/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Health",
+      "description": "Unauthenticated liveness/readiness probes."
+    },
+    {
+      "name": "Auth",
+      "description": "PERSON/ORG authentication, workspace selection and session refresh."
+    },
+    {
+      "name": "System Auth",
+      "description": "Separate, stricter authentication surface for SYSTEM (superadmin) principals."
+    },
+    {
+      "name": "Public",
+      "description": "Unauthenticated reference data (active records only)."
+    },
+    {
+      "name": "Translations",
+      "description": "UI translation bundles."
+    },
+    {
+      "name": "Languages",
+      "description": "Language catalogue (control-plane). Legacy /master reads require any authenticated principal; writes require system.reference.write."
+    },
+    {
+      "name": "Pages",
+      "description": "Page catalogue (control-plane). Legacy /master reads require any authenticated principal; writes require system.reference.write."
+    },
+    {
+      "name": "Phrases",
+      "description": "Phrase catalogue (control-plane). Legacy /master reads require any authenticated principal; writes require system.reference.write."
+    },
+    {
+      "name": "Countries",
+      "description": "Country catalogue (control-plane plus a public localized read). Legacy /master reads require any authenticated principal; writes require system.reference.write."
+    },
+    {
+      "name": "Organizations",
+      "description": "Organization detail lookup. Requires an authenticated principal scoped to the organization (Auth + Tenant)."
+    },
+    {
+      "name": "Documents",
+      "description": "Signed-document metadata. Requires an authenticated principal scoped to an organization (Auth + Tenant)."
+    },
+    {
+      "name": "Admin",
+      "description": "Canonical permission-gated control plane under /api/v1/admin. Each operation names the permission it requires; grants are loaded from the database on every request."
+    },
+    {
+      "name": "Audit",
+      "description": "Audit log reads. Requires system.audit.read."
+    },
+    {
+      "name": "Employees",
+      "description": "Tenant-scoped employee records (Auth + Workspace + Tenant)."
+    },
+    {
+      "name": "Users",
+      "description": "The caller's own profile (Auth only). Identity always comes from the access token's uid claim."
+    }
+  ],
+  "security": [
+    {
+      "bearerAuth": []
+    }
+  ],
+  "paths": {
+    "/healthz": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Liveness probe",
+        "description": "Does not touch Postgres or Redis.",
+        "operationId": "getHealthz",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Process is alive.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "ok"
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/readyz": {
+      "get": {
+        "tags": [
+          "Health"
+        ],
+        "summary": "Readiness probe",
+        "description": "Checks Postgres and Redis connectivity.",
+        "operationId": "getReadyz",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Dependencies reachable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string",
+                      "const": "ready"
+                    }
+                  }
+                }
+              }
+            }
+          },
+          "503": {
+            "description": "A dependency (database or redis) is unavailable.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "object",
+                  "properties": {
+                    "status": {
+                      "type": "string"
+                    },
+                    "reason": {
+                      "type": "string",
+                      "enum": [
+                        "database",
+                        "redis"
+                      ]
+                    }
+                  }
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/challenge": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Issue a login/register challenge",
+        "operationId": "getChallenge",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "A freshly generated challenge.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ChallengeResponse"
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/register": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Register a new user",
+        "description": "Registers a PERSON or ORG user from an e-imzo signed challenge. The refresh token is set as the httpOnly `refresh_token` cookie (path `/api/v1/auth`); it is never returned in the body.",
+        "operationId": "register",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RegisterRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Registered and authenticated.",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "refresh_token=<opaque>; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Log in with a password (PERSON/ORG only)",
+        "description": "The identifier is an email or a phone number. Every failure returns the same generic 401 (no user enumeration). Repeated failed attempts lock the (identifier, source IP) pair, and a higher all-IP threshold briefly locks the identifier itself; a locked attempt returns 429 before the credentials are checked, identically whether or not the account exists. A SYSTEM account is never authenticated here. Sets the httpOnly `refresh_token` cookie.",
+        "operationId": "loginWithPassword",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authenticated.",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "refresh_token=<opaque>; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login_with_signature": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Log in with an e-imzo signature",
+        "description": "Every failure returns the same generic 401. Sets the httpOnly `refresh_token` cookie.",
+        "operationId": "loginWithSignature",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/LoginWithSignatureRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authenticated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/login_with_usb": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "USB login (not implemented)",
+        "operationId": "loginWithUSB",
+        "security": [],
+        "responses": {
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "501": {
+            "$ref": "#/components/responses/NotImplemented"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/select_workspace": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Select the workspace for a pending person token",
+        "description": "Requires a pending-workspace access token (PERSON or SYSTEM). Sets the httpOnly `refresh_token` cookie. An inactive organization is rejected with 403.",
+        "operationId": "selectWorkspace",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SelectWorkspaceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Workspace selected.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/switch_workspace": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Switch the workspace for a selected person token",
+        "operationId": "switchWorkspace",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SwitchWorkspaceRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Workspace switched.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/workspaces": {
+      "get": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "List the current person's available workspaces",
+        "description": "Returns the active organizations owned by the person behind the access token's uid claim — exactly the workspace_options a PERSON login returns — plus which workspace the token is currently in. PERSON tokens only (personal or org workspace); a pending-selection token and ORG/SYSTEM tokens are rejected.",
+        "operationId": "listWorkspaces",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The person's workspaces.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/WorkspaceList"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/refresh": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Rotate the session from the refresh cookie",
+        "description": "Reads the httpOnly `refresh_token` cookie (path `/api/v1/auth`); no Authorization header is required (an expired access token must still be refreshable). A `system_refresh_token` is rejected here. Sets a rotated `refresh_token` cookie. The session also enforces server-side limits: it is rejected with the same 401 once idle for longer than REFRESH_IDLE_TIMEOUT_MINUTES or once its total lifetime exceeds SESSION_ABSOLUTE_MAX_MINUTES (measured from the session's first token), and the rotated cookie's Expires never exceeds that absolute cap. A refresh presenting a token that was rotated moments ago — a second browser tab racing on the same shared cookie — within REFRESH_ROTATION_GRACE_SECONDS is NOT treated as reuse: it returns a fresh access token but sets no new refresh cookie (the winning rotation already set it). Reuse outside that window, or any revoked/expired token, returns 401. Cookie-based endpoints cannot be exercised reliably from the Swagger UI Try-it-out (cookies are managed by the browser).",
+        "operationId": "refreshToken",
+        "security": [
+          {
+            "refreshCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rotated token pair.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPair"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Log out the current device",
+        "description": "Revokes the refresh-token family from the `refresh_token` cookie, clears the cookie and denies the presented access token's jti for its remaining lifetime. Works without an access token (the bearer is optional and only trusted when its signature validates). Idempotent.",
+        "operationId": "logout",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Logged out.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "example": {
+                  "message": "logged_out"
+                }
+              }
+            }
+          }
+        }
+      }
+    },
+    "/api/v1/auth/logout_all": {
+      "post": {
+        "tags": [
+          "Auth"
+        ],
+        "summary": "Log out every device",
+        "description": "Revokes every refresh-token family for the caller and denies the caller's own access token's jti. Clears the `refresh_token` cookie. Other devices' access tokens remain valid until they expire (up to ACCESS_TOKEN_EXPIRE_MINUTES).",
+        "operationId": "logoutAll",
+        "responses": {
+          "200": {
+            "description": "All sessions revoked.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "example": {
+                  "message": "logged_out_all"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/system/auth/login": {
+      "post": {
+        "tags": [
+          "System Auth"
+        ],
+        "summary": "SYSTEM (superadmin) login",
+        "description": "Authenticates only user_type=SYSTEM accounts. Unknown email, wrong password, inactive account, a non-SYSTEM account and a missing email/password hash all return the same generic 401. Uses a dedicated fail-closed per-IP limiter plus a per-(email, IP) lockout (429). Sets the httpOnly `system_refresh_token` cookie (path `/api/v1/system/auth`), which is not interchangeable with `refresh_token`.",
+        "operationId": "systemLogin",
+        "security": [],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemLoginRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Authenticated.",
+            "headers": {
+              "Set-Cookie": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "system_refresh_token=<opaque>; Path=/api/v1/system/auth; HttpOnly; Secure; SameSite=Strict"
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuthResult"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/system/auth/refresh": {
+      "post": {
+        "tags": [
+          "System Auth"
+        ],
+        "summary": "Rotate a SYSTEM session",
+        "description": "Reads the httpOnly `system_refresh_token` cookie (path `/api/v1/system/auth`). A `refresh_token` is rejected here with a generic failure. The session also enforces server-side limits: it is rejected with the same 401 once idle for longer than SYSTEM_REFRESH_IDLE_TIMEOUT_MINUTES or once its total lifetime exceeds SYSTEM_SESSION_ABSOLUTE_MAX_MINUTES (measured from the session's first token), and the rotated cookie's Expires never exceeds that absolute cap. A refresh presenting a token rotated moments ago within REFRESH_ROTATION_GRACE_SECONDS returns a fresh access token but sets no new refresh cookie (the winning rotation already set it). Reuse outside that window, or any revoked/expired token, returns 401. Cookie-based endpoint; cannot be exercised reliably from Try-it-out.",
+        "operationId": "systemRefreshToken",
+        "security": [
+          {
+            "systemRefreshCookie": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Rotated token pair.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TokenPair"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/system/auth/logout": {
+      "post": {
+        "tags": [
+          "System Auth"
+        ],
+        "summary": "Log out a SYSTEM session",
+        "description": "Requires a valid SYSTEM access token. Revokes the refresh token(s), clears the `system_refresh_token` cookie and denies the access token's jti (fail-closed: if the denylist write fails it returns 500 so the caller can retry). Idempotent.",
+        "operationId": "systemLogout",
+        "requestBody": {
+          "required": false,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemLogoutRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Logged out.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MessageResponse"
+                },
+                "example": {
+                  "message": "logged_out"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/public/languages/active": {
+      "get": {
+        "tags": [
+          "Public"
+        ],
+        "summary": "List active languages",
+        "operationId": "listActiveLanguages",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Active languages.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicLanguage"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/public/languages/{code}": {
+      "get": {
+        "tags": [
+          "Public"
+        ],
+        "summary": "Get one active language",
+        "operationId": "getPublicLanguageByCode",
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LanguageCodePath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The language.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicLanguage"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/public/pages/active": {
+      "get": {
+        "tags": [
+          "Public"
+        ],
+        "summary": "List active pages",
+        "operationId": "listActivePages",
+        "security": [],
+        "responses": {
+          "200": {
+            "description": "Active pages.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicPage"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/public/pages/slug/{slug}": {
+      "get": {
+        "tags": [
+          "Public"
+        ],
+        "summary": "Get one active page by slug",
+        "operationId": "getPublicPageBySlug",
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SlugPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PublicPage"
+                }
+              }
+            }
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/public/phrases": {
+      "get": {
+        "tags": [
+          "Public"
+        ],
+        "summary": "List phrases with their translation for the resolved language",
+        "operationId": "listPublicPhrases",
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangQuery"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/PageUUIDQuery"
+          },
+          {
+            "$ref": "#/components/parameters/SearchQuery"
+          },
+          {
+            "$ref": "#/components/parameters/IncludeTranslationsQuery"
+          },
+          {
+            "$ref": "#/components/parameters/LimitQuery"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Phrases.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicPhrase"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/public/countries": {
+      "get": {
+        "tags": [
+          "Countries",
+          "Public"
+        ],
+        "summary": "List countries localized to the resolved language",
+        "description": "Public localized read: names fall back to the active default language when a translation is missing.",
+        "operationId": "listPublicCountries",
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LangQuery"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Localized countries.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/PublicCountry"
+                  }
+                }
+              }
+            }
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/public/translations": {
+      "get": {
+        "tags": [
+          "Translations"
+        ],
+        "summary": "Get UI translation bundles for one or more pages",
+        "description": "Returns one map of key/value pairs per requested page for the resolved language. Public and unauthenticated. Language resolution: `?lang=` -> `Accept-Language` -> default.",
+        "operationId": "getTranslations",
+        "security": [],
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/PagesQuery"
+          },
+          {
+            "$ref": "#/components/parameters/LangQuery"
+          },
+          {
+            "$ref": "#/components/parameters/AcceptLanguageHeader"
+          },
+          {
+            "$ref": "#/components/parameters/IfNoneMatchHeader"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Translation bundles keyed by page slug.",
+            "headers": {
+              "Cache-Control": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "public, max-age=300"
+              },
+              "ETag": {
+                "schema": {
+                  "type": "string"
+                },
+                "description": "Hash of the response body."
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/TranslationBundle"
+                },
+                "example": {
+                  "common": {
+                    "save": "Saqlash",
+                    "cancel": "Bekor qilish"
+                  },
+                  "settings.profile": {
+                    "title": "Profil"
+                  }
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not modified; the If-None-Match ETag matches. Empty body."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/master/languages": {
+      "get": {
+        "tags": [
+          "Languages"
+        ],
+        "summary": "List all languages",
+        "operationId": "listLanguages",
+        "responses": {
+          "200": {
+            "description": "All languages (active and inactive).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Language"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Languages"
+        ],
+        "summary": "Create a language",
+        "operationId": "createLanguage",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLanguageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Language"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/master/languages/{code}": {
+      "put": {
+        "tags": [
+          "Languages"
+        ],
+        "summary": "Update a language",
+        "operationId": "updateLanguage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LanguageCodePath"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLanguageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Language"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Languages"
+        ],
+        "summary": "Delete a language",
+        "operationId": "deleteLanguage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LanguageCodePath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted. Body is null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/master/languages/{code}/default": {
+      "put": {
+        "tags": [
+          "Languages"
+        ],
+        "summary": "Set the default language",
+        "operationId": "setDefaultLanguage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LanguageCodePath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The new default language.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Language"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/master/pages": {
+      "get": {
+        "tags": [
+          "Pages"
+        ],
+        "summary": "List all pages",
+        "operationId": "listPages",
+        "responses": {
+          "200": {
+            "description": "All pages.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Page"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Pages"
+        ],
+        "summary": "Create a page",
+        "operationId": "createPage",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/master/pages/{uuid}": {
+      "get": {
+        "tags": [
+          "Pages"
+        ],
+        "summary": "Get a page by UUID",
+        "operationId": "getPageByUUID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Pages"
+        ],
+        "summary": "Update a page",
+        "operationId": "updatePage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Pages"
+        ],
+        "summary": "Delete a page",
+        "operationId": "deletePage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted. Body is null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/master/phrases": {
+      "post": {
+        "tags": [
+          "Phrases"
+        ],
+        "summary": "Create a phrase with its translations",
+        "operationId": "createPhrase",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePhraseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phrase"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/master/phrases/{uuid}": {
+      "get": {
+        "tags": [
+          "Phrases"
+        ],
+        "summary": "Get a phrase by UUID",
+        "operationId": "getPhraseByUUID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The phrase with all translations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phrase"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Phrases"
+        ],
+        "summary": "Update a phrase",
+        "operationId": "updatePhrase",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePhraseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phrase"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Phrases"
+        ],
+        "summary": "Delete a phrase",
+        "operationId": "deletePhrase",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted. Body is null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/master/phrases/{uuid}/translations/{lang}": {
+      "delete": {
+        "tags": [
+          "Phrases"
+        ],
+        "summary": "Delete one phrase translation",
+        "operationId": "deletePhraseTranslation",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          },
+          {
+            "$ref": "#/components/parameters/PhraseLangPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted. Body is null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/master/countries": {
+      "get": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "List countries",
+        "operationId": "listCountries",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SearchQuery"
+          },
+          {
+            "$ref": "#/components/parameters/LimitQuery"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Countries.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Country"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Create a country with its translations",
+        "operationId": "createCountry",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCountryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Country"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/master/countries/{code}": {
+      "get": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Get a country by code",
+        "operationId": "getCountryByCode",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountryCodePath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The country.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Country"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Update a country",
+        "description": "Full update: `country_code` is immutable and comes from the path.",
+        "operationId": "updateCountry",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountryCodePath"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCountryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Country"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Delete a country",
+        "operationId": "deleteCountry",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountryCodePath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted. Body is null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/master/countries/{code}/translations": {
+      "get": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "List a country's translations",
+        "operationId": "listCountryTranslations",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountryCodePath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Translations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CountryTranslation"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/master/countries/{code}/translations/{language_code}": {
+      "put": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Upsert a country translation",
+        "operationId": "upsertCountryTranslation",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountryCodePath"
+          },
+          {
+            "$ref": "#/components/parameters/LanguageCodePath"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertTranslationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Upserted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryTranslation"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Countries"
+        ],
+        "summary": "Delete a country translation",
+        "operationId": "deleteCountryTranslation",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountryCodePath"
+          },
+          {
+            "$ref": "#/components/parameters/LanguageCodePath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted. Body is null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/master/orgs/{uuid}": {
+      "get": {
+        "tags": [
+          "Organizations"
+        ],
+        "summary": "Get an organization by UUID",
+        "description": "The caller may only read the organization its token is scoped to (the oid claim, resolved by the Tenant middleware).",
+        "operationId": "getOrgByUUID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Org"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/master/documents/sign": {
+      "post": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Sign and store a document",
+        "description": "The real request body limit for this endpoint today is 2 MiB (the shared group limit).",
+        "operationId": "signDocument",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignDocumentRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Signed document metadata.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "413": {
+            "$ref": "#/components/responses/RequestEntityTooLarge"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/master/documents": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "List the tenant's documents",
+        "operationId": "listDocuments",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LimitQuery"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Documents.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Document"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/api/v1/master/documents/{uuid}": {
+      "get": {
+        "tags": [
+          "Documents"
+        ],
+        "summary": "Get a document by UUID",
+        "operationId": "getDocumentByUUID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The document.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Document"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/master/audit": {
+      "get": {
+        "tags": [
+          "Audit"
+        ],
+        "summary": "List audit entries in a time range",
+        "description": "The range must be at most 31 days.",
+        "operationId": "listAudit",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/StartQuery"
+          },
+          {
+            "$ref": "#/components/parameters/EndQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Audit entries.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditLog"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/api/v1/master/audit/{uuid}": {
+      "get": {
+        "tags": [
+          "Audit"
+        ],
+        "summary": "Get an audit entry by UUID",
+        "operationId": "getAuditByUUID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The audit entry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLog"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/org/employees": {
+      "get": {
+        "tags": [
+          "Employees"
+        ],
+        "summary": "List the tenant's employees",
+        "operationId": "listEmployees",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LimitQuery"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Employees.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Employee"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Employees"
+        ],
+        "summary": "Create an employee",
+        "operationId": "createEmployee",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Employee"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/api/v1/org/employees/list_by_user": {
+      "get": {
+        "tags": [
+          "Employees"
+        ],
+        "summary": "List the tenant's employees for the calling user",
+        "operationId": "listEmployeesByUser",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LimitQuery"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Employees.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Employee"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/api/v1/org/employees/{uuid}": {
+      "get": {
+        "tags": [
+          "Employees"
+        ],
+        "summary": "Get an employee by UUID",
+        "operationId": "getEmployeeByUUID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The employee.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Employee"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Employees"
+        ],
+        "summary": "Update an employee",
+        "operationId": "updateEmployee",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/EmployeeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Employee"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me": {
+      "get": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Get the current user",
+        "description": "Returns the profile of the user identified by the access token's uid claim. Works for PERSON, ORG and SYSTEM principals; no language claim is added to the token.",
+        "operationId": "getUserMe",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The current user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserMe"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/master/users/me": {
+      "put": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Update the current user's language",
+        "description": "Persists language_code for the user identified by the access token's uid claim and returns the refreshed profile. The code must match an active language; an unknown or inactive code is rejected with 400.",
+        "operationId": "updateUserMe",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserLanguageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserMe"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/system/auth/me": {
+      "get": {
+        "tags": [
+          "Users",
+          "System Auth"
+        ],
+        "summary": "Get the current SYSTEM user",
+        "description": "SYSTEM-gated alias of GET /api/v1/auth/me: identical contract, reachable with a SYSTEM access token only.",
+        "operationId": "getSystemUserMe",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The current system user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserMe"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/system/users/me": {
+      "put": {
+        "tags": [
+          "Users",
+          "System Auth"
+        ],
+        "summary": "Update the current SYSTEM user's language",
+        "description": "SYSTEM-gated alias of PUT /api/v1/master/users/me: identical contract, reachable with a SYSTEM access token only.",
+        "operationId": "updateSystemUserMe",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateUserLanguageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserMe"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me/password": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Change the current user's password",
+        "description": "Rotates the password of the user identified by the access token's uid claim. current_password is verified against the stored bcrypt hash; wrong values are counted per user and the account is locked for ACCOUNT_PW_LOCKOUT_SEC after ACCOUNT_PW_MAX_FAILURES failures — the lockout is checked before the password is compared, so a locked attempt returns the same 429 whether or not the password is correct. The new password must differ from the current one and follow the 8-72 byte rule. On success every other refresh-token family is revoked; the caller's current session survives only when the httpOnly refresh_token cookie identifies it (its path /api/v1/auth covers this route), otherwise all families, including the current one, are revoked. PERSON and ORG principals only: SYSTEM is rejected with 403. An account without a password (e-imzo-only) is rejected with 409.",
+        "operationId": "changeAccountPassword",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangePasswordRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "204": {
+            "description": "Password changed."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me/email/change": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Start an email address change",
+        "description": "Starts (or resends) the email change for the user identified by the access token's uid claim; calling this endpoint again is the resend. current_password is verified like the password change (wrong password 401, locked 429 checked before the comparison). The new address must differ from the current one and must not already belong to another account (409, checked here and again on confirm). A 6-digit code from crypto/rand is stored only as an HMAC and sent to the NEW address; it expires in EMAIL_CODE_TTL_SEC and at most EMAIL_CODE_MAX_ATTEMPTS wrong codes invalidate the pending change. A repeat request within EMAIL_CODE_RESEND_COOLDOWN_SEC is 429, and per-user, per-target-address and per-IP hourly and daily send caps also apply (429, fail-closed on a Redis outage). If the code email cannot be sent the request returns 500 and never reports success, while the cooldown still applies. No raw address or code is ever logged. PERSON and ORG only: SYSTEM is rejected with 403. An account without a password is rejected with 409.",
+        "operationId": "requestAccountEmailChange",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeEmailRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "202": {
+            "description": "Verification code sent to the new address.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/EmailChangeResponse"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/auth/me/email/confirm": {
+      "post": {
+        "tags": [
+          "Users"
+        ],
+        "summary": "Confirm an email address change",
+        "description": "Completes the pending email change for the user identified by the access token's uid claim. The code is compared in constant time against the stored HMAC; a wrong code, an expired code, exhausted attempts and no pending change all return the same 400 (never 401, which the frontend treats as session expiry). Uniqueness of the new address is re-checked inside the transaction that updates the row, and the partial unique index is the final guard; a conflict returns 409 and consumes the pending change. On success email_verified_at is set, the pending state is cleared, an audit entry is written (masked values only) and a notice is sent to the OLD address (skipped silently when the account had none). Returns the refreshed profile. PERSON and ORG only: SYSTEM is rejected with 403.",
+        "operationId": "confirmAccountEmailChange",
+        "security": [
+          {
+            "bearerAuth": []
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ConfirmEmailChangeRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Email address changed.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/UserMe"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "429": {
+            "$ref": "#/components/responses/TooManyRequests"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/audit": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List audit entries in a time range",
+        "description": "The range must be at most 31 days.",
+        "operationId": "adminListAudit",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/StartQuery"
+          },
+          {
+            "$ref": "#/components/parameters/EndQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Audit entries.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AuditLog"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/audit/{uuid}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get an audit entry by UUID",
+        "operationId": "adminGetAuditByUUID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The audit entry.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AuditLog"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/countries": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List countries",
+        "operationId": "adminListCountries",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SearchQuery"
+          },
+          {
+            "$ref": "#/components/parameters/LimitQuery"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Countries.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Country"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Create a country with its translations",
+        "operationId": "adminCreateCountry",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateCountryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Country"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/countries/{code}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get a country by code",
+        "operationId": "adminGetCountryByCode",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountryCodePath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The country.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Country"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Update a country",
+        "description": "Full update: `country_code` is immutable and comes from the path.",
+        "operationId": "adminUpdateCountry",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountryCodePath"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCountryRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Country"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete a country",
+        "operationId": "adminDeleteCountry",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountryCodePath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted. Body is null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/countries/{code}/translations": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List a country's translations",
+        "operationId": "adminListCountryTranslations",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountryCodePath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Translations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/CountryTranslation"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/countries/{code}/translations/{language_code}": {
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Upsert a country translation",
+        "operationId": "adminUpsertCountryTranslation",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountryCodePath"
+          },
+          {
+            "$ref": "#/components/parameters/LanguageCodePath"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertTranslationRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Upserted.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/CountryTranslation"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete a country translation",
+        "operationId": "adminDeleteCountryTranslation",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/CountryCodePath"
+          },
+          {
+            "$ref": "#/components/parameters/LanguageCodePath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted. Body is null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/languages": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List all languages",
+        "operationId": "adminListLanguages",
+        "responses": {
+          "200": {
+            "description": "All languages (active and inactive).",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Language"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "500": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Create a language",
+        "operationId": "adminCreateLanguage",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateLanguageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Language"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/languages/{code}": {
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Update a language",
+        "operationId": "adminUpdateLanguage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LanguageCodePath"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateLanguageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Language"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete a language",
+        "operationId": "adminDeleteLanguage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LanguageCodePath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted. Body is null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/languages/{code}/default": {
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Set the default language",
+        "operationId": "adminSetDefaultLanguage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/LanguageCodePath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The new default language.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Language"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/pages": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List all pages",
+        "operationId": "adminListPages",
+        "responses": {
+          "200": {
+            "description": "All pages.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/Page"
+                  }
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          }
+        }
+      },
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Create a page",
+        "operationId": "adminCreatePage",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/pages/{uuid}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get a page by UUID",
+        "operationId": "adminGetPageByUUID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The page.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Update a page",
+        "operationId": "adminUpdatePage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePageRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Page"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete a page",
+        "operationId": "adminDeletePage",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted. Body is null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/phrases": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Create a phrase with its translations",
+        "operationId": "adminCreatePhrase",
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreatePhraseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "201": {
+            "description": "Created.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phrase"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/phrases/{uuid}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get a phrase by UUID",
+        "operationId": "adminGetPhraseByUUID",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The phrase with all translations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phrase"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      },
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Update a phrase",
+        "operationId": "adminUpdatePhrase",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdatePhraseRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Updated.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/Phrase"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          }
+        }
+      },
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete a phrase",
+        "operationId": "adminDeletePhrase",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted. Body is null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/phrases/{uuid}/translations/{lang}": {
+      "delete": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Delete one phrase translation",
+        "operationId": "adminDeletePhraseTranslation",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          },
+          {
+            "$ref": "#/components/parameters/PhraseLangPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Deleted. Body is null.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "null"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/orgs": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List organizations",
+        "operationId": "adminListOrgs",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SearchQuery"
+          },
+          {
+            "$ref": "#/components/parameters/LimitQuery"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "Organizations.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminOrg"
+                  }
+                }
+              }
+            },
+            "headers": {
+              "X-Total-Count": {
+                "description": "Total rows matching the search, ignoring limit/offset.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/orgs/{uuid}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get an organization by UUID",
+        "operationId": "adminGetOrg",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrg"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/orgs/{uuid}/block": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Block an organization",
+        "operationId": "adminBlockOrg",
+        "description": "Writes the organization (and owning user) not-before marker first, then deactivates the org and audits. A Redis failure aborts with 503 and no database change.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The blocked organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrg"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/orgs/{uuid}/unblock": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Unblock an organization",
+        "operationId": "adminUnblockOrg",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The unblocked organization.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminOrg"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/permissions": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List permissions",
+        "operationId": "adminListPermissions",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "The permission catalogue.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminPermission"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/roles": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List roles",
+        "operationId": "adminListRoles",
+        "parameters": [],
+        "responses": {
+          "200": {
+            "description": "Role bundles with their permissions.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminRole"
+                  }
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/system-users": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List SYSTEM users",
+        "operationId": "adminListSystemUsers",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SearchQuery"
+          },
+          {
+            "$ref": "#/components/parameters/LimitQuery"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "SYSTEM accounts with their roles.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminSystemUser"
+                  }
+                }
+              }
+            },
+            "headers": {
+              "X-Total-Count": {
+                "description": "Total rows matching the search, ignoring limit/offset.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/system-users/{uuid}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get a SYSTEM user by UUID",
+        "operationId": "adminGetSystemUser",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The SYSTEM user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSystemUser"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/system-users/{uuid}/roles": {
+      "put": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Replace a SYSTEM user's roles",
+        "operationId": "adminSetSystemUserRoles",
+        "description": "Role changes are only allowed for SYSTEM users. Removing system_admin from the last active administrator is refused with 409.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "requestBody": {
+          "required": true,
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetRolesRequest"
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "The SYSTEM user with its new roles.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminSystemUser"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "description": "The target account is not a SYSTEM user; role changes are only allowed for SYSTEM users."
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "List PERSON/ORG users",
+        "operationId": "adminListUsers",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/SearchQuery"
+          },
+          {
+            "$ref": "#/components/parameters/LimitQuery"
+          },
+          {
+            "$ref": "#/components/parameters/OffsetQuery"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "PERSON and ORG users. SYSTEM accounts are only on /admin/system-users.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "type": "array",
+                  "items": {
+                    "$ref": "#/components/schemas/AdminUser"
+                  }
+                }
+              }
+            },
+            "headers": {
+              "X-Total-Count": {
+                "description": "Total rows matching the search, ignoring limit/offset.",
+                "schema": {
+                  "type": "integer"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{uuid}": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Get a PERSON/ORG user by UUID",
+        "operationId": "adminGetUser",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUser"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{uuid}/block": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Block a user",
+        "operationId": "adminBlockUser",
+        "description": "Blocks a PERSON/ORG account. Writes the user not-before marker first, then deactivates the account, revokes its refresh-token families and audits. A Redis failure aborts with 503 and no database change. A SYSTEM target is refused with 422; use /admin/system-users/{uuid}/block instead.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The blocked user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUser"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "422": {
+            "description": "The target account is a SYSTEM user; block it through /admin/system-users/{uuid}/block."
+          },
+          "503": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{uuid}/sessions/revoke": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Revoke all sessions of a user",
+        "operationId": "adminRevokeUserSessions",
+        "description": "Revokes a PERSON/ORG user's sessions: writes the not-before marker, then revokes every refresh-token family. Does not change is_active. A Redis failure aborts with 503 and no database change. A SYSTEM target is refused with 422; use /admin/system-users/{uuid}/sessions/revoke instead.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sessions revoked. No body."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "description": "The target account is a SYSTEM user; revoke it through /admin/system-users/{uuid}/sessions/revoke."
+          },
+          "503": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/users/{uuid}/unblock": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Unblock a user",
+        "operationId": "adminUnblockUser",
+        "description": "Reactivates a PERSON/ORG account. Does not delete the not-before marker. A SYSTEM target is refused with 422; use /admin/system-users/{uuid}/unblock instead.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The unblocked user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUser"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "422": {
+            "description": "The target account is a SYSTEM user; unblock it through /admin/system-users/{uuid}/unblock."
+          }
+        }
+      }
+    },
+    "/api/v1/admin/system-users/{uuid}/block": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Block a SYSTEM user",
+        "operationId": "adminBlockSystemUser",
+        "description": "Blocks a SYSTEM account. Requires system.role.manage, which system_support does not hold. Writes the user not-before marker first, then deactivates the account, revokes its refresh-token families and audits. A Redis failure aborts with 503 and no database change. The last active system_admin cannot be blocked.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The blocked SYSTEM user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUser"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/system-users/{uuid}/unblock": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Unblock a SYSTEM user",
+        "operationId": "adminUnblockSystemUser",
+        "description": "Reactivates a SYSTEM account. Requires system.role.manage. Does not delete the not-before marker.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "The unblocked SYSTEM user.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminUser"
+                }
+              }
+            }
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/system-users/{uuid}/sessions/revoke": {
+      "post": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Revoke all sessions of a SYSTEM user",
+        "operationId": "adminRevokeSystemUserSessions",
+        "description": "Revokes a SYSTEM account's sessions. Requires system.role.manage, which system_support does not hold. Writes the not-before marker, then revokes every refresh-token family and audits. Does not change is_active. A Redis failure aborts with 503 and no database change. Revoking your own sessions is refused.",
+        "parameters": [
+          {
+            "$ref": "#/components/parameters/UUIDPath"
+          }
+        ],
+        "responses": {
+          "204": {
+            "description": "Sessions revoked. No body."
+          },
+          "400": {
+            "$ref": "#/components/responses/BadRequest"
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          },
+          "404": {
+            "$ref": "#/components/responses/NotFound"
+          },
+          "409": {
+            "$ref": "#/components/responses/Conflict"
+          },
+          "503": {
+            "$ref": "#/components/responses/InternalServerError"
+          }
+        }
+      }
+    },
+    "/api/v1/admin/me": {
+      "get": {
+        "tags": [
+          "Admin"
+        ],
+        "summary": "Describe the authenticated SYSTEM caller",
+        "operationId": "adminGetMe",
+        "description": "Requires a SYSTEM principal. No permission is required: a caller may always describe itself. roles and permissions are the grants resolved for this request; the response exposes only the external uuid.",
+        "responses": {
+          "200": {
+            "description": "The caller's identity and resolved grants.",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/AdminMe"
+                }
+              }
+            }
+          },
+          "401": {
+            "$ref": "#/components/responses/Unauthorized"
+          },
+          "403": {
+            "$ref": "#/components/responses/Forbidden"
+          }
+        }
+      }
+    }
+  },
+  "components": {
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme": "bearer",
+        "bearerFormat": "JWT",
+        "description": "PERSON, ORG or SYSTEM access token."
+      },
+      "refreshCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "refresh_token",
+        "description": "httpOnly cookie scoped to path /api/v1/auth."
+      },
+      "systemRefreshCookie": {
+        "type": "apiKey",
+        "in": "cookie",
+        "name": "system_refresh_token",
+        "description": "httpOnly cookie scoped to path /api/v1/system/auth."
+      }
+    },
+    "parameters": {
+      "LangQuery": {
+        "name": "lang",
+        "in": "query",
+        "required": false,
+        "description": "Response language. Resolution order when omitted: Accept-Language, then the active default language (uz).",
+        "schema": {
+          "type": "string"
+        },
+        "example": "uz"
+      },
+      "PagesQuery": {
+        "name": "pages",
+        "in": "query",
+        "required": true,
+        "description": "Comma-separated page slugs, each matching ^[a-z0-9_]+(\\.[a-z0-9_]+)*$.",
+        "schema": {
+          "type": "string"
+        },
+        "example": "common,settings.profile"
+      },
+      "IncludeTranslationsQuery": {
+        "name": "include_translations",
+        "in": "query",
+        "required": false,
+        "description": "When true, include the full translations map.",
+        "schema": {
+          "type": "boolean",
+          "default": false
+        }
+      },
+      "PageUUIDQuery": {
+        "name": "page_uuid",
+        "in": "query",
+        "required": false,
+        "description": "Filter phrases by page UUID.",
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        }
+      },
+      "SearchQuery": {
+        "name": "search",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "string"
+        }
+      },
+      "LimitQuery": {
+        "name": "limit",
+        "in": "query",
+        "required": false,
+        "description": "Page size. Default 20, maximum 100 (employees: default 50, maximum 200).",
+        "schema": {
+          "type": "integer",
+          "minimum": 1,
+          "maximum": 200
+        }
+      },
+      "OffsetQuery": {
+        "name": "offset",
+        "in": "query",
+        "required": false,
+        "schema": {
+          "type": "integer",
+          "minimum": 0,
+          "default": 0
+        }
+      },
+      "StartQuery": {
+        "name": "start",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "example": "2026-09-01T00:00:00Z"
+      },
+      "EndQuery": {
+        "name": "end",
+        "in": "query",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "date-time"
+        },
+        "example": "2026-09-30T23:59:59Z"
+      },
+      "IfNoneMatchHeader": {
+        "name": "If-None-Match",
+        "in": "header",
+        "required": false,
+        "description": "ETag from a previous response; a match returns 304.",
+        "schema": {
+          "type": "string"
+        }
+      },
+      "AcceptLanguageHeader": {
+        "name": "Accept-Language",
+        "in": "header",
+        "required": false,
+        "description": "Used when ?lang= is absent to pick the response language; falls back to the active default language.",
+        "schema": {
+          "type": "string"
+        },
+        "example": "uz"
+      },
+      "CountryCodePath": {
+        "name": "code",
+        "in": "path",
+        "required": true,
+        "description": "Country code (immutable external key).",
+        "schema": {
+          "type": "string"
+        },
+        "example": "UZ"
+      },
+      "LanguageCodePath": {
+        "name": "language_code",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "uz"
+      },
+      "UUIDPath": {
+        "name": "uuid",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string",
+          "format": "uuid"
+        },
+        "example": "018f2b3c-4d5e-7f80-9abc-def012345678"
+      },
+      "SlugPath": {
+        "name": "slug",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "settings.profile"
+      },
+      "PhraseLangPath": {
+        "name": "lang",
+        "in": "path",
+        "required": true,
+        "schema": {
+          "type": "string"
+        },
+        "example": "uz"
+      }
+    },
+    "responses": {
+      "BadRequest": {
+        "description": "Invalid input.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Unauthorized": {
+        "description": "Missing or invalid credentials/token. Login-style endpoints intentionally return a single generic 401 for every failure reason (unknown account, wrong password, inactive account, non-matching user type).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Forbidden": {
+        "description": "Authenticated but not permitted (wrong principal type, or an unresolved user/tenant).",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "NotFound": {
+        "description": "Resource not found.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "Conflict": {
+        "description": "Unique constraint violation.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "RequestEntityTooLarge": {
+        "description": "Request body exceeded the 2 MiB limit.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "TooManyRequests": {
+        "description": "Rate limit exceeded.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "InternalServerError": {
+        "description": "Unexpected error.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      },
+      "NotImplemented": {
+        "description": "Not implemented.",
+        "content": {
+          "application/json": {
+            "schema": {
+              "$ref": "#/components/schemas/ErrorResponse"
+            }
+          }
+        }
+      }
+    },
+    "schemas": {
+      "ErrorResponse": {
+        "type": "object",
+        "description": "Standard error envelope.",
+        "properties": {
+          "message": {
+            "description": "Human-readable error message (or null for a successful delete)."
+          },
+          "fields": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Present only on validation failures (400)."
+          }
+        }
+      },
+      "MessageResponse": {
+        "type": "object",
+        "properties": {
+          "message": {
+            "type": "string"
+          }
+        }
+      },
+      "ChallengeResponse": {
+        "type": "object",
+        "properties": {
+          "challenge": {
+            "type": "string"
+          }
+        }
+      },
+      "TokenPair": {
+        "type": "object",
+        "properties": {
+          "access_token": {
+            "type": "string",
+            "description": "JWT access token. The refresh token is delivered only as an httpOnly cookie, never in the body."
+          }
+        }
+      },
+      "AuthResult": {
+        "type": "object",
+        "properties": {
+          "tokens": {
+            "$ref": "#/components/schemas/TokenPair"
+          },
+          "workspace_options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Org"
+            },
+            "description": "Present when the caller must still choose a workspace. Only active organizations are listed."
+          }
+        }
+      },
+      "WorkspaceList": {
+        "type": "object",
+        "properties": {
+          "workspace_options": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/Org"
+            },
+            "description": "Active organizations owned by the current person; identical to the workspace_options returned by login."
+          },
+          "current": {
+            "$ref": "#/components/schemas/CurrentWorkspace"
+          }
+        }
+      },
+      "CurrentWorkspace": {
+        "type": "object",
+        "properties": {
+          "workspace": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "org"
+            ],
+            "description": "The workspace the presented token is scoped to."
+          },
+          "org_id": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "External UUID of the active org when workspace is org, otherwise null."
+          }
+        }
+      },
+      "PublicLanguage": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "is_default": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Language": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "is_default": {
+            "type": "boolean"
+          },
+          "is_active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "PublicPage": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "Page": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "PhraseTranslation": {
+        "type": "object",
+        "properties": {
+          "language_code": {
+            "type": "string"
+          },
+          "translation": {
+            "type": "string"
+          }
+        }
+      },
+      "PublicPhrase": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "page_uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "word": {
+            "type": "string"
+          },
+          "translation": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "description": "Translation for the resolved language, if any."
+          },
+          "translations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "All translations, present only when include_translations=true."
+          }
+        }
+      },
+      "Phrase": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "page_uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "word": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "translation": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/PhraseTranslation"
+            }
+          }
+        }
+      },
+      "CountryTranslation": {
+        "type": "object",
+        "properties": {
+          "language_code": {
+            "type": "string"
+          },
+          "translation": {
+            "type": "string"
+          }
+        }
+      },
+      "Country": {
+        "type": "object",
+        "properties": {
+          "country_code": {
+            "type": "string"
+          },
+          "currency_code": {
+            "type": "string"
+          },
+          "currency_symbol": {
+            "type": "string"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "translations": {
+            "type": "array",
+            "items": {
+              "$ref": "#/components/schemas/CountryTranslation"
+            }
+          }
+        }
+      },
+      "PublicCountry": {
+        "type": "object",
+        "properties": {
+          "country_code": {
+            "type": "string"
+          },
+          "currency_code": {
+            "type": "string"
+          },
+          "currency_symbol": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          }
+        }
+      },
+      "AuditLog": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "occurred_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "actor_user_id": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "actor_user_uuid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "actor_type": {
+            "type": "string"
+          },
+          "org_id": {
+            "type": [
+              "integer",
+              "null"
+            ],
+            "format": "int64"
+          },
+          "org_uuid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid"
+          },
+          "target_type": {
+            "type": "string",
+            "description": "Subject kind (for example user or org); empty when the event has no single subject."
+          },
+          "target_uuid": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "uuid",
+            "description": "External UUID of the subject the event changed."
+          },
+          "action": {
+            "type": "string"
+          },
+          "details": {
+            "description": "Free-form JSON payload."
+          },
+          "ip": {
+            "type": "string"
+          },
+          "user_agent": {
+            "type": "string"
+          }
+        }
+      },
+      "Document": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "External UUID (Base.UUID serialized as id)."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "signature_type": {
+            "type": "string",
+            "enum": [
+              "ATTACHED",
+              "DETACHED"
+            ]
+          },
+          "mime_type": {
+            "type": "string"
+          },
+          "original_size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "signed_size": {
+            "type": "integer",
+            "format": "int64"
+          },
+          "status": {
+            "type": "string",
+            "enum": [
+              "SIGNED"
+            ]
+          }
+        }
+      },
+      "Org": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "External UUID (Base.UUID serialized as id)."
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "tin": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "is_active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "Employee": {
+        "type": "object",
+        "properties": {
+          "id": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "full_name": {
+            "type": "string"
+          },
+          "position": {
+            "type": "string"
+          }
+        }
+      },
+      "TranslationBundle": {
+        "type": "object",
+        "description": "One map of key/value pairs per requested page slug.",
+        "additionalProperties": {
+          "type": "object",
+          "additionalProperties": {
+            "type": "string"
+          }
+        }
+      },
+      "RegisterRequest": {
+        "type": "object",
+        "required": [
+          "challenge",
+          "pkcs7",
+          "email",
+          "password",
+          "phone_number"
+        ],
+        "properties": {
+          "challenge": {
+            "type": "string"
+          },
+          "pkcs7": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@example.com"
+          },
+          "password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 72
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+998901234567"
+          },
+          "language_code": {
+            "type": "string",
+            "description": "Optional; an empty/unknown/inactive code falls back to the default language."
+          }
+        }
+      },
+      "LoginRequest": {
+        "type": "object",
+        "required": [
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "user@example.com"
+          },
+          "phone_number": {
+            "type": "string",
+            "example": "+998901234567"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "LoginWithSignatureRequest": {
+        "type": "object",
+        "required": [
+          "pkcs7",
+          "challenge"
+        ],
+        "properties": {
+          "pkcs7": {
+            "type": "string"
+          },
+          "challenge": {
+            "type": "string"
+          }
+        }
+      },
+      "SelectWorkspaceRequest": {
+        "type": "object",
+        "required": [
+          "workspace"
+        ],
+        "properties": {
+          "workspace": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "org"
+            ]
+          },
+          "org_id": {
+            "type": "string",
+            "format": "uuid"
+          }
+        }
+      },
+      "SwitchWorkspaceRequest": {
+        "type": "object",
+        "required": [
+          "workspace"
+        ],
+        "properties": {
+          "workspace": {
+            "type": "string",
+            "enum": [
+              "personal",
+              "org"
+            ]
+          },
+          "org_id": {
+            "type": "string",
+            "format": "uuid",
+            "description": "Required when workspace=org, forbidden when workspace=personal."
+          }
+        }
+      },
+      "SystemLoginRequest": {
+        "type": "object",
+        "required": [
+          "email",
+          "password"
+        ],
+        "properties": {
+          "email": {
+            "type": "string",
+            "format": "email",
+            "example": "superadmin@example.com"
+          },
+          "password": {
+            "type": "string"
+          }
+        }
+      },
+      "SystemLogoutRequest": {
+        "type": "object",
+        "properties": {
+          "all_devices": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "CreateLanguageRequest": {
+        "type": "object",
+        "required": [
+          "name",
+          "code"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "example": "uz"
+          },
+          "name": {
+            "type": "string",
+            "example": "O'zbekcha"
+          },
+          "is_active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "UpdateLanguageRequest": {
+        "type": "object",
+        "required": [
+          "name"
+        ],
+        "properties": {
+          "name": {
+            "type": "string"
+          },
+          "is_active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreatePageRequest": {
+        "type": "object",
+        "required": [
+          "slug"
+        ],
+        "properties": {
+          "slug": {
+            "type": "string",
+            "example": "settings.profile"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "UpdatePageRequest": {
+        "type": "object",
+        "required": [
+          "slug"
+        ],
+        "properties": {
+          "slug": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "is_active": {
+            "type": "boolean"
+          }
+        }
+      },
+      "CreatePhraseRequest": {
+        "type": "object",
+        "required": [
+          "page_uuid",
+          "word",
+          "translations"
+        ],
+        "properties": {
+          "page_uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "word": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "translations": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "uz": "Saqlash",
+              "en": "Save"
+            }
+          }
+        }
+      },
+      "UpdatePhraseRequest": {
+        "type": "object",
+        "required": [
+          "page_uuid",
+          "word"
+        ],
+        "properties": {
+          "page_uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "word": {
+            "type": "string",
+            "maxLength": 255
+          },
+          "translations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "CreateCountryRequest": {
+        "type": "object",
+        "required": [
+          "country_code",
+          "currency_code",
+          "currency_symbol",
+          "translations"
+        ],
+        "properties": {
+          "country_code": {
+            "type": "string",
+            "maxLength": 10,
+            "example": "UZ"
+          },
+          "currency_code": {
+            "type": "string",
+            "maxLength": 10,
+            "example": "UZS"
+          },
+          "currency_symbol": {
+            "type": "string",
+            "maxLength": 10,
+            "example": "so'm"
+          },
+          "translations": {
+            "type": "object",
+            "minProperties": 1,
+            "additionalProperties": {
+              "type": "string"
+            },
+            "example": {
+              "uz": "O'zbekiston",
+              "en": "Uzbekistan"
+            }
+          }
+        }
+      },
+      "UpdateCountryRequest": {
+        "type": "object",
+        "required": [
+          "currency_code",
+          "currency_symbol"
+        ],
+        "properties": {
+          "currency_code": {
+            "type": "string",
+            "maxLength": 10
+          },
+          "currency_symbol": {
+            "type": "string",
+            "maxLength": 10
+          },
+          "translations": {
+            "type": "object",
+            "additionalProperties": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "UpsertTranslationRequest": {
+        "type": "object",
+        "required": [
+          "translation"
+        ],
+        "properties": {
+          "translation": {
+            "type": "string"
+          }
+        }
+      },
+      "SignDocumentRequest": {
+        "type": "object",
+        "required": [
+          "signature_type",
+          "pkcs7",
+          "mime_type"
+        ],
+        "properties": {
+          "signature_type": {
+            "type": "string",
+            "enum": [
+              "ATTACHED",
+              "DETACHED"
+            ]
+          },
+          "pkcs7": {
+            "type": "string"
+          },
+          "document": {
+            "type": "string",
+            "description": "Base64 document; required when signature_type=DETACHED."
+          },
+          "mime_type": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "application/pdf"
+          },
+          "attach_timestamp": {
+            "type": "boolean",
+            "default": false
+          }
+        }
+      },
+      "EmployeeRequest": {
+        "type": "object",
+        "required": [
+          "full_name"
+        ],
+        "properties": {
+          "full_name": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "Jane Doe"
+          },
+          "position": {
+            "type": "string",
+            "maxLength": 255,
+            "example": "Engineer"
+          }
+        }
+      },
+      "UserMe": {
+        "type": "object",
+        "description": "The caller's own user row, narrowed to non-sensitive fields (no internal id, password hash or flags).",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user_type": {
+            "type": "string",
+            "enum": [
+              "PERSON",
+              "ORG",
+              "SYSTEM"
+            ]
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phone_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "language_code": {
+            "type": "string",
+            "example": "uz"
+          },
+          "email_verified_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time",
+            "description": "When the email address was confirmed through the change flow; null for accounts that never completed it (including every pre-existing account)."
+          }
+        }
+      },
+      "ChangePasswordRequest": {
+        "type": "object",
+        "required": [
+          "current_password",
+          "new_password"
+        ],
+        "properties": {
+          "current_password": {
+            "type": "string",
+            "description": "Verified against the stored bcrypt hash."
+          },
+          "new_password": {
+            "type": "string",
+            "minLength": 8,
+            "maxLength": 72,
+            "description": "Must differ from the current password and satisfy the 8-72 byte rule."
+          }
+        }
+      },
+      "ChangeEmailRequest": {
+        "type": "object",
+        "required": [
+          "new_email",
+          "current_password"
+        ],
+        "properties": {
+          "new_email": {
+            "type": "string",
+            "format": "email",
+            "description": "Trimmed before validation. Must differ from the current address and must not be used by another account."
+          },
+          "current_password": {
+            "type": "string",
+            "description": "Verified against the stored bcrypt hash."
+          }
+        }
+      },
+      "ConfirmEmailChangeRequest": {
+        "type": "object",
+        "required": [
+          "code"
+        ],
+        "properties": {
+          "code": {
+            "type": "string",
+            "pattern": "^[0-9]{6}$",
+            "example": "042913",
+            "description": "The 6-digit code sent to the new address."
+          }
+        }
+      },
+      "EmailChangeResponse": {
+        "type": "object",
+        "properties": {
+          "expires_in": {
+            "type": "integer",
+            "description": "Seconds the verification code stays valid."
+          },
+          "resend_after": {
+            "type": "integer",
+            "description": "Seconds until the change request may be repeated."
+          }
+        }
+      },
+      "UpdateUserLanguageRequest": {
+        "type": "object",
+        "required": [
+          "language_code"
+        ],
+        "properties": {
+          "language_code": {
+            "type": "string",
+            "minLength": 1,
+            "maxLength": 3,
+            "example": "ru",
+            "description": "Must match an active language code."
+          }
+        }
+      },
+      "AdminUser": {
+        "type": "object",
+        "description": "A PERSON/ORG account on the admin surface. External UUID only; never the internal bigint id.",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "user_type": {
+            "type": "string",
+            "enum": [
+              "PERSON",
+              "ORG"
+            ]
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "phone_number": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "language_code": {
+            "type": "string"
+          },
+          "email_verified_at": {
+            "type": [
+              "string",
+              "null"
+            ],
+            "format": "date-time"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AdminSystemUser": {
+        "allOf": [
+          {
+            "$ref": "#/components/schemas/AdminUser"
+          },
+          {
+            "type": "object",
+            "required": [
+              "roles"
+            ],
+            "properties": {
+              "roles": {
+                "type": "array",
+                "items": {
+                  "type": "string"
+                }
+              }
+            }
+          }
+        ]
+      },
+      "AdminOrg": {
+        "type": "object",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "tin": {
+            "type": "string"
+          },
+          "name": {
+            "type": "string"
+          },
+          "is_active": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "type": "string",
+            "format": "date-time"
+          },
+          "updated_at": {
+            "type": "string",
+            "format": "date-time"
+          }
+        }
+      },
+      "AdminRole": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      },
+      "AdminPermission": {
+        "type": "object",
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "description": {
+            "type": "string"
+          }
+        }
+      },
+      "SetRolesRequest": {
+        "type": "object",
+        "required": [
+          "roles"
+        ],
+        "properties": {
+          "roles": {
+            "type": "array",
+            "maxItems": 10,
+            "items": {
+              "type": "string"
+            },
+            "description": "The complete replacement role set."
+          }
+        }
+      },
+      "AdminMe": {
+        "type": "object",
+        "description": "The authenticated SYSTEM caller: external UUID plus the roles and permission codes resolved for this request.",
+        "properties": {
+          "uuid": {
+            "type": "string",
+            "format": "uuid"
+          },
+          "email": {
+            "type": [
+              "string",
+              "null"
+            ]
+          },
+          "roles": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          },
+          "permissions": {
+            "type": "array",
+            "items": {
+              "type": "string"
+            }
+          }
+        }
+      }
+    }
+  }
+}

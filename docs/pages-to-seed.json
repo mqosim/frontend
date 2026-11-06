@@ -1,0 +1,23 @@
+[
+  {
+    "slug": "common",
+    "description": "Shared phrases used across the whole application",
+    "is_active": true
+  },
+  { "slug": "auth.login", "description": "Login page", "is_active": true },
+  { "slug": "auth.register", "description": "Registration page", "is_active": true },
+  { "slug": "auth.workspace", "description": "Workspace selection page", "is_active": true },
+  { "slug": "system.login", "description": "SYSTEM sign-in page", "is_active": true },
+  { "slug": "system.admin", "description": "SYSTEM admin page", "is_active": true },
+  { "slug": "home", "description": "Public landing page", "is_active": true },
+  { "slug": "dashboard", "description": "Person home / SYSTEM dashboard", "is_active": true },
+  { "slug": "org", "description": "Organization application shell", "is_active": true },
+  { "slug": "errors", "description": "Error and validation messages", "is_active": true },
+  { "slug": "settings", "description": "User settings page", "is_active": true },
+  { "slug": "settings.profile", "description": "User profile settings page", "is_active": true },
+  {
+    "slug": "notifications",
+    "description": "Outbound message templates (email etc.)",
+    "is_active": true
+  }
+]

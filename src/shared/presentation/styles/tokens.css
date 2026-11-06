@@ -1,0 +1,170 @@
+/*
+ * Design tokens. This is the single place colours, spacing, radii and
+ * typography live; components only ever reference the variables. A Figma
+ * design can later be mapped onto these names without touching components.
+ *
+ * Themes: light values live on `:root`; dark values override them under
+ * `[data-theme="dark"]`, which a small pre-paint script sets on <html> from the
+ * stored preference (falling back to `prefers-color-scheme`). `color-scheme`
+ * follows the active theme so native controls match it.
+ */
+
+/* Brand wordmark typeface (self-hosted, latin subset; see public/fonts/OFL.txt).
+   Only the wordmark uses Sora — body copy keeps --font-sans. */
+@font-face {
+  font-family: 'Sora';
+  font-style: normal;
+  font-weight: 800;
+  font-display: swap;
+  src: url('/fonts/sora-latin-800.woff2') format('woff2');
+  unicode-range:
+    U+0000-00FF, U+0131, U+0152-0153, U+02BB-02BC, U+02C6, U+02DA, U+02DC, U+0304, U+0308, U+0329,
+    U+2000-206F, U+20AC, U+2122, U+2191, U+2193, U+2212, U+2215, U+FEFF, U+FFFD;
+}
+
+:root {
+  color-scheme: light;
+
+  --color-bg: #f5f6f8;
+  --color-surface: #ffffff;
+  --color-border: #d6dae0;
+  --color-text: #1b1f24;
+  --color-text-muted: #5b6470;
+  --color-primary: #2f6fed;
+  --color-primary-hover: #2559c4;
+  --color-on-primary: #ffffff;
+  /* Brand wordmark accent (the "M" in MFIN): constant in both themes, so the
+     dark theme does not override it. */
+  --color-brand-accent: #10b981;
+  /* Brand wordmark text ("FIN"): dark navy in light mode, white in dark. */
+  --color-brand-foreground: #0b1f33;
+  --color-danger: #b3261e;
+  --color-danger-surface: #fdecea;
+  --color-success: #1a7f37;
+  --color-success-surface: #e8f5ec;
+  --color-warning: #7a5200;
+  --color-warning-surface: #fff5e0;
+  --color-info: #1b4b8f;
+  --color-info-surface: #eaf1fd;
+  --color-focus-ring: #2f6fed;
+
+  --space-1: 0.25rem;
+  --space-2: 0.5rem;
+  --space-3: 0.75rem;
+  --space-4: 1rem;
+  --space-5: 1.5rem;
+  --space-6: 2rem;
+  --space-7: 3rem;
+
+  --radius-sm: 6px;
+  --radius-md: 10px;
+  --radius-lg: 16px;
+  /* Inline icon set (module menu icons and the shell's own icon buttons). Tune
+     here to resize the whole set at once. 20px matches the reference UI's
+     outline icons inside the ~44px menu rows. */
+  --icon-size: 1.25rem;
+  /* Smaller size for the shell's secondary action icons (collapse/expand
+     toggle, footer rows, notice dismiss), which read heavy at the module-icon
+     size. */
+  --icon-size-action: 1.125rem;
+  /* Language-switcher flags: a 20x20 circle (50% radius). */
+  --radius-flag: 50%;
+
+  --font-sans: system-ui, -apple-system, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+  /* Brand wordmark typeface: Sora ExtraBold, falling back to the system stack
+     while the font loads (or if it fails). */
+  --font-brand: 'Sora', var(--font-sans);
+  /* Brand wordmark size: ~33% above --font-size-xl (the original wordmark
+     size). Fluid below ~640px viewports so the mark never clips against
+     fixed-width header controls on phones. */
+  --font-size-brand: clamp(1.6rem, 5vw, 2rem);
+  --font-size-sm: 0.875rem;
+  --font-size-md: 1rem;
+  --font-size-lg: 1.25rem;
+  --font-size-xl: 1.5rem;
+
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 6%), 0 12px 32px rgb(0 0 0 / 8%);
+  --content-max-width: 30rem;
+  --content-max-width-wide: 48rem;
+  --content-max-width-dashboard: 72rem;
+  --content-max-width-settings: 60rem;
+  /* Brand slot width floor: keeps the text wordmark's surrounding layout
+     stable and leaves room for a future brand asset without reflowing the
+     header. */
+  --brand-min-width: 7.5rem;
+
+  /*
+   * Global top-right controls (language + theme) are fixed at the app root,
+   * outside every layout. Layouts use these to reserve room so their own
+   * header actions and the centered auth card never sit under the controls.
+   * `--global-controls-width` is a generous upper bound on the controls' width.
+   * `--z-controls` sits above page content and below modals/toasts.
+   */
+  /* 2.75rem = 44px: the fixed controls (theme toggle, language trigger) must meet
+     the minimum touch target, and layouts size their action rows to this token so
+     header actions and the fixed controls keep one vertical center line. */
+  --global-controls-height: 2.75rem;
+  /*
+   * Vertical offset of the fixed top-right controls. Layout headers reuse it as
+   * their top padding (and size their own actions to `--global-controls-height`),
+   * so header actions and the fixed controls share one vertical center line.
+   */
+  --global-controls-top: calc(var(--space-4) + env(safe-area-inset-top, 0px));
+  /* Generous upper bound on the controls' width; must stay at or above their real
+     width now that the taller 44px toggle widens the pair. */
+  --global-controls-width: 9rem;
+  /* Reserved width for the language switcher alone. */
+  --global-controls-width-language: 5rem;
+  /* Reserved width for a single compact control (the standalone theme toggle). */
+  --global-controls-width-compact: 4rem;
+  /* What layouts actually reserve. Defaults to the full width and is narrowed by
+     the layouts that hide the switcher, so the offset can never drift. */
+  --global-controls-reserved: var(--global-controls-width);
+  --z-controls: 40;
+  --z-menu: 50;
+  --z-modal: 100;
+  /* Native modal dialogs render in the top layer (above all z-index); this value
+     is a defensive fallback for the confirmation dialog. */
+  --z-dialog: 110;
+
+  /*
+   * ORG module shell. `--z-drawer` sits below the fixed global controls so the
+   * language/theme controls stay reachable while the mobile drawer is open.
+   */
+  --menu-width: 15rem;
+  --menu-width-collapsed: 4rem;
+  /* Module row height: aligned with the reference's compact rows while keeping
+     the >=44px touch target on mobile. */
+  --menu-item-height: 2.75rem;
+  /* Mobile drawer toggle: larger than the fixed controls so the bigger icon is
+     not cramped; keeps a >=44px touch target. */
+  --menu-button-size: 2.75rem;
+  --subpanel-width: 16rem;
+  --z-drawer: 30;
+  --color-scrim: rgb(0 0 0 / 40%);
+}
+
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-bg: #12151a;
+  --color-surface: #1c2026;
+  --color-border: #333a44;
+  --color-text: #e7eaee;
+  --color-text-muted: #9aa4b1;
+  --color-primary: #7aa6ff;
+  --color-primary-hover: #9cbcff;
+  --color-on-primary: #0d1117;
+  --color-brand-foreground: #ffffff;
+  --color-danger: #ff9a90;
+  --color-danger-surface: #3a2220;
+  --color-warning: #f4ce7a;
+  --color-warning-surface: #3a3320;
+  --color-info: #9cc4ff;
+  --color-info-surface: #1e2a3d;
+  --color-focus-ring: #7aa6ff;
+  --shadow-card: 0 1px 2px rgb(0 0 0 / 40%);
+  --color-success: #7dd49a;
+  --color-success-surface: #1f3028;
+  --color-scrim: rgb(0 0 0 / 60%);
+}

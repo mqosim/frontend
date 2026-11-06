@@ -1,0 +1,87 @@
+name: Deploy production (frontend)
+
+on:
+  push:
+    branches: [prod]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: production-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy:
+    # Only the trusted prod branch may ever reach production: pushes from
+    # other branches never trigger this workflow, and a workflow_dispatch
+    # started from any other ref is skipped here.
+    if: github.ref == 'refs/heads/prod'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    environment:
+      name: production
+    steps:
+      - name: Prepare SSH key and pinned host key
+        env:
+          VPS_SSH_PRIVATE_KEY: ${{ secrets.VPS_SSH_PRIVATE_KEY }}
+          VPS_SSH_KNOWN_HOSTS: ${{ secrets.VPS_SSH_KNOWN_HOSTS }}
+        run: |
+          umask 077
+          mkdir -p ~/.ssh
+
+          # Fail early with a clear message if a secret came through empty
+          # (wrong secret name or wrong environment).
+          if [ -z "$VPS_SSH_PRIVATE_KEY" ]; then
+            echo "::error::VPS_SSH_PRIVATE_KEY secret is empty or not defined"
+            exit 1
+          fi
+          if [ -z "$VPS_SSH_KNOWN_HOSTS" ]; then
+            echo "::error::VPS_SSH_KNOWN_HOSTS secret is empty or not defined"
+            exit 1
+          fi
+
+          # Guarantee a trailing newline and strip any CRLF line endings.
+          # Contents are never echoed to the log; the runner is ephemeral.
+          printf '%s\n' "$VPS_SSH_PRIVATE_KEY" | tr -d '\r' > ~/.ssh/deploy_key
+          printf '%s\n' "$VPS_SSH_KNOWN_HOSTS" | tr -d '\r' > ~/.ssh/known_hosts
+          chmod 600 ~/.ssh/deploy_key ~/.ssh/known_hosts
+
+          # Is the key valid and passphrase-free? If not, fail here with a clear error.
+          if ! ssh-keygen -y -f ~/.ssh/deploy_key > /dev/null; then
+            echo "::error::deploy_key is invalid (malformed or passphrase-protected)"
+            exit 1
+          fi
+
+      - name: Preflight (read-only VPS check)
+        env:
+          VPS_HOST: ${{ vars.VPS_HOST }}
+          VPS_USER: ${{ vars.VPS_USER }}
+          VPS_PORT: ${{ vars.VPS_PORT }}
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o IdentitiesOnly=yes \
+              -o StrictHostKeyChecking=yes \
+              -o BatchMode=yes \
+              -o ConnectTimeout=15 \
+              -p "${VPS_PORT:-22}" \
+              "${VPS_USER}@${VPS_HOST}" check
+
+      - name: Deploy (backend at prod tip, frontend at pushed SHA)
+        env:
+          VPS_HOST: ${{ vars.VPS_HOST }}
+          VPS_USER: ${{ vars.VPS_USER }}
+          VPS_PORT: ${{ vars.VPS_PORT }}
+        run: |
+          ssh -i ~/.ssh/deploy_key \
+              -o IdentitiesOnly=yes \
+              -o StrictHostKeyChecking=yes \
+              -o BatchMode=yes \
+              -o ConnectTimeout=15 \
+              -p "${VPS_PORT:-22}" \
+              "${VPS_USER}@${VPS_HOST}" "deploy prod $GITHUB_SHA"
+
+      - name: Cleanup SSH material
+        if: always()
+        run: rm -f ~/.ssh/deploy_key ~/.ssh/known_hosts

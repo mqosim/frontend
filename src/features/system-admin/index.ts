@@ -1,0 +1,17 @@
+// Public surface of the system-admin feature. Other features and the
+// composition root must import from here, never from a feature's internal layers.
+export { systemAdminRoutes } from './presentation/routes'
+export { default as SystemShell } from './presentation/components/SystemShell.vue'
+export { useSystemLogout } from './presentation/composables/useSystemLogout'
+export { usePermissions } from './presentation/composables/usePermissions'
+export type { Permissions } from './presentation/composables/usePermissions'
+export { useAdminPermissionsStore } from './presentation/stores/adminPermissionsStore'
+export { AuditLogRepositoryKey, AdminUseCasesKey } from './presentation/di'
+export { createAuditLogRepository } from './infrastructure/auditLogRepository'
+export { createAdminRepository } from './infrastructure/adminRepository'
+export { createAdminUseCases } from './application/useCases'
+export { ADMIN_PERMISSIONS } from './domain/permissions'
+export type { AdminPermissionCode } from './domain/permissions'
+export type { AdminIdentity } from './domain/adminAccount'
+export type { AuditLogEntry, AuditLogRange, AuditLogRepository } from './domain/auditLog'
+export type { AdminUseCases } from './application/useCases'

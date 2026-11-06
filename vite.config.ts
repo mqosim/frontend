@@ -1,0 +1,33 @@
+import { fileURLToPath, URL } from 'node:url'
+
+import { defineConfig } from 'vite'
+import vue from '@vitejs/plugin-vue'
+
+export default defineConfig({
+  plugins: [vue()],
+  resolve: {
+    alias: {
+      '@': fileURLToPath(new URL('./src', import.meta.url)),
+    },
+  },
+  server: {
+    port: 5173,
+    proxy: {
+      // The backend sets its refresh cookies as `Secure; SameSite=Strict` on the
+      // paths /api/v1/auth and /api/v1/system/auth. Serving the SPA and the API
+      // from one origin via this proxy keeps those cookies first-party.
+      //
+      // No rewrite: the spec paths already include `/api/v1`, and the proxy must
+      // not add or strip a prefix (a rewrite would hide a doubled-path bug).
+      //
+      // Always browse http://localhost:5173 (NOT http://127.0.0.1:5173):
+      // `localhost` is a secure context in every browser, so `Secure` cookies are
+      // stored over plain HTTP; `127.0.0.1` is not a secure context in Safari and
+      // the cookies are dropped there.
+      '/api': {
+        target: 'http://127.0.0.1:8080',
+        changeOrigin: false,
+      },
+    },
+  },
+})

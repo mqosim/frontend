@@ -1,0 +1,2772 @@
+{
+  "common": {
+    "common.loading": {
+      "uz": "Yuklanmoqda…",
+      "uzc": "Юкланмоқда…",
+      "ru": "Загрузка…",
+      "en": "Loading…"
+    },
+    "common.language": {
+      "uz": "Til",
+      "uzc": "Тил",
+      "ru": "Язык",
+      "en": "Language"
+    },
+    "common.restoring": {
+      "uz": "Sessiya tiklanmoqda…",
+      "uzc": "Сессия тикланмоқда…",
+      "ru": "Восстановление сессии…",
+      "en": "Restoring your session…"
+    },
+    "a11y.skip_to_content": {
+      "uz": "Asosiy kontentga o'tish",
+      "uzc": "Асосий контентга ўтиш",
+      "ru": "Перейти к основному содержимому",
+      "en": "Skip to main content"
+    },
+    "session.expired": {
+      "uz": "Sessiya muddati tugadi. Iltimos, qaytadan kiring.",
+      "uzc": "Сессия муддати тугади. Илтимос, қайтадан киринг.",
+      "ru": "Срок сессии истёк. Пожалуйста, войдите снова.",
+      "en": "Your session has expired. Please sign in again."
+    },
+    "session.idle_title": {
+      "uz": "Sessiya tugamoqda",
+      "uzc": "Сессия тугамоқда",
+      "ru": "Сессия истекает",
+      "en": "Session expiring"
+    },
+    "session.idle_message": {
+      "uz": "Sessiyangiz {seconds} soniyadan so'ng yakunlanadi.",
+      "uzc": "Сессиянгиз {seconds} сониядан сўнг якунланади.",
+      "ru": "Ваша сессия завершится через {seconds} сек.",
+      "en": "Your session will end in {seconds} seconds."
+    },
+    "session.idle_stay": {
+      "uz": "Tizimda qolish",
+      "uzc": "Тизимда қолиш",
+      "ru": "Остаться в системе",
+      "en": "Stay signed in"
+    },
+    "session.idle_logout": {
+      "uz": "Hozir chiqish",
+      "uzc": "Ҳозир чиқиш",
+      "ru": "Выйти сейчас",
+      "en": "Log out now"
+    },
+    "session.idle_logged_out": {
+      "uz": "Harakatsizlik sababli tizimdan chiqarildingiz.",
+      "uzc": "Ҳаракатсизлик сабабли тизимдан чиқарилдингиз.",
+      "ru": "Вы вышли из системы из-за неактивности.",
+      "en": "You were signed out due to inactivity."
+    },
+    "action.logout": {
+      "uz": "Chiqish",
+      "uzc": "Чиқиш",
+      "ru": "Выйти",
+      "en": "Log out"
+    },
+    "user.menu": {
+      "uz": "Foydalanuvchi menyusi",
+      "uzc": "Фойдаланувчи менюси",
+      "ru": "Меню пользователя",
+      "en": "User menu"
+    },
+    "wallet.balance": {
+      "uz": "Hamyon",
+      "uzc": "Ҳамён",
+      "ru": "Кошелёк",
+      "en": "Wallet"
+    },
+    "wallet.balance_unavailable": {
+      "uz": "Hamyon mavjud emas",
+      "uzc": "Ҳамён мавжуд эмас",
+      "ru": "Кошелёк недоступен",
+      "en": "Wallet unavailable"
+    },
+    "action.logout_title": {
+      "uz": "Chiqish",
+      "uzc": "Чиқиш",
+      "ru": "Выйти",
+      "en": "Log out"
+    },
+    "action.logout_message": {
+      "uz": "Tizimdan chiqmoqchimisiz?",
+      "uzc": "Тизимдан чиқмоқчимисиз?",
+      "ru": "Вы хотите выйти из системы?",
+      "en": "Do you want to log out?"
+    },
+    "action.cancel": {
+      "uz": "Bekor qilish",
+      "uzc": "Бекор қилиш",
+      "ru": "Отмена",
+      "en": "Cancel"
+    },
+    "action.save": {
+      "uz": "Saqlash",
+      "uzc": "Сақлаш",
+      "ru": "Сохранить",
+      "en": "Save"
+    },
+    "action.settings": {
+      "uz": "Sozlamalar",
+      "uzc": "Созламалар",
+      "ru": "Настройки",
+      "en": "Settings"
+    },
+    "action.switch_workspace": {
+      "uz": "Ish maydonini almashtirish",
+      "uzc": "Иш майдонини алмаштириш",
+      "ru": "Сменить пространство",
+      "en": "Switch workspace"
+    },
+    "action.dismiss": {
+      "uz": "Yopish",
+      "uzc": "Ёпиш",
+      "ru": "Закрыть",
+      "en": "Dismiss"
+    },
+    "workspace.personal": {
+      "uz": "Shaxsiy",
+      "uzc": "Шахсий",
+      "ru": "Личное",
+      "en": "Personal"
+    },
+    "workspace.unknown": {
+      "uz": "Tashkilot",
+      "uzc": "Ташкилот",
+      "ru": "Организация",
+      "en": "Organization"
+    },
+    "workspace.switch_hint": {
+      "uz": "Ishlashni istagan ish maydoningizni tanlang.",
+      "uzc": "Ишлашни истаган иш майдонингизни танланг.",
+      "ru": "Выберите рабочее пространство, в котором хотите работать.",
+      "en": "Choose the workspace you want to work in."
+    },
+    "workspace.switch_confirm": {
+      "uz": "Almashtirish",
+      "uzc": "Алмаштириш",
+      "ru": "Сменить",
+      "en": "Switch"
+    },
+    "workspace.switch_empty": {
+      "uz": "Mavjud tashkilotlar yo'q.",
+      "uzc": "Мавжуд ташкилотлар йўқ.",
+      "ru": "Доступных организаций нет.",
+      "en": "No organizations are available."
+    },
+    "workspace.switch_retry": {
+      "uz": "Qayta urinish",
+      "uzc": "Қайта уриниш",
+      "ru": "Повторить",
+      "en": "Retry"
+    },
+    "system.badge": {
+      "uz": "Tizim",
+      "uzc": "Тизим",
+      "ru": "Система",
+      "en": "System"
+    },
+    "theme.switch_to_dark": {
+      "uz": "Tungi rejimga o'tish",
+      "uzc": "Тунги режимга ўтиш",
+      "ru": "Переключить на тёмную тему",
+      "en": "Switch to dark theme"
+    },
+    "theme.switch_to_light": {
+      "uz": "Kunduzgi rejimga o'tish",
+      "uzc": "Кундузги режимга ўтиш",
+      "ru": "Переключить на светлую тему",
+      "en": "Switch to light theme"
+    }
+  },
+  "auth.login": {
+    "auth.login_subtitle": {
+      "uz": "Davom etish uchun tizimga kiring",
+      "uzc": "Давом этиш учун тизимга киринг",
+      "ru": "Войдите, чтобы продолжить",
+      "en": "Sign in to continue"
+    },
+    "auth.no_account": {
+      "uz": "Hisobingiz yo'qmi?",
+      "uzc": "Ҳисобингиз йўқми?",
+      "ru": "Нет аккаунта?",
+      "en": "Don't have an account?"
+    },
+    "auth.phone": {
+      "uz": "Telefon raqami",
+      "uzc": "Телефон рақами",
+      "ru": "Номер телефона",
+      "en": "Phone number"
+    },
+    "auth.identifier": {
+      "uz": "Elektron pochta yoki telefon raqami",
+      "uzc": "Электрон почта ёки телефон рақами",
+      "ru": "Электронная почта или номер телефона",
+      "en": "Email or phone number"
+    },
+    "auth.email": {
+      "uz": "Elektron pochta",
+      "uzc": "Электрон почта",
+      "ru": "Электронная почта",
+      "en": "Email"
+    },
+    "auth.sign_in": {
+      "uz": "Kirish",
+      "uzc": "Кириш",
+      "ru": "Войти",
+      "en": "Sign in"
+    },
+    "auth.password": {
+      "uz": "Parol",
+      "uzc": "Парол",
+      "ru": "Пароль",
+      "en": "Password"
+    },
+    "auth.method_label": {
+      "uz": "Kirish usuli",
+      "uzc": "Кириш усули",
+      "ru": "Способ входа",
+      "en": "Sign-in method"
+    },
+    "auth.method_eimzo": {
+      "uz": "E-IMZO kaliti",
+      "uzc": "E-IMZO калити",
+      "ru": "Ключ E-IMZO",
+      "en": "E-IMZO key"
+    },
+    "auth.method_password": {
+      "uz": "Parol",
+      "uzc": "Парол",
+      "ru": "Пароль",
+      "en": "Password"
+    },
+    "auth.method_usb": {
+      "uz": "USB token",
+      "uzc": "USB токен",
+      "ru": "USB-токен",
+      "en": "USB token"
+    },
+    "auth.eimzo_select": {
+      "uz": "Kalitni tanlang",
+      "uzc": "Калитни танланг",
+      "ru": "Выберите ключ",
+      "en": "Select a key"
+    },
+    "auth.eimzo_loading": {
+      "uz": "E-IMZO kalitlari qidirilmoqda…",
+      "uzc": "E-IMZO калитлари қидирилмоқда…",
+      "ru": "Поиск ключей E-IMZO…",
+      "en": "Looking for E-IMZO keys…"
+    },
+    "auth.eimzo_empty": {
+      "uz": "Bu kompyuterda E-IMZO kalitlari topilmadi.",
+      "uzc": "Бу компьютерда E-IMZO калитлари топилмади.",
+      "ru": "На этом компьютере ключи E-IMZO не найдены.",
+      "en": "No E-IMZO keys were found on this computer."
+    },
+    "auth.eimzo_refresh": {
+      "uz": "Ro'yxatni yangilash",
+      "uzc": "Рўйхатни янгилаш",
+      "ru": "Обновить список",
+      "en": "Refresh list"
+    },
+    "auth.eimzo_key_serial": {
+      "uz": "Seriya",
+      "uzc": "Серия",
+      "ru": "Серия",
+      "en": "Serial"
+    },
+    "auth.eimzo_key_valid_until": {
+      "uz": "Amal qilish muddati",
+      "uzc": "Амал қилиш муддати",
+      "ru": "Действует до",
+      "en": "Valid until"
+    },
+    "auth.usb_title": {
+      "uz": "USB token",
+      "uzc": "USB токен",
+      "ru": "USB-токен",
+      "en": "USB token"
+    },
+    "auth.usb_text": {
+      "uz": "USB token orqali kirish hozircha mavjud emas.",
+      "uzc": "USB токен орқали кириш ҳозирча мавжуд эмас.",
+      "ru": "Вход по USB-токену пока недоступен.",
+      "en": "USB token sign-in is not available yet."
+    }
+  },
+  "auth.register": {
+    "auth.register_title": {
+      "uz": "Hisob yaratish",
+      "uzc": "Ҳисоб яратиш",
+      "ru": "Создание аккаунта",
+      "en": "Create your account"
+    },
+    "auth.register_method_label": {
+      "uz": "Ro'yxatdan o'tish usuli",
+      "uzc": "Рўйхатдан ўтиш усули",
+      "ru": "Способ регистрации",
+      "en": "Registration method"
+    },
+    "auth.register_submit": {
+      "uz": "Hisob yaratish",
+      "uzc": "Ҳисоб яратиш",
+      "ru": "Создать аккаунт",
+      "en": "Create account"
+    },
+    "auth.have_account": {
+      "uz": "Hisobingiz bormi?",
+      "uzc": "Ҳисобингиз борми?",
+      "ru": "Уже есть аккаунт?",
+      "en": "Already have an account?"
+    },
+    "auth.password_hint": {
+      "uz": "8 tadan 72 tagacha belgi",
+      "uzc": "8 тадан 72 тагача белги",
+      "ru": "От 8 до 72 символов",
+      "en": "8 to 72 characters"
+    }
+  },
+  "auth.workspace": {
+    "auth.workspace_title": {
+      "uz": "Ish maydonini tanlang",
+      "uzc": "Иш майдонини танланг",
+      "ru": "Выберите рабочее пространство",
+      "en": "Choose a workspace"
+    },
+    "auth.workspace_subtitle": {
+      "uz": "Qanday davom etishni tanlang.",
+      "uzc": "Қандай давом этишни танланг.",
+      "ru": "Выберите, как продолжить.",
+      "en": "Select how you want to continue."
+    },
+    "auth.workspace_personal": {
+      "uz": "Shaxsiy",
+      "uzc": "Шахсий",
+      "ru": "Личное",
+      "en": "Personal"
+    },
+    "auth.workspace_none": {
+      "uz": "Mavjud tashkilotlar yo'q.",
+      "uzc": "Мавжуд ташкилотлар йўқ.",
+      "ru": "Нет доступных организаций.",
+      "en": "No organizations are available."
+    },
+    "auth.workspace_submit": {
+      "uz": "Davom etish",
+      "uzc": "Давом этиш",
+      "ru": "Продолжить",
+      "en": "Continue"
+    },
+    "auth.back_to_login": {
+      "uz": "Tizimga qaytish",
+      "uzc": "Тизимга қайтиш",
+      "ru": "Вернуться ко входу",
+      "en": "Back to sign in"
+    }
+  },
+  "system.login": {
+    "system.login_title": {
+      "uz": "Tizimga kirish",
+      "uzc": "Тизимга кириш",
+      "ru": "Вход в систему",
+      "en": "System sign in"
+    },
+    "system.login_subtitle": {
+      "uz": "Cheklangan kirish.",
+      "uzc": "Чекланган кириш.",
+      "ru": "Ограниченный доступ.",
+      "en": "Restricted access."
+    },
+    "system.email": {
+      "uz": "Elektron pochta",
+      "uzc": "Электрон почта",
+      "ru": "Электронная почта",
+      "en": "Email"
+    },
+    "system.password": {
+      "uz": "Parol",
+      "uzc": "Парол",
+      "ru": "Пароль",
+      "en": "Password"
+    },
+    "system.login_submit": {
+      "uz": "Kirish",
+      "uzc": "Кириш",
+      "ru": "Войти",
+      "en": "Sign in"
+    },
+    "system.back_to_app": {
+      "uz": "Ilovaga qaytish",
+      "uzc": "Иловага қайтиш",
+      "ru": "Вернуться в приложение",
+      "en": "Back to the app"
+    }
+  },
+  "system.admin": {
+    "system.menu_label": {
+      "uz": "Boshqaruv",
+      "uzc": "Бошқарув",
+      "ru": "Администрирование",
+      "en": "Administration"
+    },
+    "system.open_menu": {
+      "uz": "Menyuni ochish",
+      "uzc": "Менюни очиш",
+      "ru": "Открыть меню",
+      "en": "Open menu"
+    },
+    "system.close_menu": {
+      "uz": "Menyuni yopish",
+      "uzc": "Менюни ёпиш",
+      "ru": "Закрыть меню",
+      "en": "Close menu"
+    },
+    "system.collapse_menu": {
+      "uz": "Menyuni yig'ish",
+      "uzc": "Менюни йиғиш",
+      "ru": "Свернуть меню",
+      "en": "Collapse menu"
+    },
+    "system.expand_menu": {
+      "uz": "Menyuni yoyish",
+      "uzc": "Менюни ёйиш",
+      "ru": "Развернуть меню",
+      "en": "Expand menu"
+    },
+    "system.principal": {
+      "uz": "Hisob turi",
+      "uzc": "Ҳисоб тури",
+      "ru": "Тип аккаунта",
+      "en": "Account type"
+    },
+    "system.nav_dashboard": {
+      "uz": "Boshqaruv paneli",
+      "uzc": "Бошқарув панели",
+      "ru": "Панель управления",
+      "en": "Dashboard"
+    },
+    "system.nav_organizations": {
+      "uz": "Tashkilotlar",
+      "uzc": "Ташкилотлар",
+      "ru": "Организации",
+      "en": "Organizations"
+    },
+    "system.nav_users": {
+      "uz": "Foydalanuvchilar",
+      "uzc": "Фойдаланувчилар",
+      "ru": "Пользователи",
+      "en": "Users"
+    },
+    "system.nav_subscriptions": {
+      "uz": "Obunalar va to'lovlar",
+      "uzc": "Обунаҳ ва тўловлар",
+      "ru": "Подписки и биллинг",
+      "en": "Subscriptions & Billing"
+    },
+    "system.nav_products": {
+      "uz": "Mahsulotlar va modullar",
+      "uzc": "Маҳсулотлар ва модуллар",
+      "ru": "Продукты и модули",
+      "en": "Products & Modules"
+    },
+    "system.nav_reports": {
+      "uz": "Hisobotlar va tahlillar",
+      "uzc": "Ҳисоботлар ва таҳлиллар",
+      "ru": "Отчёты и аналитика",
+      "en": "Reports & Analytics"
+    },
+    "system.nav_audit": {
+      "uz": "Audit jurnali",
+      "uzc": "Аудит журнали",
+      "ru": "Журнал аудита",
+      "en": "Audit Logs"
+    },
+    "system.page_placeholder": {
+      "uz": "Bu bo'lim hali ishlab chiqilmoqda — boshqaruv xizmati ulanmagan.",
+      "uzc": "Бу бўлим ҳали ишлаб чиқилмоқда — бошқарув хизмати уланмаган.",
+      "ru": "Этот раздел пока в разработке — управляющий сервис ещё не подключён.",
+      "en": "This section is a placeholder — its management service has not been connected yet."
+    },
+    "system.dash_title": {
+      "uz": "Platforma bir qarashda",
+      "uzc": "Платформа бир қарашда",
+      "ru": "Платформа одним взглядом",
+      "en": "Platform at a glance"
+    },
+    "system.dash_subtitle": {
+      "uz": "Tashkilotlar, foydalanuvchilar va platforma faoliyatining qisqacha xulosasi.",
+      "uzc": "Ташкилотлар, фойдаланувчилар ва платформа фаолиятининг қисқача хулосаси.",
+      "ru": "Краткий обзор организаций, пользователей и активности платформы.",
+      "en": "A summary of organizations, users and platform activity."
+    },
+    "system.dash_sample_notice": {
+      "uz": "Namuna ma'lumotlar — quyidagi raqamlar va nomlar haqiqiy platforma statistikasi emas.",
+      "uzc": "Намуна маълумотлар — қуйидаги рақамлар ва номлар ҳақиқий платформа статистикаси эмас.",
+      "ru": "Пример данных — приведённые цифры и названия не являются реальной статистикой платформы.",
+      "en": "Sample data — the figures and names below are placeholders, not real platform statistics."
+    },
+    "system.dash_card_organizations": {
+      "uz": "Tashkilotlar",
+      "uzc": "Ташкилотлар",
+      "ru": "Организации",
+      "en": "Organizations"
+    },
+    "system.dash_card_users": {
+      "uz": "Foydalanuvchilar",
+      "uzc": "Фойдаланувчилар",
+      "ru": "Пользователи",
+      "en": "Users"
+    },
+    "system.dash_card_subs": {
+      "uz": "Faol obunalar",
+      "uzc": "Фаол обунаҳ",
+      "ru": "Активные подписки",
+      "en": "Active subscriptions"
+    },
+    "system.dash_card_new-orgs": {
+      "uz": "Yangi tashkilotlar, 30 kun",
+      "uzc": "Янги ташкилотлар, 30 кун",
+      "ru": "Новые организации за 30 дней",
+      "en": "New organizations, 30 days"
+    },
+    "system.dash_registrations_title": {
+      "uz": "So'nggi ro'yxatdan o'tgan tashkilotlar",
+      "uzc": "Сўнгги рўйхатдан ўтган ташкилотлар",
+      "ru": "Недавно зарегистрированные организации",
+      "en": "Recent organization registrations"
+    },
+    "system.dash_reg_name": {
+      "uz": "Tashkilot",
+      "uzc": "Ташкилот",
+      "ru": "Организация",
+      "en": "Organization"
+    },
+    "system.dash_reg_plan": {
+      "uz": "Tarif",
+      "uzc": "Тариф",
+      "ru": "Тариф",
+      "en": "Plan"
+    },
+    "system.dash_reg_date": {
+      "uz": "Ro'yxatdan o'tgan",
+      "uzc": "Рўйхатдан ўтган",
+      "ru": "Дата регистрации",
+      "en": "Registered"
+    },
+    "system.dash_reg_status": {
+      "uz": "Holat",
+      "uzc": "Ҳолат",
+      "ru": "Статус",
+      "en": "Status"
+    },
+    "system.dash_plan_free": {
+      "uz": "Bepul",
+      "uzc": "Бепул",
+      "ru": "Бесплатный",
+      "en": "Free"
+    },
+    "system.dash_plan_standard": {
+      "uz": "Standart",
+      "uzc": "Стандарт",
+      "ru": "Стандартный",
+      "en": "Standard"
+    },
+    "system.dash_plan_pro": {
+      "uz": "Pro",
+      "uzc": "Про",
+      "ru": "Про",
+      "en": "Pro"
+    },
+    "system.dash_status_active": {
+      "uz": "Faol",
+      "uzc": "Фаол",
+      "ru": "Активна",
+      "en": "Active"
+    },
+    "system.dash_status_onboarding": {
+      "uz": "Sozlanmoqda",
+      "uzc": "Созланмоқда",
+      "ru": "Настройка",
+      "en": "Onboarding"
+    },
+    "system.dash_activity_title": {
+      "uz": "So'nggi administrator harakatlari",
+      "uzc": "Сўнгги администратор ҳаракатлари",
+      "ru": "Недавние действия администраторов",
+      "en": "Recent administrative activity"
+    },
+    "system.dash_act_sign_in": {
+      "uz": "Tizimga kirdi",
+      "uzc": "Тизимга кирди",
+      "ru": "Вход в систему",
+      "en": "Signed in"
+    },
+    "system.dash_act_org_created": {
+      "uz": "Tashkilot yaratdi",
+      "uzc": "Ташкилот яратди",
+      "ru": "Создал организацию",
+      "en": "Created an organization"
+    },
+    "system.dash_act_user_suspended": {
+      "uz": "Foydalanuvchini to'xtatdi",
+      "uzc": "Фойдаланувчини тўхтатди",
+      "ru": "Приостановил пользователя",
+      "en": "Suspended a user"
+    },
+    "system.dash_act_plan_changed": {
+      "uz": "Tarifni o'zgartirdi",
+      "uzc": "Тарифни ўзгартирди",
+      "ru": "Изменил тарифный план",
+      "en": "Changed a subscription plan"
+    },
+    "system.settings_subtitle": {
+      "uz": "Administrator hisobi sozlamalarini boshqaring.",
+      "uzc": "Администратор ҳисоби созламаларини бошқаринг.",
+      "ru": "Управление настройками учётной записи администратора.",
+      "en": "Manage your administrator account preferences."
+    },
+    "system.audit_title": {
+      "uz": "Audit jurnali",
+      "uzc": "Аудит журнали",
+      "ru": "Журнал аудита",
+      "en": "Audit logs"
+    },
+    "system.audit_subtitle": {
+      "uz": "Platforma tomonidan qayd etilgan xavfsizlikka oid hodisalar, eng yangilari birinchi.",
+      "uzc": "Платформа томонидан қайд этилган хавфсизликка оид ҳодисалар, энг янгилари биринчи.",
+      "ru": "Связанные с безопасностью события платформы, сначала новые.",
+      "en": "Security-relevant events recorded by the platform, newest first."
+    },
+    "system.audit_range_label": {
+      "uz": "Davr",
+      "uzc": "Давр",
+      "ru": "Период",
+      "en": "Period"
+    },
+    "system.audit_range_1h": {
+      "uz": "Oxirgi bir soat",
+      "uzc": "Охирги бир соат",
+      "ru": "Последний час",
+      "en": "Last hour"
+    },
+    "system.audit_range_24h": {
+      "uz": "Oxirgi 24 soat",
+      "uzc": "Охирги 24 соат",
+      "ru": "Последние 24 часа",
+      "en": "Last 24 hours"
+    },
+    "system.audit_range_7d": {
+      "uz": "Oxirgi 7 kun",
+      "uzc": "Охирги 7 кун",
+      "ru": "Последние 7 дней",
+      "en": "Last 7 days"
+    },
+    "system.audit_range_31d": {
+      "uz": "Oxirgi 31 kun",
+      "uzc": "Охирги 31 кун",
+      "ru": "Последний 31 день",
+      "en": "Last 31 days"
+    },
+    "system.audit_refresh": {
+      "uz": "Yangilash",
+      "uzc": "Янгилаш",
+      "ru": "Обновить",
+      "en": "Refresh"
+    },
+    "system.audit_count": {
+      "uz": "Hodisalar: {count}",
+      "uzc": "Ҳодисалар: {count}",
+      "ru": "События: {count}",
+      "en": "Events: {count}"
+    },
+    "system.audit_col_time": {
+      "uz": "Vaqt",
+      "uzc": "Вақт",
+      "ru": "Время",
+      "en": "Time"
+    },
+    "system.audit_col_action": {
+      "uz": "Amal",
+      "uzc": "Амал",
+      "ru": "Действие",
+      "en": "Action"
+    },
+    "system.audit_col_actor": {
+      "uz": "Foydalanuvchi",
+      "uzc": "Фойдаланувчи",
+      "ru": "Инициатор",
+      "en": "Actor"
+    },
+    "system.audit_col_org": {
+      "uz": "Tashkilot",
+      "uzc": "Ташкилот",
+      "ru": "Организация",
+      "en": "Organization"
+    },
+    "system.audit_col_ip": {
+      "uz": "IP manzil",
+      "uzc": "IP манзил",
+      "ru": "IP-адрес",
+      "en": "IP address"
+    },
+    "system.audit_row_details": {
+      "uz": "Hodisa tafsilotlarini ko‘rish",
+      "uzc": "Ҳодиса тафсилотларини кўриш",
+      "ru": "Показать детали события",
+      "en": "View event details"
+    },
+    "system.audit_details_title": {
+      "uz": "Hodisa tafsilotlari",
+      "uzc": "Ҳодиса тафсилотлари",
+      "ru": "Детали события",
+      "en": "Event details"
+    },
+    "system.audit_details_user": {
+      "uz": "Foydalanuvchi ID",
+      "uzc": "Фойдаланувчи ID",
+      "ru": "ID пользователя",
+      "en": "User ID"
+    },
+    "system.audit_details_org_id": {
+      "uz": "Tashkilot ID",
+      "uzc": "Ташкилот ID",
+      "ru": "ID организации",
+      "en": "Organization ID"
+    },
+    "system.audit_details_agent": {
+      "uz": "User agent",
+      "uzc": "User agent",
+      "ru": "User-Agent",
+      "en": "User agent"
+    },
+    "system.audit_details_uuid": {
+      "uz": "Hodisa ID",
+      "uzc": "Ҳодиса ID",
+      "ru": "ID события",
+      "en": "Event ID"
+    },
+    "system.audit_details_payload": {
+      "uz": "Hodisa ma‘lumotlari",
+      "uzc": "Ҳодиса маълумотлари",
+      "ru": "Данные события",
+      "en": "Event data"
+    },
+    "system.audit_details_no_data": {
+      "uz": "Ma‘lumot yo‘q.",
+      "uzc": "Маълумот йўқ.",
+      "ru": "Нет данных.",
+      "en": "No data."
+    },
+    "system.audit_details_close": {
+      "uz": "Tafsilotlarni yashirish",
+      "uzc": "Тафсилотларни яшириш",
+      "ru": "Скрыть детали",
+      "en": "Hide details"
+    },
+    "system.audit_empty": {
+      "uz": "Bu davrda audit hodisalari yo‘q.",
+      "uzc": "Бу даврда аудит ҳодисалари йўқ.",
+      "ru": "За этот период событий нет.",
+      "en": "No audit events in this period."
+    },
+    "system.audit_error_load": {
+      "uz": "Audit jurnalini yuklab bo‘lmadi.",
+      "uzc": "Аудит журналини юклаб бўлмади.",
+      "ru": "Не удалось загрузить журнал аудита.",
+      "en": "Could not load audit logs."
+    },
+    "system.audit_error_forbidden": {
+      "uz": "Bu hisobga audit jurnaliga kirish ruxsat etilmagan.",
+      "uzc": "Бу ҳисобга аудит журналига кириш рухсат этилмаган.",
+      "ru": "У этой учётной записи нет доступа к журналу аудита.",
+      "en": "This account does not have access to audit logs."
+    },
+    "system.audit_error_detail": {
+      "uz": "Hodisa tafsilotlarini yuklab bo‘lmadi.",
+      "uzc": "Ҳодиса тафсилотларини юклаб бўлмади.",
+      "ru": "Не удалось загрузить детали события.",
+      "en": "Could not load event details."
+    },
+    "system.audit_retry": {
+      "uz": "Qayta urinish",
+      "uzc": "Қайта уриниш",
+      "ru": "Повторить",
+      "en": "Retry"
+    },
+    "system.audit_page_status": {
+      "uz": "Sahifa: {page}/{pages}",
+      "uzc": "Саҳифа: {page}/{pages}",
+      "ru": "Страница {page} из {pages}",
+      "en": "Page {page} of {pages}"
+    },
+    "system.audit_prev_page": {
+      "uz": "Oldingi sahifa",
+      "uzc": "Олдинги саҳифа",
+      "ru": "Предыдущая страница",
+      "en": "Previous page"
+    },
+    "system.audit_next_page": {
+      "uz": "Keyingi sahifa",
+      "uzc": "Кейинги саҳифа",
+      "ru": "Следующая страница",
+      "en": "Next page"
+    },
+    "system.nav_system_users": {
+      "uz": "Tizim foydalanuvchilari",
+      "uzc": "Тизим фойдаланувчилари",
+      "ru": "Системные пользователи",
+      "en": "System users"
+    },
+    "system.admin_search": {
+      "uz": "Qidirish",
+      "uzc": "Қидириш",
+      "ru": "Поиск",
+      "en": "Search"
+    },
+    "system.admin_search_orgs": {
+      "uz": "Tashkilotlarni qidirish",
+      "uzc": "Ташкилотларни қидириш",
+      "ru": "Поиск организаций",
+      "en": "Search organizations"
+    },
+    "system.admin_search_users": {
+      "uz": "Email yoki telefon bo'yicha qidirish",
+      "uzc": "Email ёки телефон бўйича қидириш",
+      "ru": "Поиск по почте или телефону",
+      "en": "Search by email or phone"
+    },
+    "system.admin_search_system_users": {
+      "uz": "Tizim foydalanuvchilarini email bo'yicha qidirish",
+      "uzc": "Тизим фойдаланувчиларини email бўйича қидириш",
+      "ru": "Поиск системных пользователей по почте",
+      "en": "Search system users by email"
+    },
+    "system.admin_clear": {
+      "uz": "Tozalash",
+      "uzc": "Тозалаш",
+      "ru": "Очистить",
+      "en": "Clear"
+    },
+    "system.admin_view": {
+      "uz": "Ko'rish",
+      "uzc": "Кўриш",
+      "ru": "Открыть",
+      "en": "View"
+    },
+    "system.admin_retry": {
+      "uz": "Qayta urinish",
+      "uzc": "Қайта уриниш",
+      "ru": "Повторить",
+      "en": "Retry"
+    },
+    "system.admin_empty": {
+      "uz": "Yozuvlar topilmadi.",
+      "uzc": "Ёзувлар топилмади.",
+      "ru": "Записи не найдены.",
+      "en": "No records found."
+    },
+    "system.admin_status": {
+      "uz": "Holat",
+      "uzc": "Ҳолат",
+      "ru": "Статус",
+      "en": "Status"
+    },
+    "system.admin_active": {
+      "uz": "Faol",
+      "uzc": "Фаол",
+      "ru": "Активен",
+      "en": "Active"
+    },
+    "system.admin_blocked": {
+      "uz": "Bloklangan",
+      "uzc": "Блокланган",
+      "ru": "Заблокирован",
+      "en": "Blocked"
+    },
+    "system.admin_created": {
+      "uz": "Yaratilgan",
+      "uzc": "Яратилган",
+      "ru": "Создан",
+      "en": "Created"
+    },
+    "system.admin_updated": {
+      "uz": "Yangilangan",
+      "uzc": "Янгиланган",
+      "ru": "Обновлён",
+      "en": "Updated"
+    },
+    "system.admin_uuid": {
+      "uz": "ID",
+      "uzc": "ID",
+      "ru": "ID",
+      "en": "ID"
+    },
+    "system.admin_actions": {
+      "uz": "Amallar",
+      "uzc": "Амаллар",
+      "ru": "Действия",
+      "en": "Actions"
+    },
+    "system.admin_back": {
+      "uz": "Orqaga",
+      "uzc": "Орқага",
+      "ru": "Назад",
+      "en": "Back"
+    },
+    "system.admin_pagination": {
+      "uz": "Sahifalash",
+      "uzc": "Саҳифалаш",
+      "ru": "Постраничная навигация",
+      "en": "Pagination"
+    },
+    "system.admin_range": {
+      "uz": "{total} dan {start}–{end} ko'rsatilmoqda",
+      "uzc": "{total} дан {start}–{end} кўрсатилмоқда",
+      "ru": "Показано {start}–{end} из {total}",
+      "en": "Showing {start}–{end} of {total}"
+    },
+    "system.admin_page_status": {
+      "uz": "{pages} sahifadan {page}-sahifa",
+      "uzc": "{pages} саҳифадан {page}-саҳифа",
+      "ru": "Страница {page} из {pages}",
+      "en": "Page {page} of {pages}"
+    },
+    "system.admin_prev_page": {
+      "uz": "Oldingi sahifa",
+      "uzc": "Олдинги саҳифа",
+      "ru": "Предыдущая страница",
+      "en": "Previous page"
+    },
+    "system.admin_next_page": {
+      "uz": "Keyingi sahifa",
+      "uzc": "Кейинги саҳифа",
+      "ru": "Следующая страница",
+      "en": "Next page"
+    },
+    "system.admin_error_forbidden": {
+      "uz": "Bu hisobda ushbu bo'limga ruxsat yo'q.",
+      "uzc": "Бу ҳисобда ушбу бўлимга рухсат йўқ.",
+      "ru": "У этой учётной записи нет доступа к разделу.",
+      "en": "This account does not have access to this section."
+    },
+    "system.admin_me_error": {
+      "uz": "Administrator ruxsatlarini yuklab bo'lmadi. Ba'zi bo'limlar yashiringan bo'lishi mumkin.",
+      "uzc": "Администратор рухсатларини юклаб бўлмади. Баъзи бўлимлар яширилган бўлиши мумкин.",
+      "ru": "Не удалось загрузить права администратора. Некоторые разделы могут быть скрыты.",
+      "en": "Could not load your administrator permissions. Some sections may be hidden."
+    },
+    "system.action_error_forbidden": {
+      "uz": "Bu amalni bajarish uchun ruxsatingiz yo'q.",
+      "uzc": "Бу амални бажариш учун рухсатингиз йўқ.",
+      "ru": "У вас нет прав на это действие.",
+      "en": "You do not have permission to perform this action."
+    },
+    "system.action_error_not_found": {
+      "uz": "Yozuv endi mavjud emas.",
+      "uzc": "Ёзув энди мавжуд эмас.",
+      "ru": "Запись больше не существует.",
+      "en": "The record no longer exists."
+    },
+    "system.action_error_unprocessable": {
+      "uz": "Bu amal ushbu hisob uchun ruxsat etilmagan.",
+      "uzc": "Бу амал ушбу ҳисоб учун рухсат этилмаган.",
+      "ru": "Это действие недоступно для данной учётной записи.",
+      "en": "This action is not allowed for this account."
+    },
+    "system.action_error_unavailable": {
+      "uz": "Xizmat vaqtincha mavjud emas. Birozdan so'ng qayta urinib ko'ring.",
+      "uzc": "Хизмат вақтинча мавжуд эмас. Бироздан сўнг қайта уриниб кўринг.",
+      "ru": "Сервис временно недоступен. Попробуйте позже.",
+      "en": "The service is temporarily unavailable. Try again shortly."
+    },
+    "system.action_error_conflict": {
+      "uz": "Amal joriy holatga zid keladi.",
+      "uzc": "Амал жорий ҳолатга зид келади.",
+      "ru": "Действие конфликтует с текущим состоянием.",
+      "en": "The action conflicts with the current state."
+    },
+    "system.action_error_self": {
+      "uz": "Bu amalni o'z hisobingizda bajara olmaysiz.",
+      "uzc": "Бу амални ўз ҳисобингизда бажара олмайсиз.",
+      "ru": "Нельзя выполнить это действие для своей учётной записи.",
+      "en": "You cannot perform this action on your own account."
+    },
+    "system.action_error_last_admin": {
+      "uz": "Bu oxirgi administratorni olib tashlaydi.",
+      "uzc": "Бу охирги администраторни олиб ташлайди.",
+      "ru": "Это удалит последнего администратора.",
+      "en": "This would remove the last administrator."
+    },
+    "system.action_error_self_or_last_admin": {
+      "uz": "O'zingizni bloklay olmaysiz va oxirgi administratorni bloklab bo'lmaydi.",
+      "uzc": "Ўзингизни блоклай олмайсиз ва охирги администраторни блоклаб бўлмайди.",
+      "ru": "Нельзя заблокировать себя или последнего администратора.",
+      "en": "You cannot block yourself, and the last administrator cannot be blocked."
+    },
+    "system.orgs_title": {
+      "uz": "Tashkilotlar",
+      "uzc": "Ташкилотлар",
+      "ru": "Организации",
+      "en": "Organizations"
+    },
+    "system.orgs_subtitle": {
+      "uz": "Platformada ro'yxatdan o'tgan barcha tashkilotlar.",
+      "uzc": "Платформада рўйхатдан ўтган барча ташкилотлар.",
+      "ru": "Все организации, зарегистрированные на платформе.",
+      "en": "Every organization registered on the platform."
+    },
+    "system.orgs_col_name": {
+      "uz": "Tashkilot",
+      "uzc": "Ташкилот",
+      "ru": "Организация",
+      "en": "Organization"
+    },
+    "system.orgs_col_tin": {
+      "uz": "STIR",
+      "uzc": "СТИР",
+      "ru": "ИНН",
+      "en": "TIN"
+    },
+    "system.orgs_block": {
+      "uz": "Bloklash",
+      "uzc": "Блоклаш",
+      "ru": "Заблокировать",
+      "en": "Block"
+    },
+    "system.orgs_unblock": {
+      "uz": "Blokdan chiqarish",
+      "uzc": "Блокдан чиқариш",
+      "ru": "Разблокировать",
+      "en": "Unblock"
+    },
+    "system.orgs_block_title": {
+      "uz": "Tashkilot bloklansinmi?",
+      "uzc": "Ташкилот блоклансинми?",
+      "ru": "Заблокировать организацию?",
+      "en": "Block organization?"
+    },
+    "system.orgs_block_message": {
+      "uz": "{name} bloklansinmi? Blokdan chiqarilmaguncha a'zolari kira olmaydi.",
+      "uzc": "{name} блоклансинми? Блокдан чиқарилмагунча аъзолари кира олмайди.",
+      "ru": "Заблокировать «{name}»? Участники потеряют доступ до разблокировки.",
+      "en": "Block {name}? Its members will lose access until it is unblocked."
+    },
+    "system.orgs_unblock_title": {
+      "uz": "Tashkilot blokdan chiqarilsinmi?",
+      "uzc": "Ташкилот блокдан чиқарилсинми?",
+      "ru": "Разблокировать организацию?",
+      "en": "Unblock organization?"
+    },
+    "system.orgs_unblock_message": {
+      "uz": "{name} blokdan chiqarilsinmi? A'zolari yana kira oladi.",
+      "uzc": "{name} блокдан чиқарилсинми? Аъзолари яна кира олади.",
+      "ru": "Разблокировать «{name}»? Участники снова получат доступ.",
+      "en": "Unblock {name}? Its members will regain access."
+    },
+    "system.orgs_detail_title": {
+      "uz": "Tashkilot ma'lumotlari",
+      "uzc": "Ташкилот маълумотлари",
+      "ru": "Сведения об организации",
+      "en": "Organization details"
+    },
+    "system.users_title": {
+      "uz": "Foydalanuvchilar",
+      "uzc": "Фойдаланувчилар",
+      "ru": "Пользователи",
+      "en": "Users"
+    },
+    "system.users_subtitle": {
+      "uz": "Platformada ro'yxatdan o'tgan shaxsiy va tashkilot hisoblari.",
+      "uzc": "Платформада рўйхатдан ўтган шахсий ва ташкилот ҳисоблари.",
+      "ru": "Личные и организационные учётные записи на платформе.",
+      "en": "Person and organization accounts registered on the platform."
+    },
+    "system.users_col_user": {
+      "uz": "Foydalanuvchi",
+      "uzc": "Фойдаланувчи",
+      "ru": "Пользователь",
+      "en": "User"
+    },
+    "system.users_col_type": {
+      "uz": "Turi",
+      "uzc": "Тури",
+      "ru": "Тип",
+      "en": "Type"
+    },
+    "system.users_type_person": {
+      "uz": "Jismoniy shaxs",
+      "uzc": "Жисмоний шахс",
+      "ru": "Физическое лицо",
+      "en": "Person"
+    },
+    "system.users_type_org": {
+      "uz": "Tashkilot",
+      "uzc": "Ташкилот",
+      "ru": "Организация",
+      "en": "Organization"
+    },
+    "system.users_email": {
+      "uz": "Email",
+      "uzc": "Email",
+      "ru": "Почта",
+      "en": "Email"
+    },
+    "system.users_phone": {
+      "uz": "Telefon",
+      "uzc": "Телефон",
+      "ru": "Телефон",
+      "en": "Phone"
+    },
+    "system.users_language": {
+      "uz": "Til",
+      "uzc": "Тил",
+      "ru": "Язык",
+      "en": "Language"
+    },
+    "system.users_email_verified": {
+      "uz": "Email tasdiqlangan",
+      "uzc": "Email тасдиқланган",
+      "ru": "Почта подтверждена",
+      "en": "Email verified"
+    },
+    "system.users_not_verified": {
+      "uz": "Tasdiqlanmagan",
+      "uzc": "Тасдиқланмаган",
+      "ru": "Не подтверждена",
+      "en": "Not verified"
+    },
+    "system.users_block": {
+      "uz": "Bloklash",
+      "uzc": "Блоклаш",
+      "ru": "Заблокировать",
+      "en": "Block"
+    },
+    "system.users_unblock": {
+      "uz": "Blokdan chiqarish",
+      "uzc": "Блокдан чиқариш",
+      "ru": "Разблокировать",
+      "en": "Unblock"
+    },
+    "system.users_revoke": {
+      "uz": "Seanslarni bekor qilish",
+      "uzc": "Сеансларни бекор қилиш",
+      "ru": "Отозвать сеансы",
+      "en": "Revoke sessions"
+    },
+    "system.users_block_title": {
+      "uz": "Foydalanuvchi bloklansinmi?",
+      "uzc": "Фойдаланувчи блоклансинми?",
+      "ru": "Заблокировать пользователя?",
+      "en": "Block user?"
+    },
+    "system.users_block_message": {
+      "uz": "{name} bloklansinmi? U barcha qurilmalardan chiqariladi va blokdan chiqarilmaguncha kira olmaydi.",
+      "uzc": "{name} блоклансинми? У барча қурилмалардан чиқарилади ва блокдан чиқарилмагунча кира олмайди.",
+      "ru": "Заблокировать «{name}»? Пользователь будет выйден со всех устройств и не сможет войти до разблокировки.",
+      "en": "Block {name}? They will be signed out and cannot sign in until unblocked."
+    },
+    "system.users_unblock_title": {
+      "uz": "Foydalanuvchi blokdan chiqarilsinmi?",
+      "uzc": "Фойдаланувчи блокдан чиқарилсинми?",
+      "ru": "Разблокировать пользователя?",
+      "en": "Unblock user?"
+    },
+    "system.users_unblock_message": {
+      "uz": "{name} blokdan chiqarilsinmi? U yana kira oladi.",
+      "uzc": "{name} блокдан чиқарилсинми? У яна кира олади.",
+      "ru": "Разблокировать «{name}»? Пользователь снова сможет войти.",
+      "en": "Unblock {name}? They will be able to sign in again."
+    },
+    "system.users_revoke_title": {
+      "uz": "Seanslar bekor qilinsinmi?",
+      "uzc": "Сеанслар бекор қилинсинми?",
+      "ru": "Отозвать сеансы?",
+      "en": "Revoke sessions?"
+    },
+    "system.users_revoke_message": {
+      "uz": "{name} barcha qurilmalardan chiqarilsinmi?",
+      "uzc": "{name} барча қурилмалардан чиқарилсинми?",
+      "ru": "Выйти «{name}» из всех устройств?",
+      "en": "Sign {name} out of every device?"
+    },
+    "system.users_org_block_notice": {
+      "uz": "Buning o'rniga tashkilotni bloklang.",
+      "uzc": "Бунинг ўрнига ташкилотни блокланг.",
+      "ru": "Заблокируйте организацию.",
+      "en": "Block the organization instead."
+    },
+    "system.users_detail_title": {
+      "uz": "Foydalanuvchi ma'lumotlari",
+      "uzc": "Фойдаланувчи маълумотлари",
+      "ru": "Сведения о пользователе",
+      "en": "User details"
+    },
+    "system.system_users_title": {
+      "uz": "Tizim foydalanuvchilari",
+      "uzc": "Тизим фойдаланувчилари",
+      "ru": "Системные пользователи",
+      "en": "System users"
+    },
+    "system.system_users_subtitle": {
+      "uz": "Platforma boshqaruv paneliga kira oladigan hisoblar.",
+      "uzc": "Платформа бошқарув панелига кира оладиган ҳисоблар.",
+      "ru": "Учётные записи с доступом к панели управления платформой.",
+      "en": "Accounts with access to the platform control plane."
+    },
+    "system.system_users_col_roles": {
+      "uz": "Rollar",
+      "uzc": "Роллар",
+      "ru": "Роли",
+      "en": "Roles"
+    },
+    "system.system_users_no_roles": {
+      "uz": "Rol tayinlanmagan",
+      "uzc": "Рол тайинланмаган",
+      "ru": "Роли не назначены",
+      "en": "No roles assigned"
+    },
+    "system.system_users_block": {
+      "uz": "Bloklash",
+      "uzc": "Блоклаш",
+      "ru": "Заблокировать",
+      "en": "Block"
+    },
+    "system.system_users_unblock": {
+      "uz": "Blokdan chiqarish",
+      "uzc": "Блокдан чиқариш",
+      "ru": "Разблокировать",
+      "en": "Unblock"
+    },
+    "system.system_users_revoke": {
+      "uz": "Seanslarni bekor qilish",
+      "uzc": "Сеансларни бекор қилиш",
+      "ru": "Отозвать сеансы",
+      "en": "Revoke sessions"
+    },
+    "system.system_users_block_title": {
+      "uz": "Tizim foydalanuvchisi bloklansinmi?",
+      "uzc": "Тизим фойдаланувчиси блоклансинми?",
+      "ru": "Заблокировать системного пользователя?",
+      "en": "Block system user?"
+    },
+    "system.system_users_block_message": {
+      "uz": "{name} bloklansinmi? U barcha qurilmalardan chiqariladi va blokdan chiqarilmaguncha kira olmaydi.",
+      "uzc": "{name} блоклансинми? У барча қурилмалардан чиқарилади ва блокдан чиқарилмагунча кира олмайди.",
+      "ru": "Заблокировать «{name}»? Пользователь будет выйден со всех устройств и не сможет войти до разблокировки.",
+      "en": "Block {name}? They will be signed out and cannot sign in until unblocked."
+    },
+    "system.system_users_unblock_title": {
+      "uz": "Tizim foydalanuvchisi blokdan chiqarilsinmi?",
+      "uzc": "Тизим фойдаланувчиси блокдан чиқарилсинми?",
+      "ru": "Разблокировать системного пользователя?",
+      "en": "Unblock system user?"
+    },
+    "system.system_users_unblock_message": {
+      "uz": "{name} blokdan chiqarilsinmi? U yana kira oladi.",
+      "uzc": "{name} блокдан чиқарилсинми? У яна кира олади.",
+      "ru": "Разблокировать «{name}»? Пользователь снова сможет войти.",
+      "en": "Unblock {name}? They will be able to sign in again."
+    },
+    "system.system_users_revoke_title": {
+      "uz": "Seanslar bekor qilinsinmi?",
+      "uzc": "Сеанслар бекор қилинсинми?",
+      "ru": "Отозвать сеансы?",
+      "en": "Revoke sessions?"
+    },
+    "system.system_users_revoke_message": {
+      "uz": "{name} barcha qurilmalardan chiqarilsinmi?",
+      "uzc": "{name} барча қурилмалардан чиқарилсинми?",
+      "ru": "Выйти «{name}» из всех устройств?",
+      "en": "Sign {name} out of every device?"
+    },
+    "system.system_users_detail_title": {
+      "uz": "Tizim foydalanuvchisi ma'lumotlari",
+      "uzc": "Тизим фойдаланувчиси маълумотлари",
+      "ru": "Сведения о системном пользователе",
+      "en": "System user details"
+    },
+    "system.system_users_read_only": {
+      "uz": "Tizim foydalanuvchilarini ko'rishingiz mumkin, ammo rollarni boshqarish uchun qo'shimcha ruxsat kerak.",
+      "uzc": "Тизим фойдаланувчиларини кўришингиз мумкин, аммо ролларни бошқариш учун қўшимча рухсат керак.",
+      "ru": "Вы можете просматривать системных пользователей, но для управления ролями нужны дополнительные права.",
+      "en": "You can view system users, but role management requires additional access."
+    },
+    "system.system_users_roles_title": {
+      "uz": "Rollar",
+      "uzc": "Роллар",
+      "ru": "Роли",
+      "en": "Roles"
+    },
+    "system.system_users_roles_hint": {
+      "uz": "Bu hisobga tayinlangan rol to'plamlarini tanlang.",
+      "uzc": "Бу ҳисобга тайинланган рол тўпламларини танланг.",
+      "ru": "Выберите наборы ролей для этой учётной записи.",
+      "en": "Select the role bundles assigned to this account."
+    },
+    "system.system_users_role_permissions": {
+      "uz": "{count} ta ruxsat",
+      "uzc": "{count} та рухсат",
+      "ru": "{count} разрешений",
+      "en": "{count} permissions"
+    },
+    "system.system_users_save_roles": {
+      "uz": "Rollarni saqlash",
+      "uzc": "Ролларни сақлаш",
+      "ru": "Сохранить роли",
+      "en": "Save roles"
+    },
+    "system.system_users_roles_saved": {
+      "uz": "Rollar yangilandi.",
+      "uzc": "Роллар янгиланди.",
+      "ru": "Роли обновлены.",
+      "en": "Roles updated."
+    }
+  },
+  "home": {
+    "home.title": {
+      "uz": "Xush kelibsiz",
+      "uzc": "Хуш келибсиз",
+      "ru": "Добро пожаловать",
+      "en": "Welcome"
+    },
+    "home.subtitle": {
+      "uz": "Ish maydoningizga kirish uchun tizimga kiring.",
+      "uzc": "Иш майдонингизга кириш учун тизимга киринг.",
+      "ru": "Войдите, чтобы перейти в рабочее пространство.",
+      "en": "Sign in to reach your workspace."
+    },
+    "nav.register": {
+      "uz": "Ro'yxatdan o'tish",
+      "uzc": "Рўйхатдан ўтиш",
+      "ru": "Регистрация",
+      "en": "Register"
+    },
+    "nav.login": {
+      "uz": "Kirish",
+      "uzc": "Кириш",
+      "ru": "Войти",
+      "en": "Login"
+    },
+    "nav.dashboard": {
+      "uz": "Boshqaruv paneli",
+      "uzc": "Бошқарув панели",
+      "ru": "Панель управления",
+      "en": "Dashboard"
+    },
+    "landing.nav.features": {
+      "uz": "Imkoniyatlar",
+      "uzc": "Имкониятлар",
+      "ru": "Возможности",
+      "en": "Features"
+    },
+    "landing.nav.how": {
+      "uz": "Qanday ishlaydi",
+      "uzc": "Қандай ишлайди",
+      "ru": "Как это работает",
+      "en": "How it works"
+    },
+    "landing.nav.security": {
+      "uz": "Xavfsizlik",
+      "uzc": "Хавфсизлик",
+      "ru": "Безопасность",
+      "en": "Security"
+    },
+    "landing.a11y.menu": {
+      "uz": "Menyu",
+      "uzc": "Меню",
+      "ru": "Меню",
+      "en": "Menu"
+    },
+    "landing.hero.title": {
+      "uz": "Biznesingizni bir joyda boshqaring",
+      "uzc": "Бизнесингизни бир жойда бошқаринг",
+      "ru": "Управляйте бизнесом в одном месте",
+      "en": "Run your business in one place"
+    },
+    "landing.hero.subtitle": {
+      "uz": "Hisob-kitob, moliya va kundalik jarayonlar — butun biznesingiz uchun yagona platforma.",
+      "uzc": "Ҳисоб-китоб, молия ва кундалик жараёнлар — бутун бизнесингиз учун ягона платформа.",
+      "ru": "Учёт, финансы и ежедневные процессы — одна платформа для всего бизнеса.",
+      "en": "Accounting, finance and daily operations — one platform for your whole business."
+    },
+    "landing.cta.start": {
+      "uz": "Boshlash",
+      "uzc": "Бошлаш",
+      "ru": "Начать",
+      "en": "Get started"
+    },
+    "landing.cta.preview": {
+      "uz": "Platformani ko‘rish",
+      "uzc": "Платформани кўриш",
+      "ru": "Посмотреть платформу",
+      "en": "See the platform"
+    },
+    "landing.features.title": {
+      "uz": "Butun biznes uchun bitta platforma",
+      "uzc": "Бутун бизнес учун битта платформа",
+      "ru": "Одна платформа для всего бизнеса",
+      "en": "One platform for the whole business"
+    },
+    "landing.features.subtitle": {
+      "uz": "MFIN hisob-kitob, hujjatlar, bank va jamoa ishini bitta ish maydoniga to‘playdi.",
+      "uzc": "MFIN ҳисоб-китоб, ҳужжатлар, банк ва жамоа ишини битта иш майдонига тўплайди.",
+      "ru": "MFIN собирает учёт, документы, банк и работу команды в одном рабочем пространстве.",
+      "en": "MFIN brings accounting, documents, banking and teamwork into a single workspace."
+    },
+    "landing.features.workspaces.title": {
+      "uz": "Shaxsiy va tashkilot ish maydonlari",
+      "uzc": "Шахсий ва ташкилот иш майдонлари",
+      "ru": "Личные и организационные пространства",
+      "en": "Personal and organization workspaces"
+    },
+    "landing.features.workspaces.text": {
+      "uz": "Shaxsiy ishlarni va tashkilot jarayonlarini ajratib turing, bir bosishda o‘ting.",
+      "uzc": "Шахсий ишларни ва ташкилот жараёнларини ажратиб турунг, бир босишда ўтинг.",
+      "ru": "Держите личные дела и процессы компании раздельно и переключайтесь одним нажатием.",
+      "en": "Keep personal affairs and company operations apart, and switch between workspaces in one click."
+    },
+    "landing.features.documents.title": {
+      "uz": "Hujjatlar, fakturalar va hisobotlar",
+      "uzc": "Ҳужжатлар, фактуралар ва ҳисоботлар",
+      "ru": "Документы, счета и отчётность",
+      "en": "Documents, invoices and reporting"
+    },
+    "landing.features.documents.text": {
+      "uz": "Faktura va shartnomalarni tayyorlang, to‘lovlarni kuzatib boring, moliyani bir joyda ko‘ring.",
+      "uzc": "Фактура ва шартномаларни тайёрланг, тўловларни кузатиб боринг, молияни бир жойда кўринг.",
+      "ru": "Готовьте счета и договоры, следите за оплатами и видите финансы в одном месте.",
+      "en": "Prepare invoices and contracts, track payments and keep the financial picture in one place."
+    },
+    "landing.features.signing.title": {
+      "uz": "E-IMZO bilan kiring",
+      "uzc": "E-IMZO билан киринг",
+      "ru": "Вход с E-IMZO",
+      "en": "Sign in with E-IMZO"
+    },
+    "landing.features.signing.text": {
+      "uz": "Milliy elektron imzo bilan xavfsiz kiring — parol shart emas.",
+      "uzc": "Миллий электрон имзо билан хавфсиз киринг — парол шарт эмас.",
+      "ru": "Входите по национальной электронной подписи — пароль не нужен.",
+      "en": "Use the national electronic signature to sign in securely — no password needed."
+    },
+    "landing.modules.title": {
+      "uz": "Hammasi bitta tizimda",
+      "uzc": "Ҳаммаси битта тизимда",
+      "ru": "Всё в одной системе",
+      "en": "Everything in one system"
+    },
+    "landing.modules.subtitle": {
+      "uz": "Biznesingiz ishlatadigan modullar — bitta navigatsiyada yonma-yon.",
+      "uzc": "Бизнесингиз ишлатадиган модуллар — битта навигацияда ёнма-ён.",
+      "ru": "Модули вашего бизнеса — рядом, в одной навигации.",
+      "en": "The modules your business runs on, side by side in one navigation."
+    },
+    "landing.modules.note": {
+      "uz": "MFIN faol ishlanmoqda — modullar bosqichma-bosqich qo‘shiladi.",
+      "uzc": "MFIN фаол ишланмоқда — модуллар босқичма-босқич қўшилади.",
+      "ru": "MFIN в активной разработке — модули добавляются поэтапно.",
+      "en": "MFIN is in active development — modules become available step by step."
+    },
+    "landing.steps.title": {
+      "uz": "Uch qadamda ishga tushish",
+      "uzc": "Уч қадамда ишга тушиш",
+      "ru": "Три шага до старта",
+      "en": "Up and running in three steps"
+    },
+    "landing.steps.one.title": {
+      "uz": "Hisob yarating",
+      "uzc": "Ҳисоб яратинг",
+      "ru": "Создайте аккаунт",
+      "en": "Create an account"
+    },
+    "landing.steps.one.text": {
+      "uz": "Parol yoki E-IMZO kaliti bilan ro‘yxatdan o‘ting.",
+      "uzc": "Парол ёки E-IMZO калити билан рўйхатдан ўтинг.",
+      "ru": "Зарегистрируйтесь с паролем или ключом E-IMZO.",
+      "en": "Register with a password or your E-IMZO key."
+    },
+    "landing.steps.two.title": {
+      "uz": "Ish maydonini tanlang",
+      "uzc": "Иш майдонини танланг",
+      "ru": "Выберите пространство",
+      "en": "Choose a workspace"
+    },
+    "landing.steps.two.text": {
+      "uz": "Shaxsiy yoki tashkilot ichida ishlang.",
+      "uzc": "Шахсий ёки ташкилот ичида ишланг.",
+      "ru": "Работайте лично или внутри организации.",
+      "en": "Work personally or inside your organization."
+    },
+    "landing.steps.three.title": {
+      "uz": "Biznesni boshqaring",
+      "uzc": "Бизнесни бошқаринг",
+      "ru": "Управляйте бизнесом",
+      "en": "Run the business"
+    },
+    "landing.steps.three.text": {
+      "uz": "Fakturalar, bank, ombor, HR — hammasi bir joyda.",
+      "uzc": "Фактуралар, банк, омбор, HR — ҳаммаси бир жойда.",
+      "ru": "Счета, банк, склад, HR — всё в одном месте.",
+      "en": "Invoices, bank, warehouse, HR — everything in one place."
+    },
+    "landing.trust.title": {
+      "uz": "Ishonch va nazorat",
+      "uzc": "Ишонч ва назорат",
+      "ru": "Доверие и контроль",
+      "en": "Trust and control"
+    },
+    "landing.trust.signing.title": {
+      "uz": "E-IMZO elektron imzosi",
+      "uzc": "E-IMZO электрон имзоси",
+      "ru": "Электронная подпись E-IMZO",
+      "en": "E-IMZO electronic signature"
+    },
+    "landing.trust.signing.text": {
+      "uz": "Milliy elektron imzo bilan kiring.",
+      "uzc": "Миллий электрон имзо билан киринг.",
+      "ru": "Входите с национальной электронной подписью.",
+      "en": "Sign in with the national e-signature."
+    },
+    "landing.trust.workspaces.title": {
+      "uz": "Tashkilot asosidagi ruxsat",
+      "uzc": "Ташкилот асосидаги рухсат",
+      "ru": "Доступ по организациям",
+      "en": "Organization-based access"
+    },
+    "landing.trust.workspaces.text": {
+      "uz": "Har bir tashkilot o‘z ish maydonida ishlaydi.",
+      "uzc": "Ҳар бир ташкилот ўз иш майдонида ишлайди.",
+      "ru": "Каждая организация работает в своём пространстве.",
+      "en": "Every organization works in its own workspace."
+    },
+    "landing.trust.sessions.title": {
+      "uz": "Himoyalangan sessiyalar",
+      "uzc": "Ҳимояланган сессиялар",
+      "ru": "Защищённые сессии",
+      "en": "Protected sessions"
+    },
+    "landing.trust.sessions.text": {
+      "uz": "Sessiyalar xavfsiz tugaydi va faqat egasiga qaytadi.",
+      "uzc": "Сессиялар хавфсиз тугайди ва фақат эгасига қайтади.",
+      "ru": "Сессии безопасно завершаются и возвращаются только владельцу.",
+      "en": "Sessions expire safely and restore only for their owner."
+    },
+    "landing.final.title": {
+      "uz": "MFIN ni sinab ko‘rishga tayyormisiz?",
+      "uzc": "MFIN ни синаб кўришга тайёрмисиз?",
+      "ru": "Готовы попробовать MFIN?",
+      "en": "Ready to try MFIN?"
+    },
+    "landing.final.text": {
+      "uz": "Hisob yarating va platformani o‘zingiz ko‘ring.",
+      "uzc": "Ҳисоб яратинг ва платформани ўзингиз кўринг.",
+      "ru": "Создайте аккаунт и посмотрите платформу своими глазами.",
+      "en": "Create an account and see the platform for yourself."
+    },
+    "landing.footer.tagline": {
+      "uz": "O‘zbekistondagi bizneslar uchun biznes-platforma.",
+      "uzc": "Ўзбекистондаги бизнеслар учун бизнес-платформа.",
+      "ru": "Бизнес-платформа для компаний в Узбекистане.",
+      "en": "A business platform for companies in Uzbekistan."
+    },
+    "landing.mock.income": {
+      "uz": "Tushumlar",
+      "uzc": "Тушумлар",
+      "ru": "Доходы",
+      "en": "Income"
+    },
+    "landing.mock.expenses": {
+      "uz": "Xarajatlar",
+      "uzc": "Харажатлар",
+      "ru": "Расходы",
+      "en": "Expenses"
+    },
+    "landing.mock.balance": {
+      "uz": "Balans",
+      "uzc": "Баланс",
+      "ru": "Баланс",
+      "en": "Balance"
+    },
+    "landing.mock.documents": {
+      "uz": "Oxirgi hujjatlar",
+      "uzc": "Охирги ҳужжатлар",
+      "ru": "Последние документы",
+      "en": "Recent documents"
+    },
+    "landing.mock.paid": {
+      "uz": "To‘langan",
+      "uzc": "Тўланган",
+      "ru": "Оплачен",
+      "en": "Paid"
+    },
+    "landing.mock.pending": {
+      "uz": "Kutilmoqda",
+      "uzc": "Кутилмоқда",
+      "ru": "Ожидает",
+      "en": "Pending"
+    }
+  },
+  "dashboard": {
+    "dashboard.title": {
+      "uz": "Xush kelibsiz",
+      "uzc": "Хуш келибсиз",
+      "ru": "Добро пожаловать",
+      "en": "Welcome"
+    },
+    "dashboard.subtitle": {
+      "uz": "Sessiyangiz faol.",
+      "uzc": "Сессиянгиз фаол.",
+      "ru": "Ваша сессия активна.",
+      "en": "Your session is active."
+    },
+    "dashboard.principal": {
+      "uz": "Asosiy subyekt",
+      "uzc": "Асосий субект",
+      "ru": "Основной субъект",
+      "en": "Principal"
+    },
+    "dashboard.workspace": {
+      "uz": "Ish maydoni",
+      "uzc": "Иш майдони",
+      "ru": "Рабочее пространство",
+      "en": "Workspace"
+    },
+    "personal.dashboard_title": {
+      "uz": "Shaxsiy moliyangiz bir qarashda",
+      "uzc": "Шахсий молиянгиз бир қарашда",
+      "ru": "Личные финансы одним взглядом",
+      "en": "Your personal finances at a glance"
+    },
+    "personal.dashboard_subtitle": {
+      "uz": "Shaxsiy daromad, xarajat va balansingiz bitta joyda umumlashtiriladi.",
+      "uzc": "Шахсий даромад, харажат ва балансингиз битта жойда умумлаштирилади.",
+      "ru": "Личные доходы, расходы и баланс собраны в одном месте.",
+      "en": "A summary of your personal income, spending and balance in one place."
+    },
+    "personal.dashboard_sample_notice": {
+      "uz": "Namuna ma'lumotlar — raqamlar haqiqiy emas.",
+      "uzc": "Намуна маълумотлар — рақамлар ҳақиқий эмас.",
+      "ru": "Демонстрационные данные — цифры не являются реальными.",
+      "en": "Sample data for development — the figures are not real."
+    },
+    "personal.dashboard_card_income": {
+      "uz": "Shu oylik daromad",
+      "uzc": "Шу ойлик даромад",
+      "ru": "Доходы за месяц",
+      "en": "Income this month"
+    },
+    "personal.dashboard_card_expenses": {
+      "uz": "Shu oylik xarajatlar",
+      "uzc": "Шу ойлик харажатлар",
+      "ru": "Расходы за месяц",
+      "en": "Expenses this month"
+    },
+    "personal.dashboard_card_balance": {
+      "uz": "Shaxsiy balans",
+      "uzc": "Шахсий баланс",
+      "ru": "Личный баланс",
+      "en": "Personal balance"
+    },
+    "personal.dashboard_vs_prev_month": {
+      "uz": "o'tgan oyga nisbatan",
+      "uzc": "ўтган ойга нисбатан",
+      "ru": "к прошлому месяцу",
+      "en": "vs last month"
+    },
+    "personal.dashboard_activity_title": {
+      "uz": "So'nggi harakatlar",
+      "uzc": "Сўнгги ҳаракатлар",
+      "ru": "Последние операции",
+      "en": "Recent activity"
+    },
+    "personal.dashboard_tx_description": {
+      "uz": "Tavsif",
+      "uzc": "Тавсиф",
+      "ru": "Описание",
+      "en": "Description"
+    },
+    "personal.dashboard_tx_date": {
+      "uz": "Sana",
+      "uzc": "Сана",
+      "ru": "Дата",
+      "en": "Date"
+    },
+    "personal.dashboard_tx_amount": {
+      "uz": "Summa",
+      "uzc": "Сумма",
+      "ru": "Сумма",
+      "en": "Amount"
+    },
+    "personal.dashboard_tx_status": {
+      "uz": "Holat",
+      "uzc": "Ҳолат",
+      "ru": "Статус",
+      "en": "Status"
+    },
+    "personal.dashboard_status_completed": {
+      "uz": "Bajarildi",
+      "uzc": "Бажарилди",
+      "ru": "Завершено",
+      "en": "Completed"
+    },
+    "personal.dashboard_status_pending": {
+      "uz": "Kutilmoqda",
+      "uzc": "Кутилмоқда",
+      "ru": "Ожидается",
+      "en": "Pending"
+    },
+    "personal.dashboard_tx_cat_salary": {
+      "uz": "Ish haqi",
+      "uzc": "Иш ҳақи",
+      "ru": "Зарплата",
+      "en": "Salary"
+    },
+    "personal.dashboard_tx_cat_groceries": {
+      "uz": "Oziq-ovqat",
+      "uzc": "Озиқ-овқат",
+      "ru": "Продукты",
+      "en": "Groceries"
+    },
+    "personal.dashboard_tx_cat_utilities": {
+      "uz": "Kommunal to'lovlar",
+      "uzc": "Комунал тўловлар",
+      "ru": "Коммунальные услуги",
+      "en": "Utilities"
+    },
+    "personal.dashboard_tx_cat_transfer": {
+      "uz": "Kirim o'tkazmasi",
+      "uzc": "Кирим ўтказмаси",
+      "ru": "Входящий перевод",
+      "en": "Incoming transfer"
+    },
+    "personal.dashboard_tx_cat_cafe": {
+      "uz": "Kafe",
+      "uzc": "Кафе",
+      "ru": "Кафе",
+      "en": "Café"
+    }
+  },
+  "org": {
+    "org.menu_label": {
+      "uz": "Modullar",
+      "uzc": "Модуллар",
+      "ru": "Модули",
+      "en": "Modules"
+    },
+    "org.collapse_menu": {
+      "uz": "Menyuni yig'ish",
+      "uzc": "Менюни йиғиш",
+      "ru": "Свернуть меню",
+      "en": "Collapse menu"
+    },
+    "org.expand_menu": {
+      "uz": "Menyuni yoyish",
+      "uzc": "Менюни ёйиш",
+      "ru": "Развернуть меню",
+      "en": "Expand menu"
+    },
+    "org.open_menu": {
+      "uz": "Menyuni ochish",
+      "uzc": "Менюни очиш",
+      "ru": "Открыть меню",
+      "en": "Open menu"
+    },
+    "org.close_menu": {
+      "uz": "Menyuni yopish",
+      "uzc": "Менюни ёпиш",
+      "ru": "Закрыть меню",
+      "en": "Close menu"
+    },
+    "org.principal": {
+      "uz": "Subyekt turi",
+      "uzc": "Субект тури",
+      "ru": "Тип субъекта",
+      "en": "Principal"
+    },
+    "org.workspace": {
+      "uz": "Ish maydoni",
+      "uzc": "Иш майдони",
+      "ru": "Рабочее пространство",
+      "en": "Workspace"
+    },
+    "org.subpanel_placeholder": {
+      "uz": "Bo'lim navigatsiyasi bu yerda paydo bo'ladi.",
+      "uzc": "Бўлим навигацияси бу ерда пайдо бўлади.",
+      "ru": "Подменю появится здесь.",
+      "en": "Sub-navigation will appear here."
+    },
+    "org.page_placeholder": {
+      "uz": "Bu modul hozircha mavjud emas.",
+      "uzc": "Бу модул ҳозирча мавжуд эмас.",
+      "ru": "Этот модуль пока недоступен.",
+      "en": "This module is not available yet."
+    },
+    "org.module_invoices": {
+      "uz": "Xisob fakturalari",
+      "uzc": "Хисоб фактуралари",
+      "ru": "Счета-фактуры",
+      "en": "Invoices"
+    },
+    "org.module_bank": {
+      "uz": "Bank",
+      "uzc": "Банк",
+      "ru": "Банк",
+      "en": "Bank"
+    },
+    "org.module_assets": {
+      "uz": "Aktlar",
+      "uzc": "Актлар",
+      "ru": "Активы",
+      "en": "Assets"
+    },
+    "org.module_warehouse": {
+      "uz": "Ombor",
+      "uzc": "Омбор",
+      "ru": "Склад",
+      "en": "Warehouse"
+    },
+    "org.module_contracts": {
+      "uz": "Shartnomalar",
+      "uzc": "Шартномалар",
+      "ru": "Договоры",
+      "en": "Contracts"
+    },
+    "org.module_letters": {
+      "uz": "Xatlar",
+      "uzc": "Хатлар",
+      "ru": "Письма",
+      "en": "Letters"
+    },
+    "org.module_hr": {
+      "uz": "Kadrlar",
+      "uzc": "Кадрлар",
+      "ru": "Кадры",
+      "en": "HR"
+    },
+    "org.module_balance": {
+      "uz": "Balans",
+      "uzc": "Баланс",
+      "ru": "Баланс",
+      "en": "Balance"
+    },
+    "org.module_new_documents": {
+      "uz": "Yangi hujjatlar",
+      "uzc": "Янги ҳужжатлар",
+      "ru": "Новые документы",
+      "en": "New documents"
+    },
+    "org.module_dashboard": {
+      "uz": "Boshqaruv paneli",
+      "uzc": "Бошқарув панели",
+      "ru": "Панель управления",
+      "en": "Dashboard"
+    },
+    "org.module_apps": {
+      "uz": "Ilovalar",
+      "uzc": "Иловалар",
+      "ru": "Приложения",
+      "en": "Apps"
+    },
+    "org.dashboard_title": {
+      "uz": "Biznesingiz bir qarashda",
+      "uzc": "Бизнесингиз бир қарашда",
+      "ru": "Весь бизнес — одним взглядом",
+      "en": "Your business at a glance"
+    },
+    "org.dashboard_subtitle": {
+      "uz": "Bu sahifa kompaniyangizning so'nggi moliyaviy faoliyatini umumlashtiradi.",
+      "uzc": "Бу саҳифа компаниянгизнинг сўнгги молиявий фаолиятини умумлаштиради.",
+      "ru": "На этой странице обобщена последняя финансовая активность вашей компании.",
+      "en": "A summary of your recent financial activity across the workspace."
+    },
+    "org.dashboard_sample_notice": {
+      "uz": "Namuna ma'lumotlar — raqamlar haqiqiy emas.",
+      "uzc": "Намуна маълумотлар — рақамлар ҳақиқий эмас.",
+      "ru": "Демонстрационные данные — цифры не являются реальными.",
+      "en": "Sample data for development — the figures are not real."
+    },
+    "org.dashboard_card_income": {
+      "uz": "Umumiy daromad",
+      "uzc": "Умумий даромад",
+      "ru": "Общий доход",
+      "en": "Total income"
+    },
+    "org.dashboard_card_expenses": {
+      "uz": "Umumiy xarajatlar",
+      "uzc": "Умумий харажатлар",
+      "ru": "Общие расходы",
+      "en": "Total expenses"
+    },
+    "org.dashboard_card_balance": {
+      "uz": "Joriy balans",
+      "uzc": "Жорий баланс",
+      "ru": "Текущий баланс",
+      "en": "Current balance"
+    },
+    "org.dashboard_card_receivables": {
+      "uz": "Debitorlik qarzlari",
+      "uzc": "Дебиторлик қарзлари",
+      "ru": "Дебиторская задолженность",
+      "en": "Outstanding receivables"
+    },
+    "org.dashboard_vs_prev_month": {
+      "uz": "o'tgan oyga nisbatan",
+      "uzc": "ўтган ойга нисбатан",
+      "ru": "к прошлому месяцу",
+      "en": "vs last month"
+    },
+    "org.dashboard_chart_title": {
+      "uz": "Daromad va xarajatlar",
+      "uzc": "Даромад ва харажатлар",
+      "ru": "Доходы и расходы",
+      "en": "Income and expenses"
+    },
+    "org.dashboard_period_3m": {
+      "uz": "3 oy",
+      "uzc": "3 ой",
+      "ru": "3 месяца",
+      "en": "3 months"
+    },
+    "org.dashboard_period_6m": {
+      "uz": "6 oy",
+      "uzc": "6 ой",
+      "ru": "6 месяцев",
+      "en": "6 months"
+    },
+    "org.dashboard_period_12m": {
+      "uz": "12 oy",
+      "uzc": "12 ой",
+      "ru": "12 месяцев",
+      "en": "12 months"
+    },
+    "org.dashboard_legend_income": {
+      "uz": "Daromad",
+      "uzc": "Даромад",
+      "ru": "Доходы",
+      "en": "Income"
+    },
+    "org.dashboard_legend_expenses": {
+      "uz": "Xarajatlar",
+      "uzc": "Харажатлар",
+      "ru": "Расходы",
+      "en": "Expenses"
+    },
+    "org.dashboard_chart_aria": {
+      "uz": "Oylar bo'yicha daromad va xarajatlar chiziqdiagrammasi. Qiymatlarni ko'rish uchun chap va o'ng strelkalardan foydalaning.",
+      "uzc": "Ойлар бўйича даромад ва харажатлар чизиқдиаграммаси. Қийматларни кўриш учун чап ва ўнг стрелкалардан фойдаланинг.",
+      "ru": "Линейный график доходов и расходов по месяцам. Используйте стрелки влево и вправо, чтобы просмотреть значения.",
+      "en": "Line chart of income and expenses by month. Use the left and right arrow keys to read values."
+    },
+    "org.dashboard_transactions_title": {
+      "uz": "So'nggi tranzaksiyalar",
+      "uzc": "Сўнгги транзакциялар",
+      "ru": "Последние операции",
+      "en": "Recent transactions"
+    },
+    "org.dashboard_tx_description": {
+      "uz": "Tavsif",
+      "uzc": "Тавсиф",
+      "ru": "Описание",
+      "en": "Description"
+    },
+    "org.dashboard_tx_date": {
+      "uz": "Sana",
+      "uzc": "Сана",
+      "ru": "Дата",
+      "en": "Date"
+    },
+    "org.dashboard_tx_type": {
+      "uz": "Turi",
+      "uzc": "Тури",
+      "ru": "Тип",
+      "en": "Type"
+    },
+    "org.dashboard_tx_amount": {
+      "uz": "Summa",
+      "uzc": "Сумма",
+      "ru": "Сумма",
+      "en": "Amount"
+    },
+    "org.dashboard_tx_status": {
+      "uz": "Holat",
+      "uzc": "Ҳолат",
+      "ru": "Статус",
+      "en": "Status"
+    },
+    "org.dashboard_type_income": {
+      "uz": "Kirim",
+      "uzc": "Кирим",
+      "ru": "Доход",
+      "en": "Income"
+    },
+    "org.dashboard_type_expense": {
+      "uz": "Chiqim",
+      "uzc": "Чиқим",
+      "ru": "Расход",
+      "en": "Expense"
+    },
+    "org.dashboard_status_completed": {
+      "uz": "Bajarildi",
+      "uzc": "Бажарилди",
+      "ru": "Завершено",
+      "en": "Completed"
+    },
+    "org.dashboard_status_pending": {
+      "uz": "Kutilmoqda",
+      "uzc": "Кутилмоқда",
+      "ru": "Ожидается",
+      "en": "Pending"
+    },
+    "org.dashboard_tx_cat_client_payment": {
+      "uz": "Mijoz to'lovi",
+      "uzc": "Мижоз тўлови",
+      "ru": "Оплата от клиента",
+      "en": "Client payment"
+    },
+    "org.dashboard_tx_cat_invoice": {
+      "uz": "Hisob-faktura",
+      "uzc": "Ҳисоб-фактура",
+      "ru": "Счёт",
+      "en": "Invoice"
+    },
+    "org.dashboard_tx_cat_tax": {
+      "uz": "Soliq to'lovi",
+      "uzc": "Солиқ тўлови",
+      "ru": "Налоговый платёж",
+      "en": "Tax payment"
+    },
+    "org.dashboard_tx_cat_supplier_payment": {
+      "uz": "Ta'minotchi to'lovi",
+      "uzc": "Таъминотчи тўлови",
+      "ru": "Оплата поставщику",
+      "en": "Supplier payment"
+    },
+    "org.dashboard_tx_cat_payroll": {
+      "uz": "Ish haqi",
+      "uzc": "Иш ҳақи",
+      "ru": "Выплата зарплаты",
+      "en": "Payroll"
+    },
+    "org.dashboard_tx_cat_utilities": {
+      "uz": "Kommunal to'lovlar",
+      "uzc": "Коммунал тўловлар",
+      "ru": "Коммунальные услуги",
+      "en": "Utilities"
+    },
+    "org.dashboard_tx_cat_bank_fee": {
+      "uz": "Bank komissiyasi",
+      "uzc": "Банк комиссияси",
+      "ru": "Банковская комиссия",
+      "en": "Bank fee"
+    },
+    "org.dashboard_quick_actions": {
+      "uz": "Tezkor amallar",
+      "uzc": "Тезкор амаллар",
+      "ru": "Быстрые действия",
+      "en": "Quick actions"
+    },
+    "org.dashboard_qa_create_invoice": {
+      "uz": "Hisob-faktura yaratish",
+      "uzc": "Ҳисоб-фактура яратиш",
+      "ru": "Создать счёт",
+      "en": "Create invoice"
+    },
+    "org.dashboard_qa_record_income": {
+      "uz": "Daromadni kiritish",
+      "uzc": "Даромадни киритиш",
+      "ru": "Внести доход",
+      "en": "Record income"
+    },
+    "org.dashboard_qa_record_expense": {
+      "uz": "Xarajatni kiritish",
+      "uzc": "Харажатни киритиш",
+      "ru": "Внести расход",
+      "en": "Record expense"
+    },
+    "org.dashboard_qa_view_transactions": {
+      "uz": "Tranzaksiyalarni ko'rish",
+      "uzc": "Транзакцияларни кўриш",
+      "ru": "Открыть операции",
+      "en": "View transactions"
+    },
+    "org.dashboard_qa_unavailable": {
+      "uz": "Tegishli modullar tayyor bo'lgach bu amallar mavjud bo'ladi.",
+      "uzc": "Тегишли модуллар тайёр бўлганча бу амаллар мавжуд бўлади.",
+      "ru": "Действия станут доступны по мере готовности соответствующих модулей.",
+      "en": "These actions become available as the related modules are ready."
+    },
+    "org.dashboard_attention_title": {
+      "uz": "E'tibor talab qiladi",
+      "uzc": "Эътибор талаб қилади",
+      "ru": "Требует внимания",
+      "en": "Needs attention"
+    },
+    "org.dashboard_attention_invoices": {
+      "uz": "To'lov kutilayotgan hisob-fakturalar",
+      "uzc": "Тўлов кутилаётган ҳисоб-фактуралар",
+      "ru": "Счета, ожидающие оплаты",
+      "en": "Invoices awaiting payment"
+    },
+    "org.dashboard_attention_contracts": {
+      "uz": "Tez orada tugaydigan shartnomalar",
+      "uzc": "Тез орада тугайдиган шартномалар",
+      "ru": "Скоро истекающие договоры",
+      "en": "Contracts expiring soon"
+    },
+    "org.dashboard_attention_overdue": {
+      "uz": "Muddati o'tgan to'lovlar",
+      "uzc": "Муддати ўтган тўловлар",
+      "ru": "Просроченные платежи",
+      "en": "Overdue payments"
+    }
+  },
+  "errors": {
+    "errors.generic": {
+      "uz": "Xatolik yuz berdi. Qayta urinib ko'ring.",
+      "uzc": "Хатолик юз берди. Қайта уриниб кўринг.",
+      "ru": "Что-то пошло не так. Попробуйте ещё раз.",
+      "en": "Something went wrong. Please try again."
+    },
+    "errors.unauthorized": {
+      "uz": "Avtorizatsiya talab qilinadi.",
+      "uzc": "Авторизация талаб қилинади.",
+      "ru": "Требуется авторизация.",
+      "en": "Authentication is required."
+    },
+    "errors.forbidden": {
+      "uz": "Ruxsat yo'q.",
+      "uzc": "Рухсат йўқ.",
+      "ru": "Доступ запрещён.",
+      "en": "You do not have access."
+    },
+    "errors.invalid_credentials": {
+      "uz": "Email/telefon yoki parol xato.",
+      "uzc": "Email/telefon ёки парол хато.",
+      "ru": "Неверная почта/телефон или пароль.",
+      "en": "Incorrect email/phone or password."
+    },
+    "errors.rate_limited": {
+      "uz": "Urinishlar juda ko'p. Birozdan so'ng qayta urinib ko'ring.",
+      "uzc": "Уринишлар жуда кўп. Бироздан сўнг қайта уриниб кўринг.",
+      "ru": "Слишком много попыток. Попробуйте позже.",
+      "en": "Too many attempts. Please wait and try again."
+    },
+    "errors.conflict": {
+      "uz": "Bunday yozuv allaqachon mavjud.",
+      "uzc": "Бундай ёзув аллақачон мавжуд.",
+      "ru": "Такая запись уже существует.",
+      "en": "This record already exists."
+    },
+    "errors.validation": {
+      "uz": "Belgilangan maydonlarni tekshiring.",
+      "uzc": "Белгиланган майдонларни текширинг.",
+      "ru": "Проверьте выделенные поля.",
+      "en": "Please check the highlighted fields."
+    },
+    "errors.not_found": {
+      "uz": "Topilmadi.",
+      "uzc": "Топилмади.",
+      "ru": "Не найдено.",
+      "en": "Not found."
+    },
+    "errors.not_found_title": {
+      "uz": "Sahifa topilmadi",
+      "uzc": "Саҳифа топилмади",
+      "ru": "Страница не найдена",
+      "en": "Page not found"
+    },
+    "errors.not_found_text": {
+      "uz": "Siz izlagan sahifa mavjud emas.",
+      "uzc": "Сиз излаган саҳифа мавжуд эмас.",
+      "ru": "Страницы, которую вы ищете, не существует.",
+      "en": "The page you are looking for does not exist."
+    },
+    "errors.not_found_back": {
+      "uz": "Bosh sahifaga qaytish",
+      "uzc": "Бош саҳифага қайтиш",
+      "ru": "Вернуться на главную",
+      "en": "Back to home"
+    },
+    "errors.payload_too_large": {
+      "uz": "So'rov hajmi juda katta.",
+      "uzc": "Сўров ҳажми жуда катта.",
+      "ru": "Запрос слишком большой.",
+      "en": "The request is too large."
+    },
+    "errors.network": {
+      "uz": "Serverga ulanib bo'lmadi. Ulanishni tekshiring.",
+      "uzc": "Серверга уланиб бўлмади. Уланишни текширинг.",
+      "ru": "Не удалось связаться с сервером. Проверьте соединение.",
+      "en": "Cannot reach the server. Check your connection."
+    },
+    "errors.eimzo_unavailable": {
+      "uz": "E-IMZO mijozi mavjud emas. E-IMZO dasturini o‘rnating va ishga tushiring, so‘ng qayta urinib ko‘ring.",
+      "uzc": "E-IMZO мижози мавжуд эмас. E-IMZO дастурини ўрнатинг ва ишга туширинг, сўнг қайта уриниб кўринг.",
+      "ru": "Клиент E-IMZO недоступен. Установите и запустите E-IMZO, затем повторите попытку.",
+      "en": "The E-IMZO client is not available. Install and start E-IMZO, then try again."
+    },
+    "errors.eimzo_no_keys": {
+      "uz": "Bu kompyuterda E-IMZO kalitlari topilmadi.",
+      "uzc": "Бу компьютерда E-IMZO калитлари топилмади.",
+      "ru": "На этом компьютере ключи E-IMZO не найдены.",
+      "en": "No E-IMZO keys were found on this computer."
+    },
+    "errors.eimzo_api_key_missing": {
+      "uz": "Bu sayt uchun ushbu domenga E-IMZO API kaliti sozlanmagan.",
+      "uzc": "Бу сайт учун ушбу доменга E-IMZO API калити созланмаган.",
+      "ru": "Для этого сайта не настроен ключ API E-IMZO для данного домена.",
+      "en": "This site has no E-IMZO API key for this domain."
+    },
+    "errors.eimzo_cancelled": {
+      "uz": "Imzolash bekor qilindi.",
+      "uzc": "Имзолаш бекор қилинди.",
+      "ru": "Подписание отменено.",
+      "en": "Signing was cancelled."
+    },
+    "errors.eimzo_wrong_password": {
+      "uz": "Kalit paroli (PIN) xato.",
+      "uzc": "Калит пароли (PIN) хато.",
+      "ru": "Неверный пароль (PIN) ключа.",
+      "en": "The key password (PIN) is incorrect."
+    },
+    "errors.eimzo_failed": {
+      "uz": "E-IMZO amalni bajara olmadi.",
+      "uzc": "E-IMZO амални бажара олмади.",
+      "ru": "E-IMZO не удалось выполнить операцию.",
+      "en": "E-IMZO could not complete the operation."
+    },
+    "validation.required": {
+      "uz": "Bu maydon to'ldirilishi shart.",
+      "uzc": "Бу майдон тўлдирилиши шарт.",
+      "ru": "Это поле обязательно.",
+      "en": "This field is required."
+    },
+    "validation.email": {
+      "uz": "To'g'ri email kiriting.",
+      "uzc": "Тўғри email киритинг.",
+      "ru": "Введите корректную почту.",
+      "en": "Enter a valid email address."
+    },
+    "validation.phone": {
+      "uz": "Telefon raqamini 9 yoki 12 raqam bilan kiriting.",
+      "uzc": "Телефон рақамини 9 ёки 12 рақам билан киритинг.",
+      "ru": "Введите 9 или 12 цифр номера телефона.",
+      "en": "Enter a valid phone number (9 or 12 digits)."
+    },
+    "validation.password_length": {
+      "uz": "Parol 8 dan 72 tagacha belgidan iborat bo'lishi kerak.",
+      "uzc": "Парол 8 дан 72 тагача белгидан иборат бўлиши керак.",
+      "ru": "Пароль должен содержать от 8 до 72 символов.",
+      "en": "Password must be 8 to 72 characters."
+    },
+    "validation.identifier_required": {
+      "uz": "Email yoki telefon raqamini kiriting.",
+      "uzc": "Email ёки телефон рақамини киритинг.",
+      "ru": "Введите почту или номер телефона.",
+      "en": "Enter an email or a phone number."
+    },
+    "errors.unprocessable": {
+      "uz": "So'rovni qayta ishlab bo'lmadi.",
+      "uzc": "Сўровни қайта ишлаб бўлмади.",
+      "ru": "Не удалось обработать запрос.",
+      "en": "The request could not be processed."
+    },
+    "errors.service_unavailable": {
+      "uz": "Xizmat vaqtincha mavjud emas. Birozdan so'ng qayta urinib ko'ring.",
+      "uzc": "Хизмат вақтинча мавжуд эмас. Бироздан сўнг қайта уриниб кўринг.",
+      "ru": "Сервис временно недоступен. Попробуйте позже.",
+      "en": "The service is temporarily unavailable. Try again shortly."
+    }
+  },
+  "settings": {
+    "settings.page_subtitle": {
+      "uz": "Hisob sozlamalaringiz va xavfsizlik sozlamalarini boshqaring.",
+      "uzc": "Ҳисоб созламаларингиз ва хавфсизлик созламаларини бошқаринг.",
+      "ru": "Управляйте настройками аккаунта и безопасности.",
+      "en": "Manage your account settings and security preferences"
+    },
+    "settings.profile_title": {
+      "uz": "Profil",
+      "uzc": "Профил",
+      "ru": "Профиль",
+      "en": "Profile"
+    },
+    "settings.profile_hint": {
+      "uz": "Ilovada profil ko'rinishini boshqaring.",
+      "uzc": "Иловада профил кўринишини бошқаринг.",
+      "ru": "Управляйте отображением профиля в приложении.",
+      "en": "Manage how your profile appears across the application."
+    },
+    "settings.avatar_title": {
+      "uz": "Profil fotosi",
+      "uzc": "Профил фотоси",
+      "ru": "Фото профиля",
+      "en": "Profile Photo"
+    },
+    "settings.avatar_hint": {
+      "uz": "Jamoatchilar sizni tanishiga yordam berish uchun foto qo'shing.",
+      "uzc": "Жамоатчилар сизни танишига ёрдам бериш учун фото қўшинг.",
+      "ru": "Добавьте фото, чтобы коллеги могли вас узнать.",
+      "en": "Add a photo to help teammates recognize you."
+    },
+    "settings.avatar_preview_alt": {
+      "uz": "Profil foto ko'rinishi",
+      "uzc": "Профил фото кўриниши",
+      "ru": "Предпросмотр фото профиля",
+      "en": "Profile photo preview"
+    },
+    "settings.avatar_draft_badge": {
+      "uz": "Saqlanmagan",
+      "uzc": "Сақланмаган",
+      "ru": "Не сохранено",
+      "en": "Unsaved"
+    },
+    "settings.avatar_file_label": {
+      "uz": "Profil foto fayli",
+      "uzc": "Профил фото файли",
+      "ru": "Файл фото профиля",
+      "en": "Profile photo file"
+    },
+    "settings.avatar_save": {
+      "uz": "Fotoni saqlash",
+      "uzc": "Фотони сақлаш",
+      "ru": "Сохранить фото",
+      "en": "Save Photo"
+    },
+    "settings.avatar_remove": {
+      "uz": "Fotoni olib tashlash",
+      "uzc": "Фотони олиб ташлаш",
+      "ru": "Удалить фото",
+      "en": "Remove Photo"
+    },
+    "settings.avatar_select": {
+      "uz": "Foto tanlash",
+      "uzc": "Фото танлаш",
+      "ru": "Выбрать фото",
+      "en": "Select Photo"
+    },
+    "settings.avatar_change": {
+      "uz": "Fotoni almashtirish",
+      "uzc": "Фотони алмаштириш",
+      "ru": "Изменить фото",
+      "en": "Change Photo"
+    },
+    "settings.avatar_active": {
+      "uz": "Maxsus fotosingiz ushbu sessiya davomida faol.",
+      "uzc": "Махсус фотосингиз ушбу сессия давомида фаол.",
+      "ru": "Ваше пользовательское фото активно в текущей сессии.",
+      "en": "Your custom photo is active for this session."
+    },
+    "settings.avatar_none": {
+      "uz": "Ushbu sessiya uchun maxsus foto o'rnatilmagan.",
+      "uzc": "Ушбу сессия учун махсус фото ўрнатилмаган.",
+      "ru": "Пользовательское фото для этой сессии не установлено.",
+      "en": "No custom photo is set for this session."
+    },
+    "settings.avatar_pending": {
+      "uz": "Yangi foto tanlangan, lekin saqlanmagan.",
+      "uzc": "Янги фото танланган, лекин сақланмаган.",
+      "ru": "Новое фото выбрано, но ещё не сохранено.",
+      "en": "A new photo is selected but has not been saved."
+    },
+    "settings.avatar_saving": {
+      "uz": "Fotongiz saqlanmoqda…",
+      "uzc": "Фотосингиз сақланмоқда…",
+      "ru": "Фото сохраняется…",
+      "en": "Saving your photo…"
+    },
+    "settings.avatar_saved": {
+      "uz": "Fotongiz ushbu sessiya uchun saqlandi.",
+      "uzc": "Фотосингиз ушбу сессия учун сақланди.",
+      "ru": "Фото сохранено для текущей сессии.",
+      "en": "Your photo was saved for this session."
+    },
+    "settings.avatar_save_failed": {
+      "uz": "Fotoni saqlab bo'lmadi. Qayta urinib ko'ring.",
+      "uzc": "Фотони сақлаб бўлмади. Қайта уриниб кўринг.",
+      "ru": "Не удалось сохранить фото. Попробуйте ещё раз.",
+      "en": "The photo could not be saved. Please try again."
+    },
+    "settings.avatar_removal_pending": {
+      "uz": "Fotoni olib tashlashni tasdiqlang.",
+      "uzc": "Фотони олиб ташлашни тасдиқланг.",
+      "ru": "Подтвердите удаление фото.",
+      "en": "Confirm whether you want to remove your photo."
+    },
+    "settings.avatar_removing": {
+      "uz": "Fotongiz olib tashlanmoqda…",
+      "uzc": "Фотосингиз олиб ташланмоқда…",
+      "ru": "Фото удаляется…",
+      "en": "Removing your photo…"
+    },
+    "settings.avatar_removed": {
+      "uz": "Fotongiz ushbu sessiya uchun olib tashlandi.",
+      "uzc": "Фотосингиз ушбу сессия учун олиб ташланди.",
+      "ru": "Фото удалено для текущей сессии.",
+      "en": "Your photo was removed for this session."
+    },
+    "settings.avatar_remove_failed": {
+      "uz": "Fotoni olib tashlab bo'lmadi. Qayta urinib ko'ring.",
+      "uzc": "Фотони олиб ташлаб бўлмади. Қайта уриниб кўринг.",
+      "ru": "Не удалось удалить фото. Попробуйте ещё раз.",
+      "en": "The photo could not be removed. Please try again."
+    },
+    "settings.avatar_load_failed": {
+      "uz": "Joriy fotoni yuklab bo'lmadi.",
+      "uzc": "Жорий фотони юклаб бўлмади.",
+      "ru": "Не удалось загрузить текущее фото.",
+      "en": "The current photo could not be loaded."
+    },
+    "settings.avatar_invalid_type": {
+      "uz": "JPG, PNG yoki WebP formatidagi rasm tanlang.",
+      "uzc": "JPG, PNG ёки WebP форматидаги расм танланг.",
+      "ru": "Выберите изображение в формате JPG, PNG или WebP.",
+      "en": "Choose a JPG, PNG, or WebP image."
+    },
+    "settings.avatar_too_large": {
+      "uz": "5 MB dan kichik rasm tanlang.",
+      "uzc": "5 МБ дан кам расм танланг.",
+      "ru": "Выберите изображение размером меньше 5 МБ.",
+      "en": "Choose an image smaller than 5 MB."
+    },
+    "settings.avatar_invalid_image": {
+      "uz": "Tanlangan faylni rasm sifatida o'qib bo'lmadi.",
+      "uzc": "Танланган файлни расм сифатида ўқиб бўлмади.",
+      "ru": "Не удалось прочитать выбранный файл как изображение.",
+      "en": "The selected file could not be read as an image."
+    },
+    "settings.avatar_generic_error": {
+      "uz": "Foto bilan bog'liq xatolik yuz berdi. Qayta urinib ko'ring.",
+      "uzc": "Фото билан боғлиқ хатолик юз берди. Қайта уриниб кўринг.",
+      "ru": "Произошла ошибка с фотографией. Попробуйте ещё раз.",
+      "en": "Something went wrong with the photo. Please try again."
+    },
+    "settings.avatar_remove_title": {
+      "uz": "Profil fotosi olib tashlansinmi?",
+      "uzc": "Профил фотоси олиб ташлансинми?",
+      "ru": "Удалить фото профиля?",
+      "en": "Remove profile photo?"
+    },
+    "settings.avatar_remove_message": {
+      "uz": "Ushbu sessiya uchun joriy foto olib tashlanadi. Keyin boshqa foto tanlay olasiz.",
+      "uzc": "Ушбу сессия учун жорий фото олиб ташлади. Кейин бошқа фото танлай оласиз.",
+      "ru": "Текущее фото будет удалено для этой сессии. Позже можно выбрать другое фото.",
+      "en": "This removes the current photo for this session. You can select another photo later."
+    },
+    "settings.avatar_remove_confirm": {
+      "uz": "Fotoni olib tashlash",
+      "uzc": "Фотони олиб ташлаш",
+      "ru": "Удалить фото",
+      "en": "Remove Photo"
+    },
+    "settings.avatar_local_notice": {
+      "uz": "Faqat ishlab chiqish previewi. O'zgarishlar ushbu sessiya uchun xotirada saqlanadi, sahifani yangilagandan keyin serverga yuklanmaydi yoki saqlanmaydi.",
+      "uzc": "Фақат ишлаб чиқиш кўриниши. Ўзгаришлар ушбу сессия учун хотирада сақланади, саҳифа янгилангандан кейин серверга юкланмайди ёки сақланмайди.",
+      "ru": "Только режим разработки. Изменения хранятся в памяти до конца сессии и не загружаются на сервер и не сохраняются после перезагрузки страницы.",
+      "en": "Development preview only. Changes stay in memory for this session and are not uploaded or saved after a page reload."
+    },
+    "settings.nav_profile": {
+      "uz": "Profil",
+      "uzc": "Профил",
+      "ru": "Профиль",
+      "en": "Profile"
+    },
+    "settings.nav_notifications": {
+      "uz": "Bildirishnomalar",
+      "uzc": "Билдиришномалар",
+      "ru": "Уведомления",
+      "en": "Notifications"
+    },
+    "settings.nav_appearance": {
+      "uz": "Ko'rinish",
+      "uzc": "Кўриниш",
+      "ru": "Внешний вид",
+      "en": "Appearance"
+    },
+    "settings.nav_language": {
+      "uz": "Til",
+      "uzc": "Тил",
+      "ru": "Язык",
+      "en": "Language"
+    },
+    "settings.appearance_hint": {
+      "uz": "Interfeys ko'rinishini tanlang. Tanlovingiz shu qurilmada saqlanadi.",
+      "uzc": "Интерфейс кўринишини танланг. Танловингиз шу қурилмада сақланади.",
+      "ru": "Выберите оформление интерфейса. Ваш выбор сохраняется на этом устройстве.",
+      "en": "Choose how the interface looks. Your choice is saved on this device."
+    },
+    "settings.theme_light": {
+      "uz": "Yorug'",
+      "uzc": "Ёруғ",
+      "ru": "Светлая",
+      "en": "Light"
+    },
+    "settings.theme_dark": {
+      "uz": "Tungi",
+      "uzc": "Тунги",
+      "ru": "Тёмная",
+      "en": "Dark"
+    },
+    "settings.language_hint": {
+      "uz": "Interfeys tili hisobingizda saqlanadi.",
+      "uzc": "Интерфейс тили ҳисобингизда сақланади.",
+      "ru": "Язык интерфейса сохраняется в вашей учётной записи.",
+      "en": "The interface language is saved to your account."
+    },
+    "settings.saved": {
+      "uz": "Saqlandi.",
+      "uzc": "Сақланди.",
+      "ru": "Сохранено.",
+      "en": "Saved."
+    },
+    "settings.invalid_language": {
+      "uz": "Bu til mavjud emas.",
+      "uzc": "Бу тил мавжуд эмас.",
+      "ru": "Этот язык недоступен.",
+      "en": "This language is not available."
+    },
+    "settings.security_title": {
+      "uz": "Hisob xavfsizligi",
+      "uzc": "Ҳисоб хавфсизлиги",
+      "ru": "Безопасность учётной записи",
+      "en": "Account security"
+    },
+    "settings.security_hint": {
+      "uz": "Hisobingiz xavfsizligini ta'minlash uchun elektron pochtangizni va parolingizni yangilang.",
+      "uzc": "Ҳисобингиз хавфсизлигини таъминлаш учун электрон почтангизни ва паролингизни янгиланг.",
+      "ru": "Обновите адрес электронной почты и пароль, чтобы обеспечить безопасность аккаунта.",
+      "en": "Update your email address and password to keep your account secure."
+    },
+    "settings.email_label": {
+      "uz": "Elektron pochta",
+      "uzc": "Электрон почта",
+      "ru": "Электронная почта",
+      "en": "Email"
+    },
+    "settings.email_verified": {
+      "uz": "Tasdiqlangan",
+      "uzc": "Тасдиқланган",
+      "ru": "Подтверждено",
+      "en": "Verified"
+    },
+    "settings.email_not_verified": {
+      "uz": "Tasdiqlanmagan",
+      "uzc": "Тасдиқланмаган",
+      "ru": "Не подтверждено",
+      "en": "Not verified"
+    },
+    "settings.change_email_title": {
+      "uz": "Elektron pochta manzilini o'zgartirish",
+      "uzc": "Электрон почта манзилини ўзгартириш",
+      "ru": "Изменить адрес электронной почты",
+      "en": "Change Email Address"
+    },
+    "settings.email_card_hint": {
+      "uz": "Elektron pochtani o'zgartirish uchun joriy parolni kiritishingiz kerak.",
+      "uzc": "Электрон почтани ўзгартириш учун жорий паролни киритишингиз керак.",
+      "ru": "Чтобы изменить адрес электронной почты, введите текущий пароль.",
+      "en": "You'll need to enter your current password to change your email address."
+    },
+    "settings.new_email": {
+      "uz": "Yangi elektron pochta manzili",
+      "uzc": "Янги электрон почта манзили",
+      "ru": "Новый адрес электронной почты",
+      "en": "New Email Address"
+    },
+    "settings.email_banner": {
+      "uz": "Yangi elektron pochta manziliga tasdiqlash kodi yuboriladi. O'zgarishni yakunlash uchun kodni kiriting.",
+      "uzc": "Янги электрон почта манзилига тасдиқлаш коди юборилади. Ўзгаришни якунлаш учун кодни киритинг.",
+      "ru": "На новый адрес электронной почты будет отправлен код подтверждения. Введите его, чтобы завершить смену.",
+      "en": "A verification code will be sent to your new email address. Enter the code to complete the change."
+    },
+    "settings.email_submit": {
+      "uz": "Pochtani o'zgartirish",
+      "uzc": "Почтани ўзгартириш",
+      "ru": "Изменить почту",
+      "en": "Change Email"
+    },
+    "settings.current_password": {
+      "uz": "Joriy parol",
+      "uzc": "Жорий парол",
+      "ru": "Текущий пароль",
+      "en": "Current password"
+    },
+    "settings.send_code": {
+      "uz": "Kodni yuborish",
+      "uzc": "Кодни юбориш",
+      "ru": "Отправить код",
+      "en": "Send code"
+    },
+    "settings.code_sent": {
+      "uz": "6 xonali kod {email} manziliga yuborildi. U {minutes} daqiqa amal qiladi.",
+      "uzc": "6 хонали код {email} манзилига юборилди. У {minutes} дақиқа амал қилади.",
+      "ru": "6-значный код отправлен на {email}. Он действителен {minutes} мин.",
+      "en": "A 6-digit code was sent to {email}. It is valid for {minutes} minutes."
+    },
+    "settings.verification_code": {
+      "uz": "Tasdiqlash kodi",
+      "uzc": "Тасдиқлаш коди",
+      "ru": "Код подтверждения",
+      "en": "Verification code"
+    },
+    "settings.code_invalid": {
+      "uz": "6 xonali kodni kiriting.",
+      "uzc": "6 хонали кодни киритинг.",
+      "ru": "Введите 6-значный код.",
+      "en": "Enter the 6-digit code."
+    },
+    "settings.confirm_email": {
+      "uz": "Pochtani tasdiqlash",
+      "uzc": "Почтани тасдиқлаш",
+      "ru": "Подтвердить почту",
+      "en": "Confirm email"
+    },
+    "settings.email_changed": {
+      "uz": "Elektron pochta manzili yangilandi.",
+      "uzc": "Электрон почта манзили янгаланди.",
+      "ru": "Адрес электронной почты обновлён.",
+      "en": "Email address updated."
+    },
+    "settings.email_taken": {
+      "uz": "Bu elektron pochta manzili allaqachon ishlatilgan.",
+      "uzc": "Бу электрон почта манзили аллақачон ишлатилган.",
+      "ru": "Этот адрес электронной почты уже занят.",
+      "en": "This email address is already in use."
+    },
+    "settings.email_same": {
+      "uz": "Yangi manzil joriy manzil bilan bir xil.",
+      "uzc": "Янги манзил жорий манзил билан бир хил.",
+      "ru": "Новый адрес совпадает с текущим.",
+      "en": "The new email address matches the current one."
+    },
+    "settings.email_send_failed": {
+      "uz": "Kodni yuborib bo'lmadi. Iltimos, qaytadan urinib ko'ring.",
+      "uzc": "Кодни юбориб бўлмади. Илтимос, қайтадан уриниб кўринг.",
+      "ru": "Не удалось отправить код. Попробуйте ещё раз.",
+      "en": "The code could not be sent. Please try again."
+    },
+    "settings.wrong_current_password": {
+      "uz": "Joriy parol noto'g'ri.",
+      "uzc": "Жорий парол нотўғри.",
+      "ru": "Текущий пароль указан неверно.",
+      "en": "The current password is incorrect."
+    },
+    "settings.change_password_title": {
+      "uz": "Parolni o'zgartirish",
+      "uzc": "Паролни ўзгартириш",
+      "ru": "Изменение пароля",
+      "en": "Change Password"
+    },
+    "settings.password_card_hint": {
+      "uz": "Hisobingizni xavfsiz saqlash uchun kuchli parol tanlang.",
+      "uzc": "Ҳисобингизни хавфсиз сақлаш учун кучли парол танланг.",
+      "ru": "Выберите надёжный пароль, чтобы обеспечить безопасность аккаунта.",
+      "en": "Choose a strong password to keep your account safe."
+    },
+    "settings.new_password": {
+      "uz": "Yangi parol",
+      "uzc": "Янги парол",
+      "ru": "Новый пароль",
+      "en": "New Password"
+    },
+    "settings.confirm_new_password": {
+      "uz": "Yangi parolni tasdiqlash",
+      "uzc": "Янги паролни тасдиқлаш",
+      "ru": "Подтвердите новый пароль",
+      "en": "Confirm New Password"
+    },
+    "settings.req_length": {
+      "uz": "Kamida 8 belgi",
+      "uzc": "Камида 8 белги",
+      "ru": "Минимум 8 символов",
+      "en": "At least 8 characters"
+    },
+    "settings.req_number": {
+      "uz": "Raqam bor",
+      "uzc": "Рақам бор",
+      "ru": "Содержит цифру",
+      "en": "Contains a number"
+    },
+    "settings.req_lowercase": {
+      "uz": "Kichik harf bor",
+      "uzc": "Кичик ҳарф бор",
+      "ru": "Содержит строчную букву",
+      "en": "Contains a lowercase letter"
+    },
+    "settings.req_uppercase": {
+      "uz": "Katta harf bor",
+      "uzc": "Катта ҳарф бор",
+      "ru": "Содержит заглавную букву",
+      "en": "Contains an uppercase letter"
+    },
+    "settings.show_password": {
+      "uz": "Parolni ko'rsatish",
+      "uzc": "Паролни кўрсатиш",
+      "ru": "Показать пароль",
+      "en": "Show password"
+    },
+    "settings.hide_password": {
+      "uz": "Parolni yashirish",
+      "uzc": "Паролни яшириш",
+      "ru": "Скрыть пароль",
+      "en": "Hide password"
+    },
+    "settings.change_password_submit": {
+      "uz": "Parolni yangilash",
+      "uzc": "Паролни янгилаш",
+      "ru": "Обновить пароль",
+      "en": "Update Password"
+    },
+    "settings.password_changed": {
+      "uz": "Parol o'zgartirildi.",
+      "uzc": "Парол ўзгартирилди.",
+      "ru": "Пароль изменён.",
+      "en": "Password changed."
+    },
+    "settings.password_same": {
+      "uz": "Yangi parol joriy parol bilan bir xil.",
+      "uzc": "Янги парол жорий парол билан бир хил.",
+      "ru": "Новый пароль совпадает с текущим.",
+      "en": "The new password matches the current one."
+    },
+    "settings.password_mismatch": {
+      "uz": "Parollar bir xil emas.",
+      "uzc": "Пароллар бир хил эмас.",
+      "ru": "Пароли не совпадают.",
+      "en": "Passwords do not match."
+    },
+    "settings.no_password_set": {
+      "uz": "Bu hisobda parol belgilanmagan.",
+      "uzc": "Бу ҳисобда парол белгиленмаган.",
+      "ru": "В этой учётной записи не установлен пароль.",
+      "en": "This account has no password set."
+    },
+    "settings.search_placeholder": {
+      "uz": "Hamma narsani qidirish...",
+      "uzc": "Ҳамма нарсани қидириш...",
+      "ru": "Искать что угодно...",
+      "en": "Search anything..."
+    },
+    "settings.role_user": {
+      "uz": "Foydalanuvchi",
+      "uzc": "Фойдаланувчи",
+      "ru": "Пользователь",
+      "en": "User"
+    },
+    "settings.role_org": {
+      "uz": "Tashkilot",
+      "uzc": "Ташкилот",
+      "ru": "Организация",
+      "en": "Organization"
+    },
+    "settings.role_system": {
+      "uz": "Tizim",
+      "uzc": "Тизим",
+      "ru": "Система",
+      "en": "System"
+    }
+  }
+}
