@@ -22,3 +22,14 @@ dist-ssr
 *.njsproj
 *.sln
 *.sw?
+
+# Opencode files
+.opencode/*
+!.opencode/memory/
+.opencode/memory/*
+!.opencode/memory/PROJECT.md
+!.opencode/memory/CURRENT_STATE.md
+!.opencode/memory/DECISIONS.md
+
+# Audit files
+.audit
