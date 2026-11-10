@@ -12,6 +12,12 @@ export type TranslationBundle = Readonly<Record<string, TranslationMap>>
 
 /** Result of a translation request. 304 and 404 are outcomes, not failures. */
 export type TranslationOutcome =
-  | { readonly status: 'ok'; readonly bundles: TranslationBundle; readonly etag: string | null }
+  | {
+      readonly status: 'ok'
+      /** Internal locale code the backend actually served (may differ from the request). */
+      readonly lang: string
+      readonly bundles: TranslationBundle
+      readonly etag: string | null
+    }
   | { readonly status: 'not-modified' }
   | { readonly status: 'not-found' }

@@ -2,6 +2,7 @@ import { createI18n } from 'vue-i18n'
 import type { App } from 'vue'
 
 import type { I18nUseCases } from '../application/useCases'
+import { fromApiLang } from '../domain/localeCodes'
 import { I18nFeatureKey } from './di'
 import { fallbackMessages } from './fallbackMessages'
 import { createI18nLoader } from './loader'
@@ -14,11 +15,13 @@ import {
 
 export interface I18nFeature {
   install(app: App): void
-  /** Loads the route's pages for `lang` (cache-first) and switches the locale. */
+  /** Loads the route's pages for `lang` (cache-first) and switches to the language actually served. */
   ensure(lang: string, pages: readonly string[]): Promise<void>
   /**
-   * Loads `pages` for `lang` and only then makes `lang` active (store + vue-i18n),
-   * so the UI never renders a locale whose phrases are not in place yet.
+   * Loads `pages` for `lang` and only then makes the language active (store +
+   * vue-i18n), so the UI never renders a locale whose phrases are not in place
+   * yet. When the backend serves a different language (unknown/inactive code),
+   * that actual language becomes active.
    */
   switchTo(lang: string, pages: readonly string[]): Promise<void>
   loadLanguages(): Promise<void>
@@ -63,17 +66,23 @@ export const createI18nFeature = (deps: { useCases: I18nUseCases }): I18nFeature
       app.provide(I18nFeatureKey, feature)
     },
     async ensure(lang, pages) {
-      await loader.ensure(lang, pages)
-      i18n.global.locale.value = lang
+      // Accept API-shaped codes from callers (e.g. the SYSTEM profile's
+      // `uz-Cyrl`) and keep the feature on internal codes.
+      const actual = await loader.ensure(fromApiLang(lang), pages)
+      i18n.global.locale.value = actual
       // Keep <html lang> in step with the active locale on this path too.
-      applyDocumentLang(lang)
+      applyDocumentLang(actual)
+      // The backend may have served a different language (unknown/inactive
+      // code); reflect the real one in the store, but only when it changed.
+      const store = useLocaleStore()
+      if (store.locale !== actual) store.setLocale(actual)
     },
     async switchTo(lang, pages) {
       // Load first, switch after: a half-applied locale (changed but not loaded)
       // is never observable. The store write also persists the choice.
-      await loader.ensure(lang, pages)
-      useLocaleStore().setLocale(lang)
-      i18n.global.locale.value = lang
+      const actual = await loader.ensure(fromApiLang(lang), pages)
+      useLocaleStore().setLocale(actual)
+      i18n.global.locale.value = actual
     },
     loadLanguages,
     currentLocale: () => useLocaleStore().locale,
