@@ -20,6 +20,15 @@
 - Pages with no phrases are not negative-cached; they are retried on later navigations.
 - An empty 200 translations body is treated as success with empty bundles and the requested language.
 
+## Password+OTP registration (2026-11-10)
+
+- The `/register` route now hosts the password+OTP flow (`PasswordRegisterPanel.vue`); the previous E-IMZO register panel is left untouched but is unreachable.
+- `Accept-Language` is sent on **both** `register/start` and `register/complete` via `toApiLang(getCurrentLocale())` through openapi-fetch's `headers` option, even though OpenAPI does not declare the header on those paths.
+- Client password validation is non-empty only; `weak_password` is authoritative and the backend policy beyond the 8-char minimum is UNKNOWN. Login password behavior is unchanged.
+- OTP code is trimmed and validated as non-empty only. `full_name` is normalized client-side (collapse whitespace, trim, 2..200, reject control characters) to match the backend rule.
+- Resend is a second `register/start` with the same identifier after `resend_after`; success replaces `pending_id` and resets both timers. On 429 the cooldown uses `retryAfterMs` when present. All registration errors are mapped through `registerErrorMessageKey`.
+- Registration reuses login identifier normalization (`toLoginIdentifier`) and the login session-adoption/redirect path.
+
 ## Process and environment (2026-11-10)
 
 - Migration work stays on `main`. The AGENTS.md rule requiring an `api-migration` branch is obsolete for this work (explicit user decision).
