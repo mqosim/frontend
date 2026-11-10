@@ -360,7 +360,7 @@ At session start, check whether `CURRENT_STATE.md` records the current script na
 
 ### Language
 
-- All replies to me must be in Turkish.
+- All replies to me must be in Engilsh.
 - Code, prompts, documentation, identifiers, and commit messages must be in English.
 
 ### Task structure
