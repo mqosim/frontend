@@ -6,10 +6,18 @@ import type { TokenStore } from '@/shared/infrastructure/session/tokenStore'
 
 import type { AuthOutcome } from '../domain/entities'
 import type { AuthRepository } from '../domain/ports'
-import { toAuthOutcome, toAuthOutcomeFromMe, toUserProfile, toWorkspaceList } from './mappers'
+import {
+  toAuthOutcome,
+  toAuthOutcomeFromMe,
+  toRegisterPending,
+  toUserProfile,
+  toWorkspaceList,
+} from './mappers'
 import type {
   LoginRequestDto,
   MeResponseDto,
+  RegisterCompleteRequestDto,
+  RegisterStartRequestDto,
   SwitchTenantRequestDto,
   TokenResponseDto,
 } from './mappers'
@@ -121,6 +129,47 @@ export const createAuthRepository = ({
       }
       const result = toResult(await client.POST('/api/v1/identity/login', { body }))
       if (!result.ok) return result
+      return finish(result.value)
+    },
+
+    async registerStart(input) {
+      if (input.identifier.length === 0) {
+        // The form enforces a non-empty identifier; keep the port honest too.
+        return err({ kind: 'Validation', status: 400, fields: {} })
+      }
+      const body: RegisterStartRequestDto = { identifier: input.identifier }
+      // `Accept-Language` is the contract's optional OTP-locale header; the
+      // generated path declares no header parameter, so it travels through the
+      // openapi-fetch `headers` option instead of `params.header`.
+      const result = toResult(
+        await client.POST('/api/v1/identity/register/start', {
+          body,
+          headers: { 'Accept-Language': input.otpLocale },
+        }),
+      )
+      if (!result.ok) return result
+      const pending = toRegisterPending(result.value)
+      if (pending === null) return err({ kind: 'Unknown', status: null })
+      return ok(pending)
+    },
+
+    async registerComplete(input) {
+      const body: RegisterCompleteRequestDto = {
+        pending_id: input.pendingId,
+        code: input.code,
+        password: input.password,
+        full_name: input.fullName,
+      }
+      const result = toResult(
+        await client.POST('/api/v1/identity/register/complete', {
+          body,
+          headers: { 'Accept-Language': input.otpLocale },
+        }),
+      )
+      if (!result.ok) return result
+      // Same session adoption path as login: store the access token, schedule
+      // renewal from `expires_in`, and return the complete-session outcome. The
+      // server sets the refresh cookie on this response (see COOKIE_ENDPOINTS).
       return finish(result.value)
     },
 

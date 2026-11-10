@@ -215,7 +215,16 @@ export const fallbackMessages: Record<string, string> = {
   'auth.register_method_label': 'Registration method',
   'auth.register_submit': 'Create account',
   'auth.have_account': 'Already have an account?',
-  'auth.password_hint': '8 to 72 characters',
+  'auth.password_hint': 'Choose a strong password',
+  'auth.full_name': 'Full name',
+  'auth.register_send_code': 'Send code',
+  'auth.otp_title': 'Enter the verification code',
+  'auth.otp_subtitle': 'We sent a code to {identifier}.',
+  'auth.otp_code': 'Verification code',
+  'auth.otp_resend': 'Resend code',
+  'auth.otp_resend_in': 'Resend in {seconds}s',
+  'auth.otp_expires_in': 'Code expires in {seconds}s',
+  'auth.otp_change_identifier': 'Change email or phone',
 
   'auth.workspace_title': 'Choose a workspace',
   'auth.workspace_subtitle': 'Select how you want to continue.',
@@ -511,6 +520,13 @@ export const fallbackMessages: Record<string, string> = {
   'errors.not_found_back': 'Back to home',
   'errors.payload_too_large': 'The request is too large.',
   'errors.network': 'Cannot reach the server. Check your connection.',
+  'errors.otp_invalid': 'The verification code is incorrect.',
+  'errors.too_many_otp_attempts': 'Too many incorrect attempts. Request a new code.',
+  'errors.registration_expired': 'This registration has expired. Start again.',
+  'errors.identifier_already_registered': 'This email or phone number is already registered.',
+  'errors.weak_password': 'Choose a stronger password.',
+  'errors.otp_delivery_failed': "We couldn't send the verification code. Try again.",
+  'errors.sms_budget_exceeded': 'SMS delivery is temporarily unavailable. Try again later.',
 
   'errors.eimzo_unavailable':
     'The E-IMZO client is not available. Install and start E-IMZO, then try again.',
@@ -525,4 +541,6 @@ export const fallbackMessages: Record<string, string> = {
   'validation.phone': 'Enter a valid phone number (9 or 12 digits).',
   'validation.password_length': 'Password must be 8 to 72 characters.',
   'validation.identifier_required': 'Enter an email or a phone number.',
+  'validation.full_name': 'Enter your full name (2 to 200 characters).',
+  'validation.full_name_chars': 'The full name contains invalid characters.',
 }

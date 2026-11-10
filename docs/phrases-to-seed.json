@@ -323,10 +323,64 @@
       "en": "Already have an account?"
     },
     "auth.password_hint": {
-      "uz": "8 tadan 72 tagacha belgi",
-      "uzc": "8 тадан 72 тагача белги",
-      "ru": "От 8 до 72 символов",
-      "en": "8 to 72 characters"
+      "uz": "Kuchli parol tanlang",
+      "uzc": "Кучли парол танланг",
+      "ru": "Придумайте надёжный пароль",
+      "en": "Choose a strong password"
+    },
+    "auth.full_name": {
+      "uz": "To'liq ism",
+      "uzc": "Тўлиқ исм",
+      "ru": "Полное имя",
+      "en": "Full name"
+    },
+    "auth.register_send_code": {
+      "uz": "Kod yuborish",
+      "uzc": "Код юбориш",
+      "ru": "Отправить код",
+      "en": "Send code"
+    },
+    "auth.otp_title": {
+      "uz": "Tasdiqlash kodini kiriting",
+      "uzc": "Тасдиқлаш кодини киритинг",
+      "ru": "Введите код подтверждения",
+      "en": "Enter the verification code"
+    },
+    "auth.otp_subtitle": {
+      "uz": "{identifier} manziliga kod yubordik.",
+      "uzc": "{identifier} манзилига код юбордик.",
+      "ru": "Мы отправили код на {identifier}.",
+      "en": "We sent a code to {identifier}."
+    },
+    "auth.otp_code": {
+      "uz": "Tasdiqlash kodi",
+      "uzc": "Тасдиқлаш коди",
+      "ru": "Код подтверждения",
+      "en": "Verification code"
+    },
+    "auth.otp_resend": {
+      "uz": "Kodni qayta yuborish",
+      "uzc": "Кодни қайта юбориш",
+      "ru": "Отправить код повторно",
+      "en": "Resend code"
+    },
+    "auth.otp_resend_in": {
+      "uz": "{seconds} soniyadan so'ng qayta yuborish",
+      "uzc": "{seconds} сониядан сўнг қайта юбориш",
+      "ru": "Повторно через {seconds} с",
+      "en": "Resend in {seconds}s"
+    },
+    "auth.otp_expires_in": {
+      "uz": "Kod {seconds} soniyadan so'ng amal qilmaydi",
+      "uzc": "Код {seconds} сониядан сўнг амал қилмайди",
+      "ru": "Код действует ещё {seconds} с",
+      "en": "Code expires in {seconds}s"
+    },
+    "auth.otp_change_identifier": {
+      "uz": "Email yoki telefonni o'zgartirish",
+      "uzc": "Email ёки телефонни ўзгартириш",
+      "ru": "Изменить почту или телефон",
+      "en": "Change email or phone"
     }
   },
   "auth.workspace": {
@@ -2148,6 +2202,12 @@
       "ru": "Неверная почта/телефон или пароль.",
       "en": "Incorrect email/phone or password."
     },
+    "errors.account_blocked": {
+      "uz": "Hisobingiz bloklangan. Qo'llab-quvvatlash xizmatiga murojaat qiling.",
+      "uzc": "Ҳисобингиз блокланган. Қўллаб-қувватлаш хизматига мурожаат қилинг.",
+      "ru": "Ваш аккаунт заблокирован. Обратитесь в службу поддержки.",
+      "en": "Your account is blocked. Contact support."
+    },
     "errors.rate_limited": {
       "uz": "Urinishlar juda ko'p. Birozdan so'ng qayta urinib ko'ring.",
       "uzc": "Уринишлар жуда кўп. Бироздан сўнг қайта уриниб кўринг.",
@@ -2201,6 +2261,48 @@
       "uzc": "Серверга уланиб бўлмади. Уланишни текширинг.",
       "ru": "Не удалось связаться с сервером. Проверьте соединение.",
       "en": "Cannot reach the server. Check your connection."
+    },
+    "errors.otp_invalid": {
+      "uz": "Tasdiqlash kodi noto'g'ri.",
+      "uzc": "Тасдиқлаш коди нотўғри.",
+      "ru": "Неверный код подтверждения.",
+      "en": "The verification code is incorrect."
+    },
+    "errors.too_many_otp_attempts": {
+      "uz": "Juda ko'p noto'g'ri urinish. Yangi kod so'rang.",
+      "uzc": "Жуда кўп нотўғри уриниш. Янги код сўранг.",
+      "ru": "Слишком много неверных попыток. Запросите новый код.",
+      "en": "Too many incorrect attempts. Request a new code."
+    },
+    "errors.registration_expired": {
+      "uz": "Bu ro'yxatdan o'tish muddati tugadi. Qaytadan boshlang.",
+      "uzc": "Бу рўйхатдан ўтиш муддати тугади. Қайтадан бошланг.",
+      "ru": "Срок регистрации истёк. Начните заново.",
+      "en": "This registration has expired. Start again."
+    },
+    "errors.identifier_already_registered": {
+      "uz": "Bu email yoki telefon raqami allaqachon ro'yxatdan o'tgan.",
+      "uzc": "Бу email ёки телефон рақами аллақачон рўйхатдан ўтган.",
+      "ru": "Эта почта или номер телефона уже зарегистрированы.",
+      "en": "This email or phone number is already registered."
+    },
+    "errors.weak_password": {
+      "uz": "Kuchliroq parol tanlang.",
+      "uzc": "Кучлироқ парол танланг.",
+      "ru": "Придумайте более надёжный пароль.",
+      "en": "Choose a stronger password."
+    },
+    "errors.otp_delivery_failed": {
+      "uz": "Tasdiqlash kodini yubora olmadik. Qayta urinib ko'ring.",
+      "uzc": "Тасдиқлаш кодини юбора олмадик. Қайта уриниб кўринг.",
+      "ru": "Не удалось отправить код подтверждения. Повторите попытку.",
+      "en": "We couldn't send the verification code. Try again."
+    },
+    "errors.sms_budget_exceeded": {
+      "uz": "SMS yuborish vaqtincha mavjud emas. Keyinroq qayta urinib ko'ring.",
+      "uzc": "SMS юбориш вақтинча мавжуд эмас. Кейинроқ қайта уриниб кўринг.",
+      "ru": "Отправка SMS временно недоступна. Повторите попытку позже.",
+      "en": "SMS delivery is temporarily unavailable. Try again later."
     },
     "errors.eimzo_unavailable": {
       "uz": "E-IMZO mijozi mavjud emas. E-IMZO dasturini o‘rnating va ishga tushiring, so‘ng qayta urinib ko‘ring.",
@@ -2267,6 +2369,18 @@
       "uzc": "Email ёки телефон рақамини киритинг.",
       "ru": "Введите почту или номер телефона.",
       "en": "Enter an email or a phone number."
+    },
+    "validation.full_name": {
+      "uz": "To'liq ismingizni kiriting (2 dan 200 tagacha belgi).",
+      "uzc": "Тўлиқ исмингизни киритинг (2 дан 200 тагача белги).",
+      "ru": "Введите полное имя (от 2 до 200 символов).",
+      "en": "Enter your full name (2 to 200 characters)."
+    },
+    "validation.full_name_chars": {
+      "uz": "To'liq ismda noto'g'ri belgilar bor.",
+      "uzc": "Тўлиқ исмда нотўғри белгилар бор.",
+      "ru": "Полное имя содержит недопустимые символы.",
+      "en": "The full name contains invalid characters."
     },
     "errors.unprocessable": {
       "uz": "So'rovni qayta ishlab bo'lmadi.",

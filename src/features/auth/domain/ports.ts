@@ -1,6 +1,15 @@
 import type { Result, UserProfile } from '@/shared/domain'
 
-import type { AuthOutcome, EimzoKey, LoginInput, WorkspaceChoice, WorkspaceList } from './entities'
+import type {
+  AuthOutcome,
+  EimzoKey,
+  LoginInput,
+  RegisterCompleteInput,
+  RegisterPending,
+  RegisterStartInput,
+  WorkspaceChoice,
+  WorkspaceList,
+} from './entities'
 
 /** A signed challenge request bound for the E-IMZO entry points. */
 export interface EimzoSignature {
@@ -35,6 +44,10 @@ export interface EimzoAuthAdapter {
  */
 export interface AuthRepository {
   login(input: LoginInput): Promise<Result<AuthOutcome>>
+  /** Starts (or restarts) a password+OTP registration and sends the OTP. */
+  registerStart(input: RegisterStartInput): Promise<Result<RegisterPending>>
+  /** Verifies the OTP, creates the account and adopts the session like login. */
+  registerComplete(input: RegisterCompleteInput): Promise<Result<AuthOutcome>>
   /** Rotates the session from the refresh cookie. Single-flight per context. */
   refresh(): Promise<Result<AuthOutcome>>
   /** Revokes the session server-side and always clears the in-memory token. */

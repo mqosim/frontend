@@ -37,6 +37,34 @@ export interface LoginInput {
   readonly password: string
 }
 
+/** Step 1 of password+OTP registration (`POST /identity/register/start`). */
+export interface RegisterStartInput {
+  /** Email or phone number; the backend accepts either in one field. */
+  readonly identifier: string
+  /** Canonical API language code for the OTP delivery (`uz`, `uz-Cyrl`, `ru`, `en`). */
+  readonly otpLocale: string
+}
+
+/** The pending registration returned by `register/start`. */
+export interface RegisterPending {
+  /** Opaque id the completion step must present. */
+  readonly pendingId: string
+  /** OTP validity in seconds. */
+  readonly expiresInSec: number
+  /** Cooldown before the same registration may be restarted, in seconds. */
+  readonly resendAfterSec: number
+}
+
+/** Step 2 of password+OTP registration (`POST /identity/register/complete`). */
+export interface RegisterCompleteInput {
+  readonly pendingId: string
+  readonly code: string
+  readonly password: string
+  readonly fullName: string
+  /** Canonical API language code for the OTP delivery (`uz`, `uz-Cyrl`, `ru`, `en`). */
+  readonly otpLocale: string
+}
+
 /**
  * The tenant the caller picked in the switch dialog
  * (`POST /identity/switch-tenant`). A personal tenant is just another tenant id;

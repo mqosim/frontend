@@ -1,7 +1,12 @@
 import type { Principal, UserProfile } from '@/shared/domain'
 import type { components } from '@/shared/infrastructure/api/schema'
 
-import type { AuthOutcome, WorkspaceList, WorkspaceOption } from '../domain/entities'
+import type {
+  AuthOutcome,
+  RegisterPending,
+  WorkspaceList,
+  WorkspaceOption,
+} from '../domain/entities'
 
 type Schemas = components['schemas']
 export type LoginRequestDto = Schemas['LoginRequest']
@@ -10,6 +15,9 @@ export type TokenResponseDto = Schemas['TokenResponse']
 export type MeResponseDto = Schemas['MeResponse']
 export type TenantSummaryDto = Schemas['TenantSummarySchema']
 export type TenantMembershipDto = Schemas['TenantMembershipSchema']
+export type RegisterStartRequestDto = Schemas['RegisterStartRequest']
+export type RegisterStartResponseDto = Schemas['RegisterStartResponse']
+export type RegisterCompleteRequestDto = Schemas['RegisterCompleteRequest']
 
 /** The tenant type that identifies the person's own workspace. */
 const PERSONAL_TENANT = 'personal'
@@ -38,6 +46,18 @@ export const toAuthOutcome = (dto: TokenResponseDto | undefined): AuthOutcome | 
   return {
     kind: 'authenticated',
     principal: toPrincipal(dto.tenant, Date.now() + dto.expires_in * 1000),
+  }
+}
+
+/** Maps the `register/start` body to the pending-registration model. */
+export const toRegisterPending = (
+  dto: RegisterStartResponseDto | undefined,
+): RegisterPending | null => {
+  if (dto === undefined) return null
+  return {
+    pendingId: dto.pending_id,
+    expiresInSec: dto.expires_in,
+    resendAfterSec: dto.resend_after,
   }
 }
 

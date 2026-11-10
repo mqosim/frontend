@@ -1,18 +1,9 @@
 <script setup lang="ts">
-import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import EimzoRegisterPanel from '../components/EimzoRegisterPanel.vue'
-import MethodSelector from '../components/MethodSelector.vue'
-import UsbTokenPanel from '../components/UsbTokenPanel.vue'
-import { REGISTER_METHODS, type RegisterMethod } from '../methods'
+import PasswordRegisterPanel from '../components/PasswordRegisterPanel.vue'
 
 const { t } = useI18n()
-
-// E-IMZO is the only working method (register is signature-only on the backend);
-// USB is shown disabled until the backend implements it. Switching methods
-// unmounts the previous panel, so its state resets.
-const method = ref<RegisterMethod>('eimzo')
 </script>
 
 <template>
@@ -21,21 +12,7 @@ const method = ref<RegisterMethod>('eimzo')
       <h1 class="auth-view__title">{{ t('auth.register_title') }}</h1>
     </header>
 
-    <MethodSelector
-      v-model="method"
-      :options="REGISTER_METHODS"
-      :label="t('auth.register_method_label')"
-      id-prefix="register"
-    />
-
-    <div
-      :id="`register-panel-${method}`"
-      role="tabpanel"
-      :aria-labelledby="`register-tab-${method}`"
-    >
-      <EimzoRegisterPanel v-if="method === 'eimzo'" />
-      <UsbTokenPanel v-else />
-    </div>
+    <PasswordRegisterPanel />
 
     <p class="auth-view__footer">
       {{ t('auth.have_account') }}

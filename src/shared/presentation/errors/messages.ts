@@ -56,3 +56,28 @@ export const credentialErrorMessageKey = (error: AppError): string => {
   }
   return errorMessageKey(error)
 }
+
+/**
+ * Copy for the password+OTP registration codes (`register/start` and
+ * `register/complete`). The contract exposes these machine codes, so the copy
+ * is chosen from the code first; any other failure falls back to the shared
+ * kind-based copy. The backend `message` is never surfaced.
+ */
+const REGISTER_ERROR_KEYS: Readonly<Record<string, string>> = {
+  otp_invalid: 'errors.otp_invalid',
+  too_many_otp_attempts: 'errors.too_many_otp_attempts',
+  registration_expired: 'errors.registration_expired',
+  identifier_already_registered: 'errors.identifier_already_registered',
+  weak_password: 'errors.weak_password',
+  otp_delivery_failed: 'errors.otp_delivery_failed',
+  sms_budget_exceeded: 'errors.sms_budget_exceeded',
+  rate_limited: 'errors.rate_limited',
+}
+
+export const registerErrorMessageKey = (error: AppError): string => {
+  if ('code' in error && error.code !== undefined) {
+    const key = REGISTER_ERROR_KEYS[error.code]
+    if (key !== undefined) return key
+  }
+  return errorMessageKey(error)
+}

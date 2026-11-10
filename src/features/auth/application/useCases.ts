@@ -1,6 +1,14 @@
 import type { Result, UserProfile } from '@/shared/domain'
 
-import type { AuthOutcome, LoginInput, WorkspaceChoice, WorkspaceList } from '../domain/entities'
+import type {
+  AuthOutcome,
+  LoginInput,
+  RegisterCompleteInput,
+  RegisterPending,
+  RegisterStartInput,
+  WorkspaceChoice,
+  WorkspaceList,
+} from '../domain/entities'
 import type { AuthRepository } from '../domain/ports'
 
 export interface AuthUseCaseDeps {
@@ -8,13 +16,17 @@ export interface AuthUseCaseDeps {
 }
 
 /**
- * The regular-context identity surface for the current migration step: password
- * login, refresh, logout, the masked profile and tenant switching. E-IMZO,
- * registration, password/email change and language persistence are not part of
- * this step and are preserved in git history.
+ * The regular-context identity surface: password login, password+OTP
+ * registration, refresh, logout, the masked profile and tenant switching.
+ * E-IMZO, password/email change and language persistence are not part of this
+ * step and are preserved in git history.
  */
 export interface AuthUseCases {
   login(input: LoginInput): Promise<Result<AuthOutcome>>
+  /** Starts (or restarts) a password+OTP registration and sends the OTP. */
+  registerStart(input: RegisterStartInput): Promise<Result<RegisterPending>>
+  /** Verifies the OTP, creates the account and adopts the session like login. */
+  registerComplete(input: RegisterCompleteInput): Promise<Result<AuthOutcome>>
   /** The caller's masked profile; the source of the display name. */
   getProfile(): Promise<Result<UserProfile>>
   /** The person's switchable tenants; the source for the account label and picker. */
@@ -27,6 +39,8 @@ export interface AuthUseCases {
 
 export const createAuthUseCases = ({ repository }: AuthUseCaseDeps): AuthUseCases => ({
   login: (input) => repository.login(input),
+  registerStart: (input) => repository.registerStart(input),
+  registerComplete: (input) => repository.registerComplete(input),
   getProfile: () => repository.getProfile(),
   listWorkspaces: () => repository.listWorkspaces(),
   switchTenant: (choice) => repository.switchTenant(choice),
