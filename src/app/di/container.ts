@@ -3,12 +3,15 @@ import type { AuthOutcome } from '@/features/auth'
 import { loadAccountWorkspaces } from '@/features/auth'
 import { createAuthUseCases } from '@/features/auth/application/useCases'
 import { createAuthRepository } from '@/features/auth/infrastructure/authRepository'
+import { createEimzoAdapter } from '@/features/auth/infrastructure/eimzo/createEimzoAdapter'
 import { createI18nFeature } from '@/features/i18n'
 import { createI18nUseCases } from '@/features/i18n/application/useCases'
 import {
   createLanguageRepository,
   createTranslationRepository,
 } from '@/features/i18n/infrastructure/publicContentRepository'
+import { createNotificationsUseCases } from '@/features/notifications/application/useCases'
+import { createNotificationPreferencesRepository } from '@/features/notifications/infrastructure/notificationPreferencesRepository'
 import { createAdminRepository, createAuditLogRepository } from '@/features/system-admin'
 import type { AdminUseCases, AuditLogRepository } from '@/features/system-admin'
 import { createAdminUseCases } from '@/features/system-admin/application/useCases'
@@ -44,6 +47,7 @@ export interface AppContainer {
   readonly router: ReturnType<typeof createAppRouter>
   readonly i18n: ReturnType<typeof createI18nFeature>
   readonly authUseCases: ReturnType<typeof createAuthUseCases>
+  readonly notificationsUseCases: ReturnType<typeof createNotificationsUseCases>
   readonly systemAuthUseCases: ReturnType<typeof createSystemAuthUseCases>
   readonly adminUseCases: AdminUseCases
   readonly auditLogRepository: AuditLogRepository
@@ -57,7 +61,7 @@ export interface AppContainer {
  * setter, which the root UI renders).
  */
 export const createContainer = (): AppContainer => {
-  const { apiBaseUrl } = readEnv()
+  const { apiBaseUrl, baseUrl } = readEnv()
   const idlePolicies = readIdlePolicies()
 
   // Two independent contexts: separate in-memory token stores (and therefore
@@ -102,6 +106,7 @@ export const createContainer = (): AppContainer => {
   const authRepository = createAuthRepository({
     client: authClient,
     tokens: authTokens,
+    eimzo: createEimzoAdapter({ baseUrl, apiBaseUrl }),
     refreshRunner: () => authRuntime.restore(),
     onLoggedOut: () => authRuntime.announceLogout(),
     onLogoutStart: () => authRuntime.beginLogout(),
@@ -132,6 +137,12 @@ export const createContainer = (): AppContainer => {
   })
 
   const authUseCases = createAuthUseCases({ repository: authRepository })
+
+  // Notification preferences (including the account's interface language) use
+  // the regular authenticated client: they belong to the PERSON/ORG realm.
+  const notificationsUseCases = createNotificationsUseCases({
+    repository: createNotificationPreferencesRepository(authClient),
+  })
 
   const systemAuthUseCases = createSystemAuthUseCases({ repository: systemAuthRepository })
 
@@ -297,6 +308,7 @@ export const createContainer = (): AppContainer => {
     router,
     i18n,
     authUseCases,
+    notificationsUseCases,
     systemAuthUseCases,
     adminUseCases,
     auditLogRepository,

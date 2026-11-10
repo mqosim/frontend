@@ -58,6 +58,34 @@ export const credentialErrorMessageKey = (error: AppError): string => {
 }
 
 /**
+ * The backend's E-IMZO machine codes for `/identity/eimzo/login` and
+ * `/identity/eimzo/link`: a fixed set plus dynamic reject reasons
+ * (`eimzo_<reason>`). The status alone cannot decide the copy — the
+ * infrastructure maps 502 to `Unknown` and 503 to `ServiceUnavailable`, and a
+ * 401 on these endpoints means a rejected signature, not an expired session —
+ * so the code decides first and `null` means "no E-IMZO-specific copy, let the
+ * caller fall back". The backend `message` is never surfaced.
+ */
+const EIMZO_CODE_KEYS: Readonly<Record<string, string>> = {
+  invalid_certificate: 'errors.eimzo_invalid_certificate',
+  certificate_revoked: 'errors.eimzo_certificate_revoked',
+  eimzo_certificate_revoked: 'errors.eimzo_certificate_revoked',
+  eimzo_required: 'errors.eimzo_required',
+  eimzo_error: 'errors.eimzo_error',
+  eimzo_unavailable: 'errors.eimzo_unavailable',
+  eimzo_challenge_not_found_or_expired: 'errors.eimzo_challenge_expired',
+}
+
+export const eimzoCodeKey = (error: AppError): string | null => {
+  if ('code' in error && error.code !== undefined) {
+    const direct = EIMZO_CODE_KEYS[error.code]
+    if (direct !== undefined) return direct
+    if (error.code.startsWith('eimzo_')) return 'errors.eimzo_rejected'
+  }
+  return null
+}
+
+/**
  * Copy for the password+OTP registration codes (`register/start` and
  * `register/complete`). The contract exposes these machine codes, so the copy
  * is chosen from the code first; any other failure falls back to the shared
@@ -70,7 +98,6 @@ const REGISTER_ERROR_KEYS: Readonly<Record<string, string>> = {
   identifier_already_registered: 'errors.identifier_already_registered',
   weak_password: 'errors.weak_password',
   otp_delivery_failed: 'errors.otp_delivery_failed',
-  sms_budget_exceeded: 'errors.sms_budget_exceeded',
   rate_limited: 'errors.rate_limited',
 }
 

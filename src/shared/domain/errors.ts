@@ -29,13 +29,18 @@ export interface ApiErrorProblem {
  * `revision_conflict`, `csrf_header_required`); it is absent for status-only
  * failures (a non-JSON body from a proxy, an unmapped status). `problems`
  * carries the field-level validation details the contract sends for
- * `validation_error` and `content_invalid`.
+ * `validation_error`, `content_invalid`, and the register-start conflict.
  */
 export type AppError =
   | { readonly kind: 'Unauthorized'; readonly status: 401; readonly code?: string }
   | { readonly kind: 'Forbidden'; readonly status: 403; readonly code?: string }
   | { readonly kind: 'NotFound'; readonly status: 404; readonly code?: string }
-  | { readonly kind: 'Conflict'; readonly status: 409; readonly code?: string }
+  | {
+      readonly kind: 'Conflict'
+      readonly status: 409
+      readonly code?: string
+      readonly problems?: readonly ApiErrorProblem[]
+    }
   | {
       readonly kind: 'Unprocessable'
       readonly status: 422

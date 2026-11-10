@@ -9,8 +9,6 @@ interface ImportMetaEnv {
   readonly VITE_API_BASE_URL?: string
   /** Dev-only E-IMZO mock switch. Must be exactly `"true"`. */
   readonly VITE_EIMZO_MOCK?: string
-  /** pkcs7 value the E-IMZO mock impersonates (`test_mock` = PERSON, `test_mock_org` = ORG). */
-  readonly VITE_EIMZO_MOCK_PKCS7?: string
   /**
    * Optional inactivity-warning override in milliseconds for the regular
    * (PERSON/ORG) context. Mostly used to shorten the timeout during QA;

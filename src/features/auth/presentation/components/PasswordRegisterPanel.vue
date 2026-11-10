@@ -5,9 +5,10 @@ import { getCurrentLocale, toApiLang } from '@/features/i18n'
 import { registerErrorMessageKey } from '@/shared/presentation/errors/messages'
 
 import type { RegisterPending } from '../../domain/entities'
-import type { RegisterCompleteFormValues } from '../schemas'
+import type { RegisterCompleteFormValues, RegisterStartFormValues } from '../schemas'
 import { useAuthOutcome } from '../composables/useAuthOutcome'
 import { useAuthUseCases } from '../composables/useAuthUseCases'
+import { toRegisterStartFieldErrors, type RegisterStartFieldErrors } from '../registrationErrors'
 import RegisterIdentifierForm from './RegisterIdentifierForm.vue'
 import RegisterVerifyForm from './RegisterVerifyForm.vue'
 
@@ -21,9 +22,11 @@ const auth = useAuthUseCases()
 const { applyOutcome } = useAuthOutcome()
 
 const step = ref<'identifier' | 'verify'>('identifier')
-const identifier = ref('')
+const email = ref('')
+const phone = ref('')
 const pending = ref<RegisterPending | null>(null)
 const formErrorKey = ref('')
+const fieldErrors = ref<RegisterStartFieldErrors>({})
 const isResending = ref(false)
 
 // Deadlines are absolute wall-clock timestamps, so the countdowns stay correct
@@ -81,17 +84,25 @@ const applyPending = (value: RegisterPending): void => {
   resendAt.value = nowMs + value.resendAfterSec * 1000
 }
 
-const submitIdentifier = async (normalizedIdentifier: string): Promise<void> => {
+const submitIdentifier = async (values: RegisterStartFormValues): Promise<void> => {
   formErrorKey.value = ''
+  fieldErrors.value = {}
   const result = await auth.registerStart({
-    identifier: normalizedIdentifier,
+    email: values.email,
+    phone: values.phone,
     otpLocale: otpLocale(),
   })
   if (!result.ok) {
+    const fieldErrorKeys = toRegisterStartFieldErrors(result.error)
+    if (Object.keys(fieldErrorKeys).length > 0) {
+      fieldErrors.value = fieldErrorKeys
+      return
+    }
     formErrorKey.value = registerErrorMessageKey(result.error)
     return
   }
-  identifier.value = normalizedIdentifier
+  email.value = values.email
+  phone.value = values.phone
   applyPending(result.value)
   step.value = 'verify'
 }
@@ -101,7 +112,8 @@ const resend = async (): Promise<void> => {
   formErrorKey.value = ''
   isResending.value = true
   const result = await auth.registerStart({
-    identifier: identifier.value,
+    email: email.value,
+    phone: phone.value,
     otpLocale: otpLocale(),
   })
   isResending.value = false
@@ -138,7 +150,9 @@ const submitComplete = async (values: RegisterCompleteFormValues): Promise<boole
   }
   // Drop the pending registration and its deadlines before leaving the page.
   pending.value = null
-  identifier.value = ''
+  email.value = ''
+  phone.value = ''
+  fieldErrors.value = {}
   expiresAt.value = 0
   resendAt.value = 0
   // Same session adoption and redirect as password login.
@@ -148,6 +162,7 @@ const submitComplete = async (values: RegisterCompleteFormValues): Promise<boole
 
 const changeIdentifier = (): void => {
   formErrorKey.value = ''
+  fieldErrors.value = {}
   pending.value = null
   expiresAt.value = 0
   resendAt.value = 0
@@ -159,13 +174,15 @@ const changeIdentifier = (): void => {
   <div class="password-register">
     <RegisterIdentifierForm
       v-if="step === 'identifier'"
-      :initial-identifier="identifier"
+      :initial-email="email"
+      :initial-phone="phone"
       :server-error-key="formErrorKey"
+      :field-errors="fieldErrors"
       :submit="submitIdentifier"
     />
     <RegisterVerifyForm
       v-else
-      :identifier="identifier"
+      :email="email"
       :expires-in-seconds="expiresInSeconds"
       :resend-in-seconds="resendInSeconds"
       :can-resend="canResend"

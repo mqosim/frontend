@@ -15,7 +15,7 @@ export interface paths {
         put?: never;
         /**
          * Register Start
-         * @description Begin a registration and send an OTP to the identifier.
+         * @description Begin a registration and send an OTP to the email.
          */
         post: operations["register_start_api_v1_identity_register_start_post"];
         delete?: never;
@@ -1724,15 +1724,19 @@ export interface components {
         };
         /**
          * RegisterStartRequest
-         * @description Start a registration for an email or phone number.
+         * @description Start a registration with both an email and a phone number.
          */
         RegisterStartRequest: {
             /**
-             * Identifier
+             * Email
              * @example user@example.uz
-             * @example 90 123 45 67
              */
-            identifier: string;
+            email: string;
+            /**
+             * Phone
+             * @example +998901234567
+             */
+            phone: string;
         };
         /**
          * RegisterStartResponse
@@ -2595,17 +2599,6 @@ export interface operations {
             };
             /** @description Bad Gateway. Machine codes: otp_delivery_failed. */
             502: {
-                headers: {
-                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
-                    "X-Request-ID"?: string;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ErrorResponse"];
-                };
-            };
-            /** @description Service Unavailable. Machine codes: sms_budget_exceeded. */
-            503: {
                 headers: {
                     /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
                     "X-Request-ID"?: string;

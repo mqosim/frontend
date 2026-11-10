@@ -87,7 +87,7 @@ describe('toRegisterPending', () => {
 })
 
 describe('authRepository.registerStart', () => {
-  test('POSTs the identifier with the OTP locale header', async () => {
+  test('POSTs the email and phone with the OTP locale header', async () => {
     const calls: RecordedCall[] = []
     const client = {
       async POST(path: string, init?: RecordedCall['init']): Promise<FakeCallResult> {
@@ -101,13 +101,17 @@ describe('authRepository.registerStart', () => {
     const { repository } = makeRepository(client)
 
     const result = await repository.registerStart({
-      identifier: 'user@example.uz',
+      email: 'user@example.uz',
+      phone: '998901234567',
       otpLocale: 'uz-Cyrl',
     })
 
     expect(calls).toHaveLength(1)
     expect(calls[0]?.path).toBe('/api/v1/identity/register/start')
-    expect(calls[0]?.init?.body).toEqual({ identifier: 'user@example.uz' })
+    expect(calls[0]?.init?.body).toEqual({
+      email: 'user@example.uz',
+      phone: '998901234567',
+    })
     expect(calls[0]?.init?.headers).toEqual({ 'Accept-Language': 'uz-Cyrl' })
     if (!result.ok) throw new Error(`expected ok, got ${JSON.stringify(result.error)}`)
     expect(result.value).toEqual({ pendingId: 'p-1', expiresInSec: 300, resendAfterSec: 60 })
@@ -125,7 +129,8 @@ describe('authRepository.registerStart', () => {
     const { repository } = makeRepository(client)
 
     const result = await repository.registerStart({
-      identifier: 'user@example.uz',
+      email: 'user@example.uz',
+      phone: '998901234567',
       otpLocale: 'en',
     })
 

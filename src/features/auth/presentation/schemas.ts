@@ -35,8 +35,7 @@ export const toLoginIdentifier = (value: string): LoginIdentifier =>
 
 /**
  * One identifier (email OR phone), never both: an "@" makes it an email,
- * anything else is treated as a phone number. Shared by login and the first
- * registration step.
+ * anything else is treated as a phone number. Used by login.
  */
 const identifierIssue = (identifier: string, ctx: z.RefinementCtx): void => {
   if (identifier.length === 0) {
@@ -68,13 +67,28 @@ export const loginSchema = z
 
 export type LoginFormValues = z.infer<typeof loginSchema>
 
-/** Step 1 of password+OTP registration: the email or phone to verify. */
+/**
+ * Step 1 of password+OTP registration: both the email that receives the OTP and
+ * the phone number stored with the account. The backend validates the phone in
+ * its digits-only form, so the value is normalised before the pattern check.
+ */
 export const registerStartSchema = z
   .object({
-    identifier: z.string().trim(),
+    email: z.string().trim(),
+    phone: z.string().trim(),
   })
   .superRefine((value, ctx) => {
-    identifierIssue(value.identifier, ctx)
+    if (value.email.length === 0) {
+      ctx.addIssue({ ...issue('validation.required'), path: ['email'] })
+    } else if (!EMAIL_PATTERN.test(value.email)) {
+      ctx.addIssue({ ...issue('validation.email'), path: ['email'] })
+    }
+    const phone = normalizePhone(value.phone)
+    if (phone.length === 0) {
+      ctx.addIssue({ ...issue('validation.required'), path: ['phone'] })
+    } else if (!PHONE_PATTERN.test(phone)) {
+      ctx.addIssue({ ...issue('validation.phone'), path: ['phone'] })
+    }
   })
 
 export type RegisterStartFormValues = z.infer<typeof registerStartSchema>
@@ -119,28 +133,3 @@ export const registerCompleteSchema = z
   })
 
 export type RegisterCompleteFormValues = z.infer<typeof registerCompleteSchema>
-
-export const registerSchema = z
-  .object({
-    email: z.string().trim(),
-    phone: z.string().trim(),
-    password: z.string(),
-  })
-  .superRefine((value, ctx) => {
-    if (value.email.length === 0) {
-      ctx.addIssue({ ...issue('validation.required'), path: ['email'] })
-    } else if (!EMAIL_PATTERN.test(value.email)) {
-      ctx.addIssue({ ...issue('validation.email'), path: ['email'] })
-    }
-    if (value.phone.length === 0) {
-      ctx.addIssue({ ...issue('validation.required'), path: ['phone'] })
-    } else if (!PHONE_PATTERN.test(value.phone)) {
-      ctx.addIssue({ ...issue('validation.phone'), path: ['phone'] })
-    }
-    // The backend requires 8..72 characters.
-    if (value.password.length < 8 || value.password.length > 72) {
-      ctx.addIssue({ ...issue('validation.password_length'), path: ['password'] })
-    }
-  })
-
-export type RegisterFormValues = z.infer<typeof registerSchema>

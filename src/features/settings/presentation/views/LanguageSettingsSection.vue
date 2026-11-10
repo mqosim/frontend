@@ -2,8 +2,14 @@
 import { computed, inject, onMounted, ref, useId, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useAuthUseCases } from '@/features/auth'
-import { I18nFeatureKey, LanguageSwitcher, useLocaleStore } from '@/features/i18n'
+import {
+  fromApiLang,
+  I18nFeatureKey,
+  LanguageSwitcher,
+  toApiLang,
+  useLocaleStore,
+} from '@/features/i18n'
+import { useNotificationsUseCases } from '@/features/notifications'
 import AppAlert from '@/shared/presentation/components/AppAlert.vue'
 import { errorMessageKey } from '@/shared/presentation/errors/messages'
 
@@ -13,11 +19,12 @@ import SettingsButton from '../components/SettingsButton.vue'
  * The Language settings section: the Settings-based language selection, restored
  * after the header selector was removed. The switcher (click-open, full labels,
  * flags) holds a draft until Save — Save persists the choice to the account
- * (`updateLanguage`) before the locale flips, and Cancel discards it. The option
- * list comes from the active-languages API via the i18n feature; no language
- * list is duplicated here. Panel, typography, card chrome, and action buttons
- * follow the Account Security section's conventions so the two sections read as
- * one page.
+ * (`PUT /api/v1/notifications/preferences`, preserving the document-event
+ * setting) before the locale flips, and Cancel discards it. The option list
+ * comes from the active-languages API via the i18n feature; no language list is
+ * duplicated here. Panel, typography, card chrome, and action buttons follow
+ * the Account Security section's conventions so the two sections read as one
+ * page.
  *
  * An `apply` prop replaces the account write with a custom persistence step —
  * the SYSTEM settings page saves to the SYSTEM account
@@ -34,7 +41,7 @@ const props = defineProps<{
 }>()
 
 const { t } = useI18n()
-const auth = useAuthUseCases()
+const notifications = useNotificationsUseCases()
 const localeStore = useLocaleStore()
 const i18nFeature = inject(I18nFeatureKey)
 const titleId = useId()
@@ -58,17 +65,19 @@ onMounted(async () => {
   await i18nFeature?.loadLanguages()
 
   if (props.apply === undefined) {
-    // The saved value comes from the profile, which the router guard already
-    // synced to the account language (`adoptAccountLanguage`).
-    const profile = await auth.getProfile()
+    // The account language lives in the notification preferences, not in
+    // `/identity/me`. The contract speaks `uz-Cyrl`; `fromApiLang` restores the
+    // app's internal `uzc` before the switcher sees it.
+    const preferences = await notifications.loadPreferences()
     loading.value = false
 
-    if (!profile.ok) {
-      errorKey.value = errorMessageKey(profile.error)
+    if (!preferences.ok) {
+      errorKey.value = errorMessageKey(preferences.error)
       return
     }
 
-    const saved = profile.value.languageCode ?? localeStore.locale
+    const saved =
+      preferences.value.locale === null ? localeStore.locale : fromApiLang(preferences.value.locale)
     savedLanguage.value = saved
     draft.value = saved
   } else {
@@ -123,7 +132,7 @@ const onSave = async (): Promise<void> => {
     return
   }
 
-  const result = await auth.updateLanguage(draft.value)
+  const result = await notifications.saveLocale(toApiLang(draft.value))
   if (!result.ok) {
     errorKey.value =
       result.error.kind === 'Validation'
@@ -132,7 +141,7 @@ const onSave = async (): Promise<void> => {
     return
   }
 
-  const applied = result.value.languageCode ?? draft.value
+  const applied = result.value.locale === null ? draft.value : fromApiLang(result.value.locale)
   savedLanguage.value = applied
   draft.value = applied
   await i18nFeature?.switchTo(applied, ['settings', 'org', 'common'])

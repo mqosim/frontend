@@ -13,15 +13,3 @@ export const LOGIN_METHODS: readonly MethodOption<LoginMethod>[] = [
   { id: 'password', labelKey: 'auth.method_password' },
   { id: 'usb', labelKey: 'auth.method_usb' },
 ]
-
-/**
- * The two registration methods. Register is signature-only on the backend, so
- * E-IMZO is the only working method; USB is shown disabled until a
- * `register_with_usb` endpoint and a token-listing mechanism exist.
- */
-export type RegisterMethod = 'eimzo' | 'usb'
-
-export const REGISTER_METHODS: readonly MethodOption<RegisterMethod>[] = [
-  { id: 'eimzo', labelKey: 'auth.method_eimzo' },
-  { id: 'usb', labelKey: 'auth.method_usb' },
-]

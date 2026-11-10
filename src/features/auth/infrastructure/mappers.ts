@@ -3,6 +3,7 @@ import type { components } from '@/shared/infrastructure/api/schema'
 
 import type {
   AuthOutcome,
+  EimzoLinkResult,
   RegisterPending,
   WorkspaceList,
   WorkspaceOption,
@@ -18,6 +19,8 @@ export type TenantMembershipDto = Schemas['TenantMembershipSchema']
 export type RegisterStartRequestDto = Schemas['RegisterStartRequest']
 export type RegisterStartResponseDto = Schemas['RegisterStartResponse']
 export type RegisterCompleteRequestDto = Schemas['RegisterCompleteRequest']
+export type EimzoChallengeResponseDto = Schemas['EimzoChallengeResponse']
+export type EimzoLinkResponseDto = Schemas['EimzoLinkResponse']
 
 /** The tenant type that identifies the person's own workspace. */
 const PERSONAL_TENANT = 'personal'
@@ -59,6 +62,14 @@ export const toRegisterPending = (
     expiresInSec: dto.expires_in,
     resendAfterSec: dto.resend_after,
   }
+}
+
+/** Maps the `eimzo/link` body to the link result. */
+export const toEimzoLinkResult = (
+  dto: EimzoLinkResponseDto | undefined,
+): EimzoLinkResult | null => {
+  if (dto === undefined) return null
+  return { linked: dto.linked, pinflMasked: dto.pinfl_masked }
 }
 
 /**

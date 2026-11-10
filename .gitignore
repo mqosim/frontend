@@ -33,3 +33,6 @@ dist-ssr
 
 # Audit files
 .audit
+
+# Env files
+.env

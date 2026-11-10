@@ -11,7 +11,15 @@ import prettier from 'eslint-config-prettier'
 // crossing a layer (or a feature) is always a cross-element dependency and is
 // therefore checkable. Dependencies may only point inward: presentation ->
 // application -> domain, with infrastructure implementing domain ports.
-const FEATURES = ['home', 'auth', 'system-auth', 'i18n', 'org-dashboard', 'settings']
+const FEATURES = [
+  'home',
+  'auth',
+  'system-auth',
+  'i18n',
+  'org-dashboard',
+  'settings',
+  'notifications',
+]
 const LAYERS = ['domain', 'application', 'infrastructure', 'presentation']
 const SHARED_LAYERS = ['domain', 'infrastructure', 'presentation']
 

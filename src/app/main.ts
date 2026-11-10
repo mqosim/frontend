@@ -2,6 +2,7 @@ import { createPinia } from 'pinia'
 import { createApp } from 'vue'
 
 import { AuthUseCasesKey } from '@/features/auth'
+import { NotificationsUseCasesKey } from '@/features/notifications'
 import { AdminUseCasesKey, AuditLogRepositoryKey } from '@/features/system-admin'
 import { SystemUseCasesKey } from '@/features/system-auth'
 import { WalletServiceKey } from '@/features/wallet'
@@ -22,6 +23,7 @@ app.use(container.router)
 
 // Ports reach presentation through provide/inject — never a module import.
 app.provide(AuthUseCasesKey, container.authUseCases)
+app.provide(NotificationsUseCasesKey, container.notificationsUseCases)
 app.provide(SystemUseCasesKey, container.systemAuthUseCases)
 app.provide(WalletServiceKey, container.walletService)
 app.provide(AuditLogRepositoryKey, container.auditLogRepository)

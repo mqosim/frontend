@@ -101,7 +101,12 @@ export const toAppError = (response: Response, body: unknown): AppError => {
     case 404:
       return { kind: 'NotFound', status: 404, ...(code === undefined ? {} : { code }) }
     case 409:
-      return { kind: 'Conflict', status: 409, ...(code === undefined ? {} : { code }) }
+      return {
+        kind: 'Conflict',
+        status: 409,
+        ...(code === undefined ? {} : { code }),
+        ...(problems === undefined ? {} : { problems }),
+      }
     case 413:
       return { kind: 'PayloadTooLarge', status: 413, ...(code === undefined ? {} : { code }) }
     case 422:

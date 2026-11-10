@@ -39,8 +39,10 @@ export interface LoginInput {
 
 /** Step 1 of password+OTP registration (`POST /identity/register/start`). */
 export interface RegisterStartInput {
-  /** Email or phone number; the backend accepts either in one field. */
-  readonly identifier: string
+  /** The email that receives the OTP. */
+  readonly email: string
+  /** The phone number stored with the registration; it is not verified by OTP. */
+  readonly phone: string
   /** Canonical API language code for the OTP delivery (`uz`, `uz-Cyrl`, `ru`, `en`). */
   readonly otpLocale: string
 }
@@ -72,6 +74,13 @@ export interface RegisterCompleteInput {
  */
 export interface WorkspaceChoice {
   readonly tenantId: string
+}
+
+/** Result of linking an E-IMZO key to the signed-in account. */
+export interface EimzoLinkResult {
+  readonly linked: boolean
+  /** The masked PINFL the backend echoes back, for display only. */
+  readonly pinflMasked: string
 }
 
 /**

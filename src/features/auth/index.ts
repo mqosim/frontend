@@ -9,6 +9,7 @@ export { loadAccountWorkspaces } from './presentation/stores/accountWorkspaces'
 export { useAuthSessionStore } from './presentation/stores/sessionStore'
 export type { AuthStatus } from './presentation/stores/sessionStore'
 export { default as WorkspaceSwitchDialog } from './presentation/components/WorkspaceSwitchDialog.vue'
+export { default as EimzoKeyPicker } from './presentation/components/EimzoKeyPicker.vue'
 export type { AuthUseCases } from './application/useCases'
 export type {
   AuthOutcome,

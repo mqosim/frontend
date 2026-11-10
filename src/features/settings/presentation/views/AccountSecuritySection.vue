@@ -1,37 +1,19 @@
 <script setup lang="ts">
-import { onMounted, ref, useId } from 'vue'
+import { useId } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { useAuthUseCases } from '@/features/auth'
-import type { UserProfile } from '@/shared/domain'
+import AppAlert from '@/shared/presentation/components/AppAlert.vue'
 
-import ChangeEmailCard from '../components/ChangeEmailCard.vue'
-import ChangePasswordCard from '../components/ChangePasswordCard.vue'
+import EimzoLinkCard from '../components/EimzoLinkCard.vue'
 
 /**
- * The Account Security section of the Settings page: the reference's white panel
- * with the email-change and password-change cards.
+ * The Account Security section of the Settings page. The backend does not expose
+ * the email-change or password-change flows yet, so the section keeps its place
+ * in the Settings navigation, shows one neutral notice instead of the two
+ * forms, and offers the E-IMZO key link, which the contract does support.
  */
 const { t } = useI18n()
-const auth = useAuthUseCases()
 const securityId = useId()
-
-// The address the email-change form validates against ("must differ" rule).
-const accountEmail = ref<string | null>(null)
-
-onMounted(async () => {
-  // Validates the session and supplies the current address; a failure leaves
-  // the form usable for the password change and the email card falls back to
-  // its "must differ" check without the current address.
-  const profile = await auth.getProfile()
-  if (profile.ok) accountEmail.value = profile.value.email
-})
-
-// The confirmed email change returns the refreshed profile, so the displayed
-// address updates from backend data in one step.
-const onEmailUpdated = (profile: UserProfile): void => {
-  accountEmail.value = profile.email
-}
 </script>
 
 <template>
@@ -41,10 +23,11 @@ const onEmailUpdated = (profile: UserProfile): void => {
     </h2>
     <p class="security-section__hint">{{ t('settings.security_hint') }}</p>
 
-    <div class="security-section__cards">
-      <ChangeEmailCard :current-email="accountEmail" @updated="onEmailUpdated" />
-      <ChangePasswordCard />
+    <div class="security-section__notice">
+      <AppAlert variant="info">{{ t('settings.security_unavailable') }}</AppAlert>
     </div>
+
+    <EimzoLinkCard />
   </section>
 </template>
 
@@ -71,10 +54,7 @@ const onEmailUpdated = (profile: UserProfile): void => {
   color: var(--color-text-muted);
 }
 
-.security-section__cards {
-  display: flex;
-  flex-direction: column;
-  gap: 20px;
+.security-section__notice {
   margin-top: 20px;
 }
 </style>

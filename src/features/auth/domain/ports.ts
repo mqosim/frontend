@@ -3,6 +3,7 @@ import type { Result, UserProfile } from '@/shared/domain'
 import type {
   AuthOutcome,
   EimzoKey,
+  EimzoLinkResult,
   LoginInput,
   RegisterCompleteInput,
   RegisterPending,
@@ -21,10 +22,6 @@ export interface EimzoSignature {
  * E-IMZO (ЭЦП) signing port. The real adapter drives the local E-IMZO browser
  * client; a dev-only mock implements it for local work, so a production build
  * never ships the mock.
- *
- * E-IMZO login/link are not part of the current migration step; the port is
- * kept for the preserved adapter implementations and will be wired back into
- * the application layer when that flow is migrated.
  */
 export interface EimzoAuthAdapter {
   readonly kind: 'real' | 'mock'
@@ -58,4 +55,10 @@ export interface AuthRepository {
   listWorkspaces(): Promise<Result<WorkspaceList>>
   /** Switches the session to one of the person's tenants. */
   switchTenant(choice: WorkspaceChoice): Promise<Result<AuthOutcome>>
+  /** The signable keys the local E-IMZO client reports. */
+  listEimzoKeys(): Promise<Result<readonly EimzoKey[]>>
+  /** Signs a fresh challenge with the key and signs in (both cookies are set). */
+  loginWithEimzo(key: EimzoKey): Promise<Result<AuthOutcome>>
+  /** Signs a fresh challenge with the key and links it to the signed-in account. */
+  linkEimzo(key: EimzoKey): Promise<Result<EimzoLinkResult>>
 }

@@ -23,8 +23,8 @@ import {
  * so it can clear the sensitive fields from its own state.
  */
 const props = defineProps<{
-  /** The email or phone the code was sent to, for the announcement. */
-  identifier: string
+  /** The email the code was sent to, for the announcement. */
+  email: string
   expiresInSeconds: number
   resendInSeconds: number
   canResend: boolean
@@ -77,7 +77,7 @@ const onSubmit = handleSubmit(
     <header class="register-form__header">
       <h2 class="register-form__title">{{ t('auth.otp_title') }}</h2>
       <p class="register-form__subtitle">
-        {{ t('auth.otp_subtitle', { identifier }) }}
+        {{ t('auth.otp_subtitle', { identifier: email }) }}
       </p>
     </header>
 

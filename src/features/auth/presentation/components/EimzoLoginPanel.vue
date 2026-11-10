@@ -4,7 +4,7 @@ import { useI18n } from 'vue-i18n'
 
 import AppAlert from '@/shared/presentation/components/AppAlert.vue'
 import AppButton from '@/shared/presentation/components/AppButton.vue'
-import { credentialErrorMessageKey } from '@/shared/presentation/errors/messages'
+import { credentialErrorMessageKey, eimzoCodeKey } from '@/shared/presentation/errors/messages'
 
 import type { EimzoKey } from '../../domain/entities'
 import { useAuthUseCases } from '../composables/useAuthUseCases'
@@ -25,11 +25,13 @@ const submit = async (): Promise<void> => {
 
   submitting.value = true
   formErrorKey.value = ''
-  const result = await auth.loginWithSignature(key)
+  const result = await auth.loginWithEimzo(key)
   submitting.value = false
 
   if (!result.ok) {
-    formErrorKey.value = credentialErrorMessageKey(result.error)
+    // A 401 here is a rejected signature (the contract's `eimzo_<reason>` /
+    // `invalid_certificate`), not an expired session; the code decides first.
+    formErrorKey.value = eimzoCodeKey(result.error) ?? credentialErrorMessageKey(result.error)
     return
   }
   applyOutcome(result.value)

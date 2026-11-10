@@ -2298,12 +2298,6 @@
       "ru": "Не удалось отправить код подтверждения. Повторите попытку.",
       "en": "We couldn't send the verification code. Try again."
     },
-    "errors.sms_budget_exceeded": {
-      "uz": "SMS yuborish vaqtincha mavjud emas. Keyinroq qayta urinib ko'ring.",
-      "uzc": "SMS юбориш вақтинча мавжуд эмас. Кейинроқ қайта уриниб кўринг.",
-      "ru": "Отправка SMS временно недоступна. Повторите попытку позже.",
-      "en": "SMS delivery is temporarily unavailable. Try again later."
-    },
     "errors.eimzo_unavailable": {
       "uz": "E-IMZO mijozi mavjud emas. E-IMZO dasturini o‘rnating va ishga tushiring, so‘ng qayta urinib ko‘ring.",
       "uzc": "E-IMZO мижози мавжуд эмас. E-IMZO дастурини ўрнатинг ва ишга туширинг, сўнг қайта уриниб кўринг.",
@@ -2340,6 +2334,42 @@
       "ru": "E-IMZO не удалось выполнить операцию.",
       "en": "E-IMZO could not complete the operation."
     },
+    "errors.eimzo_invalid_certificate": {
+      "uz": "E-IMZO sertifikati yaroqsiz.",
+      "uzc": "E-IMZO сертификати ёроқсиз.",
+      "ru": "Сертификат E-IMZO недействителен.",
+      "en": "The E-IMZO certificate is invalid."
+    },
+    "errors.eimzo_required": {
+      "uz": "Bu amal uchun E-IMZO kaliti kerak.",
+      "uzc": "Бу амал учун E-IMZO калити керак.",
+      "ru": "Для этого действия требуется ключ E-IMZO.",
+      "en": "An E-IMZO key is required for this action."
+    },
+    "errors.eimzo_certificate_revoked": {
+      "uz": "E-IMZO sertifikati bekor qilingan.",
+      "uzc": "E-IMZO сертификати бекор қилинган.",
+      "ru": "Сертификат E-IMZO отозван.",
+      "en": "The E-IMZO certificate has been revoked."
+    },
+    "errors.eimzo_error": {
+      "uz": "E-IMZO orqali imzolash amalga oshmadi. Qayta urinib ko'ring.",
+      "uzc": "E-IMZO орқали имзолаш амалга ошмади. Қайта уриниб кўринг.",
+      "ru": "Не удалось подписать через E-IMZO. Повторите попытку.",
+      "en": "E-IMZO signing failed. Please try again."
+    },
+    "errors.eimzo_challenge_expired": {
+      "uz": "Imzo so'rovi muddati tugadi. Qayta urinib ko'ring.",
+      "uzc": "Имзо сўрови муддати тугади. Қайта уриниб кўринг.",
+      "ru": "Срок запроса на подпись истёк. Повторите попытку.",
+      "en": "The signing challenge has expired. Please try again."
+    },
+    "errors.eimzo_rejected": {
+      "uz": "E-IMZO imzosi rad etildi.",
+      "uzc": "E-IMZO имзоси рад этилди.",
+      "ru": "Подпись E-IMZO отклонена.",
+      "en": "The E-IMZO signature was rejected."
+    },
     "validation.required": {
       "uz": "Bu maydon to'ldirilishi shart.",
       "uzc": "Бу майдон тўлдирилиши шарт.",
@@ -2369,6 +2399,18 @@
       "uzc": "Email ёки телефон рақамини киритинг.",
       "ru": "Введите почту или номер телефона.",
       "en": "Enter an email or a phone number."
+    },
+    "validation.email_already_registered": {
+      "uz": "Bu email allaqachon ro'yxatdan o'tgan.",
+      "uzc": "Бу email аллақачон рўйхатдан ўтган.",
+      "ru": "Эта почта уже зарегистрирована.",
+      "en": "This email is already registered."
+    },
+    "validation.phone_already_registered": {
+      "uz": "Bu telefon raqami allaqachon ro'yxatdan o'tgan.",
+      "uzc": "Бу телефон рақами аллақачон рўйхатдан ўтган.",
+      "ru": "Этот номер телефона уже зарегистрирован.",
+      "en": "This phone number is already registered."
     },
     "validation.full_name": {
       "uz": "To'liq ismingizni kiriting (2 dan 200 tagacha belgi).",
@@ -2649,10 +2691,40 @@
       "en": "Account security"
     },
     "settings.security_hint": {
-      "uz": "Hisobingiz xavfsizligini ta'minlash uchun elektron pochtangizni va parolingizni yangilang.",
-      "uzc": "Ҳисобингиз хавфсизлигини таъминлаш учун электрон почтангизни ва паролингизни янгиланг.",
-      "ru": "Обновите адрес электронной почты и пароль, чтобы обеспечить безопасность аккаунта.",
-      "en": "Update your email address and password to keep your account secure."
+      "uz": "Hisobingiz uchun mavjud xavfsizlik imkoniyatlarini ko'rib chiqing.",
+      "uzc": "Ҳисобингиз учун мавжуд хавфсизлик имкониятларини кўриб чиқинг.",
+      "ru": "Ознакомьтесь с доступными для вашей учётной записи параметрами безопасности.",
+      "en": "Review the security options available for your account."
+    },
+    "settings.security_unavailable": {
+      "uz": "Elektron pochta yoki parolni o'zgartirish hali mavjud emas. Bu imkoniyat paydo bo'lganda sizga xabar beramiz.",
+      "uzc": "Электрон почта ёки паролни ўзгартириш ҳали мавжуд эмас. Бу имконият пайдо бўлганда сизга хабар берамиз.",
+      "ru": "Изменение электронной почты или пароля пока недоступно. Мы сообщим вам, когда это станет возможным.",
+      "en": "Changing your email address or password is not available yet. We will let you know when it becomes available."
+    },
+    "settings.eimzo_title": {
+      "uz": "E-IMZO kaliti",
+      "uzc": "E-IMZO калити",
+      "ru": "Ключ E-IMZO",
+      "en": "E-IMZO key"
+    },
+    "settings.eimzo_hint": {
+      "uz": "Hujjatlarni imzolash uchun E-IMZO kalitini hisobingizga bog'lang.",
+      "uzc": "Ҳужжатларни имзолаш учун E-IMZO калитини ҳисобингизга боғланг.",
+      "ru": "Привяжите ключ E-IMZO к аккаунту, чтобы подписывать документы.",
+      "en": "Link an E-IMZO key to sign documents."
+    },
+    "settings.eimzo_link": {
+      "uz": "Kalitni bog'lash",
+      "uzc": "Калитни боғлаш",
+      "ru": "Привязать ключ",
+      "en": "Link key"
+    },
+    "settings.eimzo_linked": {
+      "uz": "Kalit bog'landi: {pinfl}",
+      "uzc": "Калит боғланди: {pinfl}",
+      "ru": "Ключ привязан: {pinfl}",
+      "en": "Key linked: {pinfl}"
     },
     "settings.email_label": {
       "uz": "Elektron pochta",
@@ -2672,149 +2744,11 @@
       "ru": "Не подтверждено",
       "en": "Not verified"
     },
-    "settings.change_email_title": {
-      "uz": "Elektron pochta manzilini o'zgartirish",
-      "uzc": "Электрон почта манзилини ўзгартириш",
-      "ru": "Изменить адрес электронной почты",
-      "en": "Change Email Address"
-    },
-    "settings.email_card_hint": {
-      "uz": "Elektron pochtani o'zgartirish uchun joriy parolni kiritishingiz kerak.",
-      "uzc": "Электрон почтани ўзгартириш учун жорий паролни киритишингиз керак.",
-      "ru": "Чтобы изменить адрес электронной почты, введите текущий пароль.",
-      "en": "You'll need to enter your current password to change your email address."
-    },
-    "settings.new_email": {
-      "uz": "Yangi elektron pochta manzili",
-      "uzc": "Янги электрон почта манзили",
-      "ru": "Новый адрес электронной почты",
-      "en": "New Email Address"
-    },
-    "settings.email_banner": {
-      "uz": "Yangi elektron pochta manziliga tasdiqlash kodi yuboriladi. O'zgarishni yakunlash uchun kodni kiriting.",
-      "uzc": "Янги электрон почта манзилига тасдиқлаш коди юборилади. Ўзгаришни якунлаш учун кодни киритинг.",
-      "ru": "На новый адрес электронной почты будет отправлен код подтверждения. Введите его, чтобы завершить смену.",
-      "en": "A verification code will be sent to your new email address. Enter the code to complete the change."
-    },
-    "settings.email_submit": {
-      "uz": "Pochtani o'zgartirish",
-      "uzc": "Почтани ўзгартириш",
-      "ru": "Изменить почту",
-      "en": "Change Email"
-    },
-    "settings.current_password": {
-      "uz": "Joriy parol",
-      "uzc": "Жорий парол",
-      "ru": "Текущий пароль",
-      "en": "Current password"
-    },
     "settings.send_code": {
       "uz": "Kodni yuborish",
       "uzc": "Кодни юбориш",
       "ru": "Отправить код",
       "en": "Send code"
-    },
-    "settings.code_sent": {
-      "uz": "6 xonali kod {email} manziliga yuborildi. U {minutes} daqiqa amal qiladi.",
-      "uzc": "6 хонали код {email} манзилига юборилди. У {minutes} дақиқа амал қилади.",
-      "ru": "6-значный код отправлен на {email}. Он действителен {minutes} мин.",
-      "en": "A 6-digit code was sent to {email}. It is valid for {minutes} minutes."
-    },
-    "settings.verification_code": {
-      "uz": "Tasdiqlash kodi",
-      "uzc": "Тасдиқлаш коди",
-      "ru": "Код подтверждения",
-      "en": "Verification code"
-    },
-    "settings.code_invalid": {
-      "uz": "6 xonali kodni kiriting.",
-      "uzc": "6 хонали кодни киритинг.",
-      "ru": "Введите 6-значный код.",
-      "en": "Enter the 6-digit code."
-    },
-    "settings.confirm_email": {
-      "uz": "Pochtani tasdiqlash",
-      "uzc": "Почтани тасдиқлаш",
-      "ru": "Подтвердить почту",
-      "en": "Confirm email"
-    },
-    "settings.email_changed": {
-      "uz": "Elektron pochta manzili yangilandi.",
-      "uzc": "Электрон почта манзили янгаланди.",
-      "ru": "Адрес электронной почты обновлён.",
-      "en": "Email address updated."
-    },
-    "settings.email_taken": {
-      "uz": "Bu elektron pochta manzili allaqachon ishlatilgan.",
-      "uzc": "Бу электрон почта манзили аллақачон ишлатилган.",
-      "ru": "Этот адрес электронной почты уже занят.",
-      "en": "This email address is already in use."
-    },
-    "settings.email_same": {
-      "uz": "Yangi manzil joriy manzil bilan bir xil.",
-      "uzc": "Янги манзил жорий манзил билан бир хил.",
-      "ru": "Новый адрес совпадает с текущим.",
-      "en": "The new email address matches the current one."
-    },
-    "settings.email_send_failed": {
-      "uz": "Kodni yuborib bo'lmadi. Iltimos, qaytadan urinib ko'ring.",
-      "uzc": "Кодни юбориб бўлмади. Илтимос, қайтадан уриниб кўринг.",
-      "ru": "Не удалось отправить код. Попробуйте ещё раз.",
-      "en": "The code could not be sent. Please try again."
-    },
-    "settings.wrong_current_password": {
-      "uz": "Joriy parol noto'g'ri.",
-      "uzc": "Жорий парол нотўғри.",
-      "ru": "Текущий пароль указан неверно.",
-      "en": "The current password is incorrect."
-    },
-    "settings.change_password_title": {
-      "uz": "Parolni o'zgartirish",
-      "uzc": "Паролни ўзгартириш",
-      "ru": "Изменение пароля",
-      "en": "Change Password"
-    },
-    "settings.password_card_hint": {
-      "uz": "Hisobingizni xavfsiz saqlash uchun kuchli parol tanlang.",
-      "uzc": "Ҳисобингизни хавфсиз сақлаш учун кучли парол танланг.",
-      "ru": "Выберите надёжный пароль, чтобы обеспечить безопасность аккаунта.",
-      "en": "Choose a strong password to keep your account safe."
-    },
-    "settings.new_password": {
-      "uz": "Yangi parol",
-      "uzc": "Янги парол",
-      "ru": "Новый пароль",
-      "en": "New Password"
-    },
-    "settings.confirm_new_password": {
-      "uz": "Yangi parolni tasdiqlash",
-      "uzc": "Янги паролни тасдиқлаш",
-      "ru": "Подтвердите новый пароль",
-      "en": "Confirm New Password"
-    },
-    "settings.req_length": {
-      "uz": "Kamida 8 belgi",
-      "uzc": "Камида 8 белги",
-      "ru": "Минимум 8 символов",
-      "en": "At least 8 characters"
-    },
-    "settings.req_number": {
-      "uz": "Raqam bor",
-      "uzc": "Рақам бор",
-      "ru": "Содержит цифру",
-      "en": "Contains a number"
-    },
-    "settings.req_lowercase": {
-      "uz": "Kichik harf bor",
-      "uzc": "Кичик ҳарф бор",
-      "ru": "Содержит строчную букву",
-      "en": "Contains a lowercase letter"
-    },
-    "settings.req_uppercase": {
-      "uz": "Katta harf bor",
-      "uzc": "Катта ҳарф бор",
-      "ru": "Содержит заглавную букву",
-      "en": "Contains an uppercase letter"
     },
     "settings.show_password": {
       "uz": "Parolni ko'rsatish",
@@ -2827,36 +2761,6 @@
       "uzc": "Паролни яшириш",
       "ru": "Скрыть пароль",
       "en": "Hide password"
-    },
-    "settings.change_password_submit": {
-      "uz": "Parolni yangilash",
-      "uzc": "Паролни янгилаш",
-      "ru": "Обновить пароль",
-      "en": "Update Password"
-    },
-    "settings.password_changed": {
-      "uz": "Parol o'zgartirildi.",
-      "uzc": "Парол ўзгартирилди.",
-      "ru": "Пароль изменён.",
-      "en": "Password changed."
-    },
-    "settings.password_same": {
-      "uz": "Yangi parol joriy parol bilan bir xil.",
-      "uzc": "Янги парол жорий парол билан бир хил.",
-      "ru": "Новый пароль совпадает с текущим.",
-      "en": "The new password matches the current one."
-    },
-    "settings.password_mismatch": {
-      "uz": "Parollar bir xil emas.",
-      "uzc": "Пароллар бир хил эмас.",
-      "ru": "Пароли не совпадают.",
-      "en": "Passwords do not match."
-    },
-    "settings.no_password_set": {
-      "uz": "Bu hisobda parol belgilanmagan.",
-      "uzc": "Бу ҳисобда парол белгиленмаган.",
-      "ru": "В этой учётной записи не установлен пароль.",
-      "en": "This account has no password set."
     },
     "settings.search_placeholder": {
       "uz": "Hamma narsani qidirish...",

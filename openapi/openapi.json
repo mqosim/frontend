@@ -8,7 +8,7 @@
     "/api/v1/identity/register/start": {
       "post": {
         "summary": "Register Start",
-        "description": "Begin a registration and send an OTP to the identifier.",
+        "description": "Begin a registration and send an OTP to the email.",
         "operationId": "register_start_api_v1_identity_register_start_post",
         "requestBody": {
           "content": {
@@ -106,27 +106,6 @@
           },
           "502": {
             "description": "Bad Gateway. Machine codes: otp_delivery_failed.",
-            "headers": {
-              "X-Request-ID": {
-                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
-                "schema": {
-                  "type": "string",
-                  "examples": [
-                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
-                  ]
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
-          "503": {
-            "description": "Service Unavailable. Machine codes: sms_budget_exceeded.",
             "headers": {
               "X-Request-ID": {
                 "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
@@ -8743,22 +8722,29 @@
       },
       "RegisterStartRequest": {
         "properties": {
-          "identifier": {
+          "email": {
             "type": "string",
-            "title": "Identifier",
+            "title": "Email",
             "examples": [
-              "user@example.uz",
-              "90 123 45 67"
+              "user@example.uz"
+            ]
+          },
+          "phone": {
+            "type": "string",
+            "title": "Phone",
+            "examples": [
+              "+998901234567"
             ]
           }
         },
         "additionalProperties": false,
         "type": "object",
         "required": [
-          "identifier"
+          "email",
+          "phone"
         ],
         "title": "RegisterStartRequest",
-        "description": "Start a registration for an email or phone number."
+        "description": "Start a registration with both an email and a phone number."
       },
       "RegisterStartResponse": {
         "properties": {

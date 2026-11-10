@@ -4,16 +4,18 @@ import { toResult } from '@/shared/infrastructure/api/client'
 import type { ApiClient } from '@/shared/infrastructure/api/client'
 import type { TokenStore } from '@/shared/infrastructure/session/tokenStore'
 
-import type { AuthOutcome } from '../domain/entities'
-import type { AuthRepository } from '../domain/ports'
+import type { AuthOutcome, EimzoKey } from '../domain/entities'
+import type { AuthRepository, EimzoAuthAdapter, EimzoSignature } from '../domain/ports'
 import {
   toAuthOutcome,
   toAuthOutcomeFromMe,
+  toEimzoLinkResult,
   toRegisterPending,
   toUserProfile,
   toWorkspaceList,
 } from './mappers'
 import type {
+  EimzoChallengeResponseDto,
   LoginRequestDto,
   MeResponseDto,
   RegisterCompleteRequestDto,
@@ -25,6 +27,8 @@ import type {
 export interface AuthRepositoryDeps {
   readonly client: ApiClient
   readonly tokens: TokenStore
+  /** The E-IMZO signing adapter (real client, or the dev-only mock). */
+  readonly eimzo: EimzoAuthAdapter
   /** Runs the single-flight, cross-tab refresh owned by the session runtime. */
   readonly refreshRunner: () => Promise<Result<AuthOutcome>>
   /** Tells the session runtime that this tab logged out, so siblings can follow. */
@@ -74,6 +78,7 @@ export type AuthRepositoryImpl = AuthRepository & AuthSessionPorts
 export const createAuthRepository = ({
   client,
   tokens,
+  eimzo,
   refreshRunner,
   onLoggedOut,
   onLogoutStart,
@@ -100,6 +105,20 @@ export const createAuthRepository = ({
       return result
     }
     return finish(result.value)
+  }
+
+  /**
+   * One E-IMZO signing round: a fresh single-use challenge from the server,
+   * signed once by the adapter. The challenge is never cached or reused.
+   */
+  const signChallenge = async (key: EimzoKey): Promise<Result<EimzoSignature>> => {
+    const challenge: Result<EimzoChallengeResponseDto | undefined> = toResult(
+      await client.GET('/api/v1/identity/eimzo/challenge'),
+    )
+    if (!challenge.ok) return challenge
+    const dto = challenge.value
+    if (dto === undefined) return err({ kind: 'Unknown', status: null })
+    return eimzo.sign(dto.challenge, key)
   }
 
   // `/identity/me` is read by the profile, the workspace list and the guard's
@@ -133,11 +152,11 @@ export const createAuthRepository = ({
     },
 
     async registerStart(input) {
-      if (input.identifier.length === 0) {
-        // The form enforces a non-empty identifier; keep the port honest too.
+      if (input.email.length === 0 || input.phone.length === 0) {
+        // The form enforces both fields; keep the port honest too.
         return err({ kind: 'Validation', status: 400, fields: {} })
       }
-      const body: RegisterStartRequestDto = { identifier: input.identifier }
+      const body: RegisterStartRequestDto = { email: input.email, phone: input.phone }
       // `Accept-Language` is the contract's optional OTP-locale header; the
       // generated path declares no header parameter, so it travels through the
       // openapi-fetch `headers` option instead of `params.header`.
@@ -189,6 +208,39 @@ export const createAuthRepository = ({
       // the already-rotated cookie, never racing this tab.
       if (outcome.ok) onSessionChanged()
       return outcome
+    },
+
+    listEimzoKeys: () => eimzo.listKeys(),
+
+    async loginWithEimzo(key) {
+      const signature = await signChallenge(key)
+      if (!signature.ok) return signature
+      const result = toResult(
+        await client.POST('/api/v1/identity/eimzo/login', {
+          body: { pkcs7: signature.value.pkcs7 },
+        }),
+      )
+      if (!result.ok) return result
+      // The login response sets BOTH cookies (see COOKIE_ENDPOINTS) and carries a
+      // TokenResponse: adopt the session exactly like password login — store the
+      // token, schedule renewal from `expires_in`.
+      return finish(result.value)
+    },
+
+    async linkEimzo(key) {
+      const signature = await signChallenge(key)
+      if (!signature.ok) return signature
+      // Bearer-authenticated (the caller must already be signed in); no cookies
+      // are set or rotated on this response.
+      const result = toResult(
+        await client.POST('/api/v1/identity/eimzo/link', {
+          body: { pkcs7: signature.value.pkcs7 },
+        }),
+      )
+      if (!result.ok) return result
+      const link = toEimzoLinkResult(result.value)
+      if (link === null) return err({ kind: 'Unknown', status: null })
+      return ok(link)
     },
 
     // Delegates to the session runtime so the guard's bootstrap restore and the
