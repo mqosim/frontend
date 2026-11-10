@@ -4,7 +4,127 @@
  */
 
 export interface paths {
-    "/healthz": {
+    "/api/v1/identity/register/start": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register Start
+         * @description Begin a registration and send an OTP to the identifier.
+         */
+        post: operations["register_start_api_v1_identity_register_start_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/register/complete": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Register Complete
+         * @description Verify the OTP, create the account and start a session.
+         */
+        post: operations["register_complete_api_v1_identity_register_complete_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/login": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Login
+         * @description Authenticate with a password and start a session.
+         */
+        post: operations["login_api_v1_identity_login_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh
+         * @description Rotate the refresh cookie and issue a fresh access token.
+         */
+        post: operations["refresh_api_v1_identity_refresh_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Logout
+         * @description Revoke the current refresh-token family and clear the cookie.
+         */
+        post: operations["logout_api_v1_identity_logout_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/logout-all": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Logout All
+         * @description Revoke every session of the authenticated user.
+         */
+        post: operations["logout_all_api_v1_identity_logout_all_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/me": {
         parameters: {
             query?: never;
             header?: never;
@@ -12,10 +132,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Liveness probe
-         * @description Does not touch Postgres or Redis.
+         * Get Me
+         * @description Return the masked profile and active tenants of the authenticated user.
          */
-        get: operations["getHealthz"];
+        get: operations["get_me_api_v1_identity_me_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -24,7 +144,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/readyz": {
+    "/api/v1/identity/eimzo/challenge": {
         parameters: {
             query?: never;
             header?: never;
@@ -32,10 +152,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Readiness probe
-         * @description Checks Postgres and Redis connectivity.
+         * Eimzo Challenge
+         * @description Return a single-use challenge for the E-IMZO widget to sign.
          */
-        get: operations["getReadyz"];
+        get: operations["eimzo_challenge_api_v1_identity_eimzo_challenge_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -44,15 +164,78 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/auth/challenge": {
+    "/api/v1/identity/eimzo/login": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Issue a login/register challenge */
-        get: operations["getChallenge"];
+        get?: never;
+        put?: never;
+        /**
+         * Eimzo Login
+         * @description Authenticate a PKCS#7 signature and start a session.
+         */
+        post: operations["eimzo_login_api_v1_identity_eimzo_login_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/eimzo/link": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Eimzo Link
+         * @description Link the authenticated E-IMZO key to the account of the bearer.
+         */
+        post: operations["eimzo_link_api_v1_identity_eimzo_link_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/identity/switch-tenant": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Switch Tenant
+         * @description Rotate the refresh cookie into another tenant the user belongs to.
+         */
+        post: operations["switch_tenant_api_v1_identity_switch_tenant_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/types": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Types
+         * @description Return the registered document types with their content schemas.
+         */
+        get: operations["list_types_api_v1_documents_types_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -61,7 +244,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/auth/register": {
+    "/api/v1/documents/drafts": {
         parameters: {
             query?: never;
             header?: never;
@@ -71,111 +254,17 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Register a new user
-         * @description Registers a PERSON or ORG user from an e-imzo signed challenge. The refresh token is set as the httpOnly `refresh_token` cookie (path `/api/v1/auth`); it is never returned in the body.
+         * Create Draft
+         * @description Create a document draft (optionally idempotent).
          */
-        post: operations["register"];
+        post: operations["create_draft_api_v1_documents_drafts_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/auth/login": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Log in with a password (PERSON/ORG only)
-         * @description The identifier is an email or a phone number. Every failure returns the same generic 401 (no user enumeration). Repeated failed attempts lock the (identifier, source IP) pair, and a higher all-IP threshold briefly locks the identifier itself; a locked attempt returns 429 before the credentials are checked, identically whether or not the account exists. A SYSTEM account is never authenticated here. Sets the httpOnly `refresh_token` cookie.
-         */
-        post: operations["loginWithPassword"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/login_with_signature": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Log in with an e-imzo signature
-         * @description Every failure returns the same generic 401. Sets the httpOnly `refresh_token` cookie.
-         */
-        post: operations["loginWithSignature"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/login_with_usb": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** USB login (not implemented) */
-        post: operations["loginWithUSB"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/select_workspace": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Select the workspace for a pending person token
-         * @description Requires a pending-workspace access token (PERSON or SYSTEM). Sets the httpOnly `refresh_token` cookie. An inactive organization is rejected with 403.
-         */
-        post: operations["selectWorkspace"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/switch_workspace": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Switch the workspace for a selected person token */
-        post: operations["switchWorkspace"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/workspaces": {
+    "/api/v1/documents": {
         parameters: {
             query?: never;
             header?: never;
@@ -183,10 +272,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List the current person's available workspaces
-         * @description Returns the active organizations owned by the person behind the access token's uid claim — exactly the workspace_options a PERSON login returns — plus which workspace the token is currently in. PERSON tokens only (personal or org workspace); a pending-selection token and ORG/SYSTEM tokens are rejected.
+         * List Documents
+         * @description List the tenant's documents (keyset pagination).
          */
-        get: operations["listWorkspaces"];
+        get: operations["list_documents_api_v1_documents_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -195,7 +284,31 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/auth/refresh": {
+    "/api/v1/documents/{document_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Document
+         * @description Return one visible document.
+         */
+        get: operations["get_document_api_v1_documents__document_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update Draft
+         * @description Patch a draft; omitted fields are untouched, explicit null clears them.
+         */
+        patch: operations["update_draft_api_v1_documents__document_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/documents/{document_id}/discard": {
         parameters: {
             query?: never;
             header?: never;
@@ -205,37 +318,37 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Rotate the session from the refresh cookie
-         * @description Reads the httpOnly `refresh_token` cookie (path `/api/v1/auth`); no Authorization header is required (an expired access token must still be refreshable). A `system_refresh_token` is rejected here. Sets a rotated `refresh_token` cookie. The session also enforces server-side limits: it is rejected with the same 401 once idle for longer than REFRESH_IDLE_TIMEOUT_MINUTES or once its total lifetime exceeds SESSION_ABSOLUTE_MAX_MINUTES (measured from the session's first token), and the rotated cookie's Expires never exceeds that absolute cap. A refresh presenting a token that was rotated moments ago — a second browser tab racing on the same shared cookie — within REFRESH_ROTATION_GRACE_SECONDS is NOT treated as reuse: it returns a fresh access token but sets no new refresh cookie (the winning rotation already set it). Reuse outside that window, or any revoked/expired token, returns 401. Cookie-based endpoints cannot be exercised reliably from the Swagger UI Try-it-out (cookies are managed by the browser).
+         * Discard Draft
+         * @description Discard a draft.
          */
-        post: operations["refreshToken"];
+        post: operations["discard_draft_api_v1_documents__document_id__discard_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/auth/logout": {
+    "/api/v1/documents/{document_id}/signing-payload": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        put?: never;
         /**
-         * Log out the current device
-         * @description Revokes the refresh-token family from the `refresh_token` cookie, clears the cookie and denies the presented access token's jti for its remaining lifetime. Works without an access token (the bearer is optional and only trusted when its signature validates). Idempotent.
+         * Get Signing Payload
+         * @description Return the canonical bytes the caller is asked to sign.
          */
-        post: operations["logout"];
+        get: operations["get_signing_payload_api_v1_documents__document_id__signing_payload_get"];
+        put?: never;
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/auth/logout_all": {
+    "/api/v1/documents/{document_id}/send": {
         parameters: {
             query?: never;
             header?: never;
@@ -245,17 +358,17 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Log out every device
-         * @description Revokes every refresh-token family for the caller and denies the caller's own access token's jti. Clears the `refresh_token` cookie. Other devices' access tokens remain valid until they expire (up to ACCESS_TOKEN_EXPIRE_MINUTES).
+         * Send Document
+         * @description Send a draft by signing it as the sender (optionally idempotent).
          */
-        post: operations["logoutAll"];
+        post: operations["send_document_api_v1_documents__document_id__send_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/auth/login": {
+    "/api/v1/documents/{document_id}/sign": {
         parameters: {
             query?: never;
             header?: never;
@@ -265,17 +378,17 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * SYSTEM (superadmin) login
-         * @description Authenticates only user_type=SYSTEM accounts. Unknown email, wrong password, inactive account, a non-SYSTEM account and a missing email/password hash all return the same generic 401. Uses a dedicated fail-closed per-IP limiter plus a per-(email, IP) lockout (429). Sets the httpOnly `system_refresh_token` cookie (path `/api/v1/system/auth`), which is not interchangeable with `refresh_token`.
+         * Sign Document
+         * @description Sign a pending document as its receiver (optionally idempotent).
          */
-        post: operations["systemLogin"];
+        post: operations["sign_document_api_v1_documents__document_id__sign_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/auth/refresh": {
+    "/api/v1/documents/{document_id}/reject": {
         parameters: {
             query?: never;
             header?: never;
@@ -285,17 +398,17 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Rotate a SYSTEM session
-         * @description Reads the httpOnly `system_refresh_token` cookie (path `/api/v1/system/auth`). A `refresh_token` is rejected here with a generic failure. The session also enforces server-side limits: it is rejected with the same 401 once idle for longer than SYSTEM_REFRESH_IDLE_TIMEOUT_MINUTES or once its total lifetime exceeds SYSTEM_SESSION_ABSOLUTE_MAX_MINUTES (measured from the session's first token), and the rotated cookie's Expires never exceeds that absolute cap. A refresh presenting a token rotated moments ago within REFRESH_ROTATION_GRACE_SECONDS returns a fresh access token but sets no new refresh cookie (the winning rotation already set it). Reuse outside that window, or any revoked/expired token, returns 401. Cookie-based endpoint; cannot be exercised reliably from Try-it-out.
+         * Reject Document
+         * @description Reject a pending document as its receiver.
          */
-        post: operations["systemRefreshToken"];
+        post: operations["reject_document_api_v1_documents__document_id__reject_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/auth/logout": {
+    "/api/v1/documents/{document_id}/cancel": {
         parameters: {
             query?: never;
             header?: never;
@@ -305,10 +418,134 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Log out a SYSTEM session
-         * @description Requires a valid SYSTEM access token. Revokes the refresh token(s), clears the `system_refresh_token` cookie and denies the access token's jti (fail-closed: if the denylist write fails it returns 500 so the caller can retry). Idempotent.
+         * Cancel Document
+         * @description Cancel a pending document as its owner.
          */
-        post: operations["systemLogout"];
+        post: operations["cancel_document_api_v1_documents__document_id__cancel_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/{document_id}/evidence": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Evidence
+         * @description Export the payload and signatures (never cached).
+         */
+        get: operations["get_evidence_api_v1_documents__document_id__evidence_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/{document_id}/files": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Attach File
+         * @description Attach a file to a draft (multipart: `file` + `kind`).
+         */
+        post: operations["attach_file_api_v1_documents__document_id__files_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/{document_id}/files/{file_id}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Remove File
+         * @description Remove a file from a draft.
+         */
+        delete: operations["remove_file_api_v1_documents__document_id__files__file_id__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/documents/{document_id}/files/{file_id}/content": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Download File
+         * @description Stream the stored file bytes with an RFC 5987 attachment filename.
+         */
+        get: operations["download_file_api_v1_documents__document_id__files__file_id__content_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/audit/entries": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List Entries
+         * @description Return a page of the caller's tenant audit entries (owner/director only).
+         */
+        get: operations["list_entries_api_v1_audit_entries_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/notifications/preferences": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Preferences
+         * @description Return the authenticated user's notification preferences.
+         */
+        get: operations["get_preferences_api_v1_notifications_preferences_get"];
+        /**
+         * Update Preferences
+         * @description Replace the authenticated user's preferences and record an audit entry.
+         */
+        put: operations["update_preferences_api_v1_notifications_preferences_put"];
+        post?: never;
         delete?: never;
         options?: never;
         head?: never;
@@ -322,96 +559,11 @@ export interface paths {
             path?: never;
             cookie?: never;
         };
-        /** List active languages */
-        get: operations["listActiveLanguages"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/public/languages/{code}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get one active language */
-        get: operations["getPublicLanguageByCode"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/public/pages/active": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List active pages */
-        get: operations["listActivePages"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/public/pages/slug/{slug}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get one active page by slug */
-        get: operations["getPublicPageBySlug"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/public/phrases": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List phrases with their translation for the resolved language */
-        get: operations["listPublicPhrases"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/public/countries": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
         /**
-         * List countries localized to the resolved language
-         * @description Public localized read: names fall back to the active default language when a translation is missing.
+         * List Active Languages
+         * @description List the active interface languages with the catalog revision.
          */
-        get: operations["listPublicCountries"];
+        get: operations["list_active_languages_api_v1_public_languages_active_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -428,10 +580,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get UI translation bundles for one or more pages
-         * @description Returns one map of key/value pairs per requested page for the resolved language. Public and unauthenticated. Language resolution: `?lang=` -> `Accept-Language` -> default.
+         * Get Translations
+         * @description Return the UI messages for one language (default language fallback).
          */
-        get: operations["getTranslations"];
+        get: operations["get_translations_api_v1_public_translations_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -440,245 +592,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/master/languages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List all languages */
-        get: operations["listLanguages"];
-        put?: never;
-        /** Create a language */
-        post: operations["createLanguage"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/languages/{code}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Update a language */
-        put: operations["updateLanguage"];
-        post?: never;
-        /** Delete a language */
-        delete: operations["deleteLanguage"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/languages/{code}/default": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Set the default language */
-        put: operations["setDefaultLanguage"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/pages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List all pages */
-        get: operations["listPages"];
-        put?: never;
-        /** Create a page */
-        post: operations["createPage"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/pages/{uuid}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a page by UUID */
-        get: operations["getPageByUUID"];
-        /** Update a page */
-        put: operations["updatePage"];
-        post?: never;
-        /** Delete a page */
-        delete: operations["deletePage"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/phrases": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Create a phrase with its translations */
-        post: operations["createPhrase"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/phrases/{uuid}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a phrase by UUID */
-        get: operations["getPhraseByUUID"];
-        /** Update a phrase */
-        put: operations["updatePhrase"];
-        post?: never;
-        /** Delete a phrase */
-        delete: operations["deletePhrase"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/phrases/{uuid}/translations/{lang}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Delete one phrase translation */
-        delete: operations["deletePhraseTranslation"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/countries": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List countries */
-        get: operations["listCountries"];
-        put?: never;
-        /** Create a country with its translations */
-        post: operations["createCountry"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/countries/{code}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a country by code */
-        get: operations["getCountryByCode"];
-        /**
-         * Update a country
-         * @description Full update: `country_code` is immutable and comes from the path.
-         */
-        put: operations["updateCountry"];
-        post?: never;
-        /** Delete a country */
-        delete: operations["deleteCountry"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/countries/{code}/translations": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List a country's translations */
-        get: operations["listCountryTranslations"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/countries/{code}/translations/{language_code}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Upsert a country translation */
-        put: operations["upsertCountryTranslation"];
-        post?: never;
-        /** Delete a country translation */
-        delete: operations["deleteCountryTranslation"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/orgs/{uuid}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get an organization by UUID
-         * @description The caller may only read the organization its token is scoped to (the oid claim, resolved by the Tenant middleware).
-         */
-        get: operations["getOrgByUUID"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/documents/sign": {
+    "/api/v1/system/auth/login": {
         parameters: {
             query?: never;
             header?: never;
@@ -688,161 +602,17 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Sign and store a document
-         * @description The real request body limit for this endpoint today is 2 MiB (the shared group limit).
+         * Login
+         * @description Step 1 of 2: verify the password and hand out the single-use pre-auth token.
          */
-        post: operations["signDocument"];
+        post: operations["login_api_v1_system_auth_login_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/master/documents": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List the tenant's documents */
-        get: operations["listDocuments"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/documents/{uuid}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a document by UUID */
-        get: operations["getDocumentByUUID"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/audit": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * List audit entries in a time range
-         * @description The range must be at most 31 days.
-         */
-        get: operations["listAudit"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/audit/{uuid}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get an audit entry by UUID */
-        get: operations["getAuditByUUID"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/org/employees": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List the tenant's employees */
-        get: operations["listEmployees"];
-        put?: never;
-        /** Create an employee */
-        post: operations["createEmployee"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/org/employees/list_by_user": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List the tenant's employees for the calling user */
-        get: operations["listEmployeesByUser"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/org/employees/{uuid}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get an employee by UUID */
-        get: operations["getEmployeeByUUID"];
-        /** Update an employee */
-        put: operations["updateEmployee"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /**
-         * Get the current user
-         * @description Returns the profile of the user identified by the access token's uid claim. Works for PERSON, ORG and SYSTEM principals; no language claim is added to the token.
-         */
-        get: operations["getUserMe"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/master/users/me": {
+    "/api/v1/system/auth/totp": {
         parameters: {
             query?: never;
             header?: never;
@@ -850,12 +620,92 @@ export interface paths {
             cookie?: never;
         };
         get?: never;
+        put?: never;
         /**
-         * Update the current user's language
-         * @description Persists language_code for the user identified by the access token's uid claim and returns the refreshed profile. The code must match an active language; an unknown or inactive code is rejected with 400.
+         * Verify Totp
+         * @description Step 2 of 2: verify TOTP (or a recovery code) and open the session.
          */
-        put: operations["updateUserMe"];
-        post?: never;
+        post: operations["verify_totp_api_v1_system_auth_totp_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/auth/totp/enroll": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Enroll Totp
+         * @description Start TOTP enrollment (pre-auth token during first login, or a session).
+         */
+        post: operations["enroll_totp_api_v1_system_auth_totp_enroll_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/auth/totp/activate": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Activate Totp
+         * @description Confirm the enrollment; the recovery codes are displayed exactly once.
+         */
+        post: operations["activate_totp_api_v1_system_auth_totp_activate_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/auth/refresh": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Refresh
+         * @description Rotate the system refresh cookie and issue a fresh access token.
+         */
+        post: operations["refresh_api_v1_system_auth_refresh_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/auth/logout": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Logout
+         * @description Revoke the current system refresh-token family and clear the cookie.
+         */
+        post: operations["logout_api_v1_system_auth_logout_post"];
         delete?: never;
         options?: never;
         head?: never;
@@ -870,10 +720,10 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Get the current SYSTEM user
-         * @description SYSTEM-gated alias of GET /api/v1/auth/me: identical contract, reachable with a SYSTEM access token only.
+         * Get Me
+         * @description Return the system user's profile and effective permission set.
          */
-        get: operations["getSystemUserMe"];
+        get: operations["get_me_api_v1_system_auth_me_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -882,87 +732,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/system/users/me": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Update the current SYSTEM user's language
-         * @description SYSTEM-gated alias of PUT /api/v1/master/users/me: identical contract, reachable with a SYSTEM access token only.
-         */
-        put: operations["updateSystemUserMe"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/me/password": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Change the current user's password
-         * @description Rotates the password of the user identified by the access token's uid claim. current_password is verified against the stored bcrypt hash; wrong values are counted per user and the account is locked for ACCOUNT_PW_LOCKOUT_SEC after ACCOUNT_PW_MAX_FAILURES failures — the lockout is checked before the password is compared, so a locked attempt returns the same 429 whether or not the password is correct. The new password must differ from the current one and follow the 8-72 byte rule. On success every other refresh-token family is revoked; the caller's current session survives only when the httpOnly refresh_token cookie identifies it (its path /api/v1/auth covers this route), otherwise all families, including the current one, are revoked. PERSON and ORG principals only: SYSTEM is rejected with 403. An account without a password (e-imzo-only) is rejected with 409.
-         */
-        post: operations["changeAccountPassword"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/me/email/change": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Start an email address change
-         * @description Starts (or resends) the email change for the user identified by the access token's uid claim; calling this endpoint again is the resend. current_password is verified like the password change (wrong password 401, locked 429 checked before the comparison). The new address must differ from the current one and must not already belong to another account (409, checked here and again on confirm). A 6-digit code from crypto/rand is stored only as an HMAC and sent to the NEW address; it expires in EMAIL_CODE_TTL_SEC and at most EMAIL_CODE_MAX_ATTEMPTS wrong codes invalidate the pending change. A repeat request within EMAIL_CODE_RESEND_COOLDOWN_SEC is 429, and per-user, per-target-address and per-IP hourly and daily send caps also apply (429, fail-closed on a Redis outage). If the code email cannot be sent the request returns 500 and never reports success, while the cooldown still applies. No raw address or code is ever logged. PERSON and ORG only: SYSTEM is rejected with 403. An account without a password is rejected with 409.
-         */
-        post: operations["requestAccountEmailChange"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/auth/me/email/confirm": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Confirm an email address change
-         * @description Completes the pending email change for the user identified by the access token's uid claim. The code is compared in constant time against the stored HMAC; a wrong code, an expired code, exhausted attempts and no pending change all return the same 400 (never 401, which the frontend treats as session expiry). Uniqueness of the new address is re-checked inside the transaction that updates the row, and the partial unique index is the final guard; a conflict returns 409 and consumes the pending change. On success email_verified_at is set, the pending state is cleared, an audit entry is written (masked values only) and a notice is sent to the OLD address (skipped silently when the account had none). Returns the refreshed profile. PERSON and ORG only: SYSTEM is rejected with 403.
-         */
-        post: operations["confirmAccountEmailChange"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/audit": {
+    "/api/v1/system/users": {
         parameters: {
             query?: never;
             header?: never;
@@ -970,84 +740,58 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * List audit entries in a time range
-         * @description The range must be at most 31 days.
+         * List System Users
+         * @description Page the staff accounts (newest first) with optional role/status filters.
          */
-        get: operations["adminListAudit"];
+        get: operations["list_system_users_api_v1_system_users_get"];
         put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/audit/{uuid}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get an audit entry by UUID */
-        get: operations["adminGetAuditByUUID"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/countries": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List countries */
-        get: operations["adminListCountries"];
-        put?: never;
-        /** Create a country with its translations */
-        post: operations["adminCreateCountry"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/countries/{code}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a country by code */
-        get: operations["adminGetCountryByCode"];
         /**
-         * Update a country
-         * @description Full update: `country_code` is immutable and comes from the path.
+         * Create System User
+         * @description Create a staff account; the new user enrolls TOTP at first login.
          */
-        put: operations["adminUpdateCountry"];
-        post?: never;
-        /** Delete a country */
-        delete: operations["adminDeleteCountry"];
+        post: operations["create_system_user_api_v1_system_users_post"];
+        delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/countries/{code}/translations": {
+    "/api/v1/system/users/{user_id}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** List a country's translations */
-        get: operations["adminListCountryTranslations"];
+        /**
+         * Get System User
+         * @description Return one staff account by id.
+         */
+        get: operations["get_system_user_api_v1_system_users__user_id__get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update System User
+         * @description Edit display name, role and/or status (self-disable and last-superadmin are 409).
+         */
+        patch: operations["update_system_user_api_v1_system_users__user_id__patch"];
+        trace?: never;
+    };
+    "/api/v1/system/permissions": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Get Permissions
+         * @description The fixed permission catalog (code, not database rows).
+         */
+        get: operations["get_permissions_api_v1_system_permissions_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1056,176 +800,18 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/countries/{code}/translations/{language_code}": {
+    "/api/v1/system/tenants": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        get?: never;
-        /** Upsert a country translation */
-        put: operations["adminUpsertCountryTranslation"];
-        post?: never;
-        /** Delete a country translation */
-        delete: operations["adminDeleteCountryTranslation"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/languages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List all languages */
-        get: operations["adminListLanguages"];
-        put?: never;
-        /** Create a language */
-        post: operations["adminCreateLanguage"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/languages/{code}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Update a language */
-        put: operations["adminUpdateLanguage"];
-        post?: never;
-        /** Delete a language */
-        delete: operations["adminDeleteLanguage"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/languages/{code}/default": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /** Set the default language */
-        put: operations["adminSetDefaultLanguage"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/pages": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List all pages */
-        get: operations["adminListPages"];
-        put?: never;
-        /** Create a page */
-        post: operations["adminCreatePage"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/pages/{uuid}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a page by UUID */
-        get: operations["adminGetPageByUUID"];
-        /** Update a page */
-        put: operations["adminUpdatePage"];
-        post?: never;
-        /** Delete a page */
-        delete: operations["adminDeletePage"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/phrases": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /** Create a phrase with its translations */
-        post: operations["adminCreatePhrase"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/phrases/{uuid}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a phrase by UUID */
-        get: operations["adminGetPhraseByUUID"];
-        /** Update a phrase */
-        put: operations["adminUpdatePhrase"];
-        post?: never;
-        /** Delete a phrase */
-        delete: operations["adminDeletePhrase"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/phrases/{uuid}/translations/{lang}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        post?: never;
-        /** Delete one phrase translation */
-        delete: operations["adminDeletePhraseTranslation"];
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/orgs": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List organizations */
-        get: operations["adminListOrgs"];
+        /**
+         * List System Tenants
+         * @description Page tenant metadata (newest first) with optional type/status filters.
+         */
+        get: operations["list_system_tenants_api_v1_system_tenants_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1234,15 +820,18 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/orgs/{uuid}": {
+    "/api/v1/system/tenants/{tenant_id}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get an organization by UUID */
-        get: operations["adminGetOrg"];
+        /**
+         * Get System Tenant
+         * @description Tenant metadata, member count and zero-filled document status counts.
+         */
+        get: operations["get_system_tenant_api_v1_system_tenants__tenant_id__get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1251,7 +840,27 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/orgs/{uuid}/block": {
+    "/api/v1/system/tenants/{tenant_id}/users": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List System Tenant Users
+         * @description The tenant's users with masked contacts (read-only, never raw PII).
+         */
+        get: operations["list_system_tenant_users_api_v1_system_tenants__tenant_id__users_get"];
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/tenants/{tenant_id}/suspend": {
         parameters: {
             query?: never;
             header?: never;
@@ -1261,17 +870,17 @@ export interface paths {
         get?: never;
         put?: never;
         /**
-         * Block an organization
-         * @description Writes the organization (and owning user) not-before marker first, then deactivates the org and audits. A Redis failure aborts with 503 and no database change.
+         * Suspend System Tenant
+         * @description Suspend the tenant; logins and refreshes are refused from then on.
          */
-        post: operations["adminBlockOrg"];
+        post: operations["suspend_system_tenant_api_v1_system_tenants__tenant_id__suspend_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/orgs/{uuid}/unblock": {
+    "/api/v1/system/tenants/{tenant_id}/reactivate": {
         parameters: {
             query?: never;
             header?: never;
@@ -1280,23 +889,29 @@ export interface paths {
         };
         get?: never;
         put?: never;
-        /** Unblock an organization */
-        post: operations["adminUnblockOrg"];
+        /**
+         * Reactivate System Tenant
+         * @description Return a suspended tenant to the active lifecycle status.
+         */
+        post: operations["reactivate_system_tenant_api_v1_system_tenants__tenant_id__reactivate_post"];
         delete?: never;
         options?: never;
         head?: never;
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/permissions": {
+    "/api/v1/system/i18n/languages": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** List permissions */
-        get: operations["adminListPermissions"];
+        /**
+         * List I18N Languages
+         * @description All interface languages, active and inactive (the codes are fixed).
+         */
+        get: operations["list_i18n_languages_api_v1_system_i18n_languages_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1305,15 +920,86 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/roles": {
+    "/api/v1/system/i18n/languages/{code}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** List roles */
-        get: operations["adminListRoles"];
+        get?: never;
+        put?: never;
+        post?: never;
+        delete?: never;
+        options?: never;
+        head?: never;
+        /**
+         * Update I18N Language
+         * @description Activate/deactivate a language and/or set it as the (single) default.
+         */
+        patch: operations["update_i18n_language_api_v1_system_i18n_languages__code__patch"];
+        trace?: never;
+    };
+    "/api/v1/system/i18n/pages": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List I18N Pages
+         * @description Every catalog page (active and inactive) with its phrase count.
+         */
+        get: operations["list_i18n_pages_api_v1_system_i18n_pages_get"];
+        put?: never;
+        /**
+         * Create I18N Page
+         * @description Create an empty page (phrases are added through the phrase endpoints).
+         */
+        post: operations["create_i18n_page_api_v1_system_i18n_pages_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/i18n/pages/{page_key}": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        post?: never;
+        /**
+         * Delete I18N Page
+         * @description Hard-delete an EMPTY page (409 page_not_empty while phrases remain).
+         */
+        delete: operations["delete_i18n_page_api_v1_system_i18n_pages__page_key__delete"];
+        options?: never;
+        head?: never;
+        /**
+         * Update I18N Page
+         * @description Patch the page description and/or visibility.
+         */
+        patch: operations["update_i18n_page_api_v1_system_i18n_pages__page_key__patch"];
+        trace?: never;
+    };
+    "/api/v1/system/i18n/phrases": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * List I18N Phrases
+         * @description One page's phrases with ALL language values (key-based cursor).
+         */
+        get: operations["list_i18n_phrases_api_v1_system_i18n_phrases_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1322,15 +1008,66 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/system-users": {
+    "/api/v1/system/i18n/phrases/{page_key}/{phrase_key}": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** List SYSTEM users */
-        get: operations["adminListSystemUsers"];
+        get?: never;
+        /**
+         * Upsert I18N Phrase
+         * @description Create or update ONE phrase; every provided language in one call.
+         */
+        put: operations["upsert_i18n_phrase_api_v1_system_i18n_phrases__page_key___phrase_key__put"];
+        post?: never;
+        /**
+         * Delete I18N Phrase
+         * @description Hard-delete one phrase (its translations cascade); destructive, audited.
+         */
+        delete: operations["delete_i18n_phrase_api_v1_system_i18n_phrases__page_key___phrase_key__delete"];
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/i18n/import": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        get?: never;
+        put?: never;
+        /**
+         * Import I18N Translations
+         * @description Bulk import in the legacy seed shape (dry-run/no-overwrite/overwrite).
+         *
+         *     Body: ``{"pages": ["slug" | {key, description, is_active}],
+         *     "phrases": {page: {word: {lang: value}}}}`` — legacy ``uzc`` keys map to
+         *     ``uz-Cyrl``; stored values that differ are REPORTED unless ``overwrite``.
+         */
+        post: operations["import_i18n_translations_api_v1_system_i18n_import_post"];
+        delete?: never;
+        options?: never;
+        head?: never;
+        patch?: never;
+        trace?: never;
+    };
+    "/api/v1/system/i18n/missing": {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        /**
+         * Report I18N Missing
+         * @description Per active language: phrase counts lacking a value, grouped by page.
+         */
+        get: operations["report_i18n_missing_api_v1_system_i18n_missing_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1339,15 +1076,21 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/system-users/{uuid}": {
+    "/api/v1/system/audit/entries": {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        /** Get a SYSTEM user by UUID */
-        get: operations["adminGetSystemUser"];
+        /**
+         * List System Audit Entries
+         * @description Page through the SYSTEM audit chain (seq cursor, filters, capped size).
+         *
+         *     ``limit`` is silently clamped to ``SYSTEM_AUDIT_MAX_PAGE_SIZE``: a larger
+         *     request simply receives a smaller page and continues via ``next_cursor``.
+         */
+        get: operations["list_system_audit_entries_api_v1_system_audit_entries_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1356,181 +1099,7 @@ export interface paths {
         patch?: never;
         trace?: never;
     };
-    "/api/v1/admin/system-users/{uuid}/roles": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        /**
-         * Replace a SYSTEM user's roles
-         * @description Role changes are only allowed for SYSTEM users. Removing system_admin from the last active administrator is refused with 409.
-         */
-        put: operations["adminSetSystemUserRoles"];
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/users": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** List PERSON/ORG users */
-        get: operations["adminListUsers"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/users/{uuid}": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        /** Get a PERSON/ORG user by UUID */
-        get: operations["adminGetUser"];
-        put?: never;
-        post?: never;
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/users/{uuid}/block": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Block a user
-         * @description Blocks a PERSON/ORG account. Writes the user not-before marker first, then deactivates the account, revokes its refresh-token families and audits. A Redis failure aborts with 503 and no database change. A SYSTEM target is refused with 422; use /admin/system-users/{uuid}/block instead.
-         */
-        post: operations["adminBlockUser"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/users/{uuid}/sessions/revoke": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Revoke all sessions of a user
-         * @description Revokes a PERSON/ORG user's sessions: writes the not-before marker, then revokes every refresh-token family. Does not change is_active. A Redis failure aborts with 503 and no database change. A SYSTEM target is refused with 422; use /admin/system-users/{uuid}/sessions/revoke instead.
-         */
-        post: operations["adminRevokeUserSessions"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/users/{uuid}/unblock": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Unblock a user
-         * @description Reactivates a PERSON/ORG account. Does not delete the not-before marker. A SYSTEM target is refused with 422; use /admin/system-users/{uuid}/unblock instead.
-         */
-        post: operations["adminUnblockUser"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/system-users/{uuid}/block": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Block a SYSTEM user
-         * @description Blocks a SYSTEM account. Requires system.role.manage, which system_support does not hold. Writes the user not-before marker first, then deactivates the account, revokes its refresh-token families and audits. A Redis failure aborts with 503 and no database change. The last active system_admin cannot be blocked.
-         */
-        post: operations["adminBlockSystemUser"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/system-users/{uuid}/unblock": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Unblock a SYSTEM user
-         * @description Reactivates a SYSTEM account. Requires system.role.manage. Does not delete the not-before marker.
-         */
-        post: operations["adminUnblockSystemUser"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/system-users/{uuid}/sessions/revoke": {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        get?: never;
-        put?: never;
-        /**
-         * Revoke all sessions of a SYSTEM user
-         * @description Revokes a SYSTEM account's sessions. Requires system.role.manage, which system_support does not hold. Writes the not-before marker, then revokes every refresh-token family and audits. Does not change is_active. A Redis failure aborts with 503 and no database change. Revoking your own sessions is refused.
-         */
-        post: operations["adminRevokeSystemUserSessions"];
-        delete?: never;
-        options?: never;
-        head?: never;
-        patch?: never;
-        trace?: never;
-    };
-    "/api/v1/admin/me": {
+    "/api/v1/system/audit/verify": {
         parameters: {
             query?: never;
             header?: never;
@@ -1538,10 +1107,13 @@ export interface paths {
             cookie?: never;
         };
         /**
-         * Describe the authenticated SYSTEM caller
-         * @description Requires a SYSTEM principal. No permission is required: a caller may always describe itself. roles and permissions are the grants resolved for this request; the response exposes only the external uuid.
+         * Verify System Audit Chain
+         * @description Re-hash the newest SYSTEM_AUDIT_VERIFY_MAX_ROWS entries and check the head.
+         *
+         *     Bounded by design: ``truncated`` reports a suffix-only verification (rows
+         *     below ``verified_from_seq`` are out of scope). Superadmin only.
          */
-        get: operations["adminGetMe"];
+        get: operations["verify_system_audit_chain_api_v1_system_audit_verify_get"];
         put?: never;
         post?: never;
         delete?: never;
@@ -1554,662 +1126,1417 @@ export interface paths {
 export type webhooks = Record<string, never>;
 export interface components {
     schemas: {
-        /** @description Standard error envelope. */
-        ErrorResponse: {
-            /** @description Human-readable error message (or null for a successful delete). */
-            message?: unknown;
-            /** @description Present only on validation failures (400). */
-            fields?: {
-                [key: string]: string;
+        /**
+         * ActorType
+         * @description Who performed the audited action.
+         * @enum {string}
+         */
+        ActorType: "user" | "system" | "anonymous";
+        /**
+         * AuditEntriesResponse
+         * @description A page of audit entries plus the cursor for the next page.
+         */
+        AuditEntriesResponse: {
+            /** Items */
+            items: components["schemas"]["AuditEntryItem"][];
+            /**
+             * Next Cursor
+             * @description scope_seq cursor for the next page, absent on the last page
+             */
+            next_cursor?: number | null;
+        };
+        /**
+         * AuditEntryItem
+         * @description One audit entry visible to the tenant.
+         */
+        AuditEntryItem: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Scope Seq */
+            scope_seq: number;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Action */
+            action: string;
+            outcome: components["schemas"]["Outcome"];
+            /** Actor User Id */
+            actor_user_id?: string | null;
+            actor_type: components["schemas"]["ActorType"];
+            /** Auth Method */
+            auth_method?: string | null;
+            /** Cert Serial */
+            cert_serial?: string | null;
+            /** Resource Type */
+            resource_type?: string | null;
+            /** Resource Id */
+            resource_id?: string | null;
+            /** Details */
+            details: {
+                [key: string]: unknown;
             };
+            /** Ip */
+            ip?: string | null;
+            /** Request Id */
+            request_id?: string | null;
         };
-        MessageResponse: {
-            message?: string;
+        /** Body_attach_file_api_v1_documents__document_id__files_post */
+        Body_attach_file_api_v1_documents__document_id__files_post: {
+            /** File */
+            file: string;
+            /** @default attachment */
+            kind: components["schemas"]["FileKind"];
         };
-        ChallengeResponse: {
-            challenge?: string;
-        };
-        TokenPair: {
-            /** @description JWT access token. The refresh token is delivered only as an httpOnly cookie, never in the body. */
-            access_token?: string;
-        };
-        AuthResult: {
-            tokens?: components["schemas"]["TokenPair"];
-            /** @description Present when the caller must still choose a workspace. Only active organizations are listed. */
-            workspace_options?: components["schemas"]["Org"][];
-        };
-        WorkspaceList: {
-            /** @description Active organizations owned by the current person; identical to the workspace_options returned by login. */
-            workspace_options?: components["schemas"]["Org"][];
-            current?: components["schemas"]["CurrentWorkspace"];
-        };
-        CurrentWorkspace: {
+        /**
+         * CreateDraftRequest
+         * @description Create a draft (all fields except doc_type are optional).
+         */
+        CreateDraftRequest: {
             /**
-             * @description The workspace the presented token is scoped to.
-             * @enum {string}
+             * Doc Type
+             * @example invoice
              */
-            workspace?: "personal" | "org";
+            doc_type: string;
             /**
+             * Title
+             * @example March services
+             */
+            title?: string | null;
+            /**
+             * Number
+             * @example INV-2026-001
+             */
+            number?: string | null;
+            /**
+             * Doc Date
+             * @example 2026-03-31
+             */
+            doc_date?: string | null;
+            /**
+             * Receiver Stir
+             * @example 200000001
+             */
+            receiver_stir?: string | null;
+            /**
+             * Receiver Name
+             * @example ACME LLC
+             */
+            receiver_name?: string | null;
+            /** Content */
+            content?: {
+                [key: string]: unknown;
+            } | null;
+        };
+        /**
+         * DecisionRequest
+         * @description Reject or cancel a document with an optional closing comment.
+         */
+        DecisionRequest: {
+            /**
+             * Comment
+             * @example Goods were not delivered
+             */
+            comment?: string | null;
+        };
+        /**
+         * DiscardDraftRequest
+         * @description Discard a draft at the given revision.
+         */
+        DiscardDraftRequest: {
+            /**
+             * Expected Revision
+             * @example 1
+             */
+            expected_revision: number;
+        };
+        /**
+         * DocumentEventsPref
+         * @description How much document traffic a user wants to receive.
+         * @enum {string}
+         */
+        DocumentEventsPref: "all" | "important" | "none";
+        /**
+         * DocumentListView
+         * @description A page of document summaries plus the opaque next cursor.
+         */
+        DocumentListView: {
+            /** Items */
+            items: components["schemas"]["DocumentSummaryView"][];
+            /** Next Cursor */
+            next_cursor?: string | null;
+        };
+        /**
+         * DocumentStatus
+         * @description Lifecycle status (STEP 6A only produces draft and discarded).
+         * @enum {string}
+         */
+        DocumentStatus: "draft" | "pending" | "completed" | "rejected" | "cancelled" | "expired" | "discarded";
+        /**
+         * DocumentSummaryView
+         * @description A list row (no content).
+         */
+        DocumentSummaryView: {
+            /**
+             * Id
              * Format: uuid
-             * @description External UUID of the active org when workspace is org, otherwise null.
              */
-            org_id?: string | null;
-        };
-        PublicLanguage: {
-            code?: string;
-            name?: string;
-            is_default?: boolean;
-        };
-        Language: {
-            code?: string;
-            name?: string;
-            is_default?: boolean;
-            is_active?: boolean;
-        };
-        PublicPage: {
-            /** Format: uuid */
-            uuid?: string;
-            slug?: string;
-            description?: string;
-        };
-        Page: {
-            /** Format: uuid */
-            uuid?: string;
-            slug?: string;
-            description?: string;
-            is_active?: boolean;
-            /** Format: date-time */
-            created_at?: string;
-            /** Format: date-time */
-            updated_at?: string;
-        };
-        PhraseTranslation: {
-            language_code?: string;
-            translation?: string;
-        };
-        PublicPhrase: {
-            /** Format: uuid */
-            uuid?: string;
-            /** Format: uuid */
-            page_uuid?: string;
-            word?: string;
-            /** @description Translation for the resolved language, if any. */
-            translation?: string | null;
-            /** @description All translations, present only when include_translations=true. */
-            translations?: {
-                [key: string]: string;
-            };
-        };
-        Phrase: {
-            /** Format: uuid */
-            uuid?: string;
-            /** Format: uuid */
-            page_uuid?: string;
-            word?: string;
-            /** Format: date-time */
-            created_at?: string;
-            /** Format: date-time */
-            updated_at?: string;
-            translation?: string | null;
-            translations?: components["schemas"]["PhraseTranslation"][];
-        };
-        CountryTranslation: {
-            language_code?: string;
-            translation?: string;
-        };
-        Country: {
-            country_code?: string;
-            currency_code?: string;
-            currency_symbol?: string;
-            /** Format: date-time */
-            created_at?: string;
-            /** Format: date-time */
-            updated_at?: string;
-            translations?: components["schemas"]["CountryTranslation"][];
-        };
-        PublicCountry: {
-            country_code?: string;
-            currency_code?: string;
-            currency_symbol?: string;
-            name?: string;
-        };
-        AuditLog: {
-            /** Format: uuid */
-            uuid?: string;
-            /** Format: date-time */
-            occurred_at?: string;
-            /** Format: int64 */
-            actor_user_id?: number;
-            /** Format: uuid */
-            actor_user_uuid?: string | null;
-            actor_type?: string;
-            /** Format: int64 */
-            org_id?: number | null;
-            /** Format: uuid */
-            org_uuid?: string | null;
-            /** @description Subject kind (for example user or org); empty when the event has no single subject. */
-            target_type?: string;
+            id: string;
+            doc_type: components["schemas"]["DocumentTypeKey"];
+            /** Type Version */
+            type_version: number;
+            /** Number */
+            number?: string | null;
+            /** Doc Date */
+            doc_date?: string | null;
+            /** Title */
+            title?: string | null;
+            status: components["schemas"]["DocumentStatus"];
+            /** Revision */
+            revision: number;
             /**
-             * Format: uuid
-             * @description External UUID of the subject the event changed.
+             * Created At
+             * Format: date-time
              */
-            target_uuid?: string | null;
-            action?: string;
-            /** @description Free-form JSON payload. */
-            details?: unknown;
-            ip?: string;
-            user_agent?: string;
-        };
-        Document: {
+            created_at: string;
             /**
-             * Format: uuid
-             * @description External UUID (Base.UUID serialized as id).
+             * Updated At
+             * Format: date-time
              */
-            id?: string;
-            /** Format: date-time */
-            created_at?: string;
-            /** Format: date-time */
-            updated_at?: string;
-            /** @enum {string} */
-            signature_type?: "ATTACHED" | "DETACHED";
-            mime_type?: string;
-            /** Format: int64 */
-            original_size?: number;
-            /** Format: int64 */
-            signed_size?: number;
-            /** @enum {string} */
-            status?: "SIGNED";
+            updated_at: string;
         };
-        Org: {
+        /**
+         * DocumentTypeKey
+         * @description Canonical keys of the registered document types.
+         *
+         *     The API advertises this exact set in RESPONSES (``DocumentTypeView.key``);
+         *     requests keep ``doc_type`` free-form so an unknown key still yields the
+         *     ``unknown_document_type`` application error instead of a validation error.
+         *     ``registry.TYPES`` is keyed by this enum and a drift test keeps them equal.
+         * @enum {string}
+         */
+        DocumentTypeKey: "generic" | "contract" | "invoice" | "act" | "waybill" | "power_of_attorney";
+        /**
+         * DocumentTypeView
+         * @description A registered document type.
+         */
+        DocumentTypeView: {
+            /** @example invoice */
+            key: components["schemas"]["DocumentTypeKey"];
             /**
-             * Format: uuid
-             * @description External UUID (Base.UUID serialized as id).
+             * Version
+             * @example 1
              */
-            id?: string;
-            /** Format: date-time */
-            created_at?: string;
-            /** Format: date-time */
-            updated_at?: string;
-            tin?: string;
-            name?: string;
-            is_active?: boolean;
+            version: number;
+            /**
+             * Label
+             * @example Invoice
+             */
+            label: string;
+            /**
+             * Requires Primary File
+             * @example false
+             */
+            requires_primary_file: boolean;
+            /** Content Schema */
+            content_schema?: {
+                [key: string]: unknown;
+            } | null;
         };
-        Employee: {
-            /** Format: uuid */
-            id?: string;
-            /** Format: date-time */
-            created_at?: string;
-            /** Format: date-time */
-            updated_at?: string;
-            full_name?: string;
-            position?: string;
+        /**
+         * DocumentView
+         * @description A full document (content included).
+         */
+        DocumentView: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            doc_type: components["schemas"]["DocumentTypeKey"];
+            /** Type Version */
+            type_version: number;
+            /** Number */
+            number?: string | null;
+            /** Doc Date */
+            doc_date?: string | null;
+            /** Title */
+            title?: string | null;
+            status: components["schemas"]["DocumentStatus"];
+            /** Revision */
+            revision: number;
+            /** Content */
+            content?: {
+                [key: string]: unknown;
+            } | null;
+            /** Parties */
+            parties: components["schemas"]["PartyView"][];
+            /** Files */
+            files: components["schemas"]["FileView"][];
+            /** Signatures */
+            signatures: components["schemas"]["SignatureView"][];
+            /** Sent At */
+            sent_at?: string | null;
+            /** Finished At */
+            finished_at?: string | null;
+            /** Closing Comment */
+            closing_comment?: string | null;
+            my_role?: components["schemas"]["PartyRole"] | null;
+            /**
+             * Can Sign
+             * @default false
+             */
+            can_sign: boolean;
+            /**
+             * Can Cancel
+             * @default false
+             */
+            can_cancel: boolean;
+            /**
+             * Created At
+             * Format: date-time
+             */
+            created_at: string;
+            /**
+             * Updated At
+             * Format: date-time
+             */
+            updated_at: string;
         };
-        /** @description One map of key/value pairs per requested page slug. */
-        TranslationBundle: {
-            [key: string]: {
-                [key: string]: string;
-            };
-        };
-        RegisterRequest: {
+        /**
+         * EimzoChallengeResponse
+         * @description A single-use challenge for the E-IMZO widget to sign.
+         */
+        EimzoChallengeResponse: {
+            /**
+             * Challenge
+             * @example b64-challenge-value
+             */
             challenge: string;
-            pkcs7: string;
             /**
-             * Format: email
-             * @example user@example.com
+             * Expires In
+             * @example 120
              */
-            email: string;
-            password: string;
-            /** @example +998901234567 */
-            phone_number: string;
-            /** @description Optional; an empty/unknown/inactive code falls back to the default language. */
-            language_code?: string;
+            expires_in: number;
         };
+        /**
+         * EimzoLinkResponse
+         * @description Result of linking an E-IMZO key to the authenticated account.
+         */
+        EimzoLinkResponse: {
+            /** Linked */
+            linked: boolean;
+            /**
+             * Pinfl Masked
+             * @example 123*******4567
+             */
+            pinfl_masked: string;
+        };
+        /**
+         * ErrorBody
+         * @description The inner ``error`` object of the public envelope.
+         */
+        ErrorBody: {
+            /**
+             * Code
+             * @example document_not_found
+             */
+            code: string;
+            /**
+             * Message
+             * @example Document not found
+             */
+            message: string;
+            /** Problems */
+            problems?: components["schemas"]["ErrorProblem"][] | null;
+        };
+        /**
+         * ErrorProblem
+         * @description One field-level problem: a JSON path plus a machine code (never a value).
+         */
+        ErrorProblem: {
+            /**
+             * Path
+             * @example content.lines[0].unit_price
+             */
+            path: string;
+            /**
+             * Code
+             * @example money_scale
+             */
+            code: string;
+        };
+        /**
+         * ErrorResponse
+         * @description The single application error envelope returned for every AppError.
+         */
+        ErrorResponse: {
+            error: components["schemas"]["ErrorBody"];
+        };
+        /**
+         * EvidenceSignatureView
+         * @description One signature in an evidence export.
+         */
+        EvidenceSignatureView: {
+            party_role: components["schemas"]["PartyRole"];
+            /** Signer Name */
+            signer_name: string;
+            /** Signer Stir */
+            signer_stir?: string | null;
+            /** Cert Serial */
+            cert_serial: string;
+            /**
+             * Signing Time
+             * Format: date-time
+             */
+            signing_time: string;
+            /**
+             * Timestamp Time
+             * Format: date-time
+             */
+            timestamp_time: string;
+            /** Pkcs7 B64 */
+            pkcs7_b64: string;
+        };
+        /**
+         * EvidenceView
+         * @description The signed payload and every signature's PKCS#7.
+         */
+        EvidenceView: {
+            /** Payload B64 */
+            payload_b64: string;
+            /** Payload Sha256 */
+            payload_sha256: string;
+            /** Payload Version */
+            payload_version: number;
+            /** Revision */
+            revision: number;
+            /** Signatures */
+            signatures: components["schemas"]["EvidenceSignatureView"][];
+        };
+        /**
+         * FileKind
+         * @description Whether a file is the document's primary file or an attachment.
+         * @enum {string}
+         */
+        FileKind: "primary" | "attachment";
+        /**
+         * FileView
+         * @description Stored file metadata.
+         */
+        FileView: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            kind: components["schemas"]["FileKind"];
+            /** Filename */
+            filename: string;
+            /** Content Type */
+            content_type: string;
+            /** Size Bytes */
+            size_bytes: number;
+            /** Sha256 */
+            sha256: string;
+        };
+        /**
+         * LanguageView
+         * @description One active interface language.
+         */
+        LanguageView: {
+            /**
+             * Code
+             * @example uz-Cyrl
+             */
+            code: string;
+            /**
+             * Name
+             * @example Uzbek (Cyrillic)
+             */
+            name: string;
+            /**
+             * Native Name
+             * @example Ўзбекча
+             */
+            native_name: string;
+            /**
+             * Script
+             * @example cyrillic
+             */
+            script: string;
+            /** Is Default */
+            is_default: boolean;
+            /** Sort Order */
+            sort_order: number;
+        };
+        /**
+         * LanguagesResponse
+         * @description The active languages plus the catalog revision (mirrors the ETag input).
+         */
+        LanguagesResponse: {
+            /** Revision */
+            revision: number;
+            /** Languages */
+            languages: components["schemas"]["LanguageView"][];
+        };
+        /**
+         * Locale
+         * @description Supported interface/notification languages.
+         * @enum {string}
+         */
+        Locale: "uz" | "uz-Cyrl" | "ru" | "en";
+        /**
+         * LoginRequest
+         * @description Password login with an email or phone identifier.
+         */
         LoginRequest: {
             /**
-             * Format: email
-             * @example user@example.com
+             * Identifier
+             * @example user@example.uz
              */
-            email?: string;
-            /** @example +998901234567 */
-            phone_number?: string;
+            identifier: string;
+            /**
+             * Password
+             * @example correct horse battery staple
+             */
             password: string;
         };
-        LoginWithSignatureRequest: {
-            pkcs7: string;
-            challenge: string;
-        };
-        SelectWorkspaceRequest: {
-            /** @enum {string} */
-            workspace: "personal" | "org";
-            /** Format: uuid */
-            org_id?: string;
-        };
-        SwitchWorkspaceRequest: {
-            /** @enum {string} */
-            workspace: "personal" | "org";
+        /**
+         * MeResponse
+         * @description Masked profile of the authenticated user plus their active tenants.
+         */
+        MeResponse: {
             /**
+             * Id
              * Format: uuid
-             * @description Required when workspace=org, forbidden when workspace=personal.
              */
-            org_id?: string;
-        };
-        SystemLoginRequest: {
-            /**
-             * Format: email
-             * @example superadmin@example.com
-             */
-            email: string;
-            password: string;
-        };
-        SystemLogoutRequest: {
-            /** @default false */
-            all_devices: boolean;
-        };
-        CreateLanguageRequest: {
-            /** @example uz */
-            code: string;
-            /** @example O'zbekcha */
-            name: string;
-            is_active?: boolean;
-        };
-        UpdateLanguageRequest: {
-            name: string;
-            is_active?: boolean;
-        };
-        CreatePageRequest: {
-            /** @example settings.profile */
-            slug: string;
-            description?: string;
-        };
-        UpdatePageRequest: {
-            slug: string;
-            description?: string;
-            is_active?: boolean;
-        };
-        CreatePhraseRequest: {
-            /** Format: uuid */
-            page_uuid: string;
-            word: string;
-            /**
-             * @example {
-             *       "uz": "Saqlash",
-             *       "en": "Save"
-             *     }
-             */
-            translations: {
-                [key: string]: string;
-            };
-        };
-        UpdatePhraseRequest: {
-            /** Format: uuid */
-            page_uuid: string;
-            word: string;
-            translations?: {
-                [key: string]: string;
-            };
-        };
-        CreateCountryRequest: {
-            /** @example UZ */
-            country_code: string;
-            /** @example UZS */
-            currency_code: string;
-            /** @example so'm */
-            currency_symbol: string;
-            /**
-             * @example {
-             *       "uz": "O'zbekiston",
-             *       "en": "Uzbekistan"
-             *     }
-             */
-            translations: {
-                [key: string]: string;
-            };
-        };
-        UpdateCountryRequest: {
-            currency_code: string;
-            currency_symbol: string;
-            translations?: {
-                [key: string]: string;
-            };
-        };
-        UpsertTranslationRequest: {
-            translation: string;
-        };
-        SignDocumentRequest: {
-            /** @enum {string} */
-            signature_type: "ATTACHED" | "DETACHED";
-            pkcs7: string;
-            /** @description Base64 document; required when signature_type=DETACHED. */
-            document?: string;
-            /** @example application/pdf */
-            mime_type: string;
-            /** @default false */
-            attach_timestamp: boolean;
-        };
-        EmployeeRequest: {
-            /** @example Jane Doe */
+            id: string;
+            /** Full Name */
             full_name: string;
-            /** @example Engineer */
-            position?: string;
+            /** Pinfl Masked */
+            pinfl_masked?: string | null;
+            /** Email Masked */
+            email_masked?: string | null;
+            /** Phone Masked */
+            phone_masked?: string | null;
+            /** Has Password */
+            has_password: boolean;
+            /** Auth Method */
+            auth_method?: string | null;
+            tenant: components["schemas"]["TenantSummarySchema"];
+            /** Tenants */
+            tenants: components["schemas"]["TenantMembershipSchema"][];
         };
-        /** @description The caller's own user row, narrowed to non-sensitive fields (no internal id, password hash or flags). */
-        UserMe: {
-            /** Format: uuid */
-            uuid?: string;
-            /** @enum {string} */
-            user_type?: "PERSON" | "ORG" | "SYSTEM";
-            email?: string | null;
-            phone_number?: string | null;
-            /** @example uz */
-            language_code?: string;
+        /**
+         * Outcome
+         * @description Result of the audited action.
+         * @enum {string}
+         */
+        Outcome: "success" | "failure" | "denied";
+        /**
+         * PartyRole
+         * @description Whether the party sends or receives the document.
+         * @enum {string}
+         */
+        PartyRole: "sender" | "receiver";
+        /**
+         * PartyStatus
+         * @description Signing status of a party (used from STEP 6B onwards).
+         * @enum {string}
+         */
+        PartyStatus: "pending" | "signed" | "rejected";
+        /**
+         * PartyView
+         * @description A document party; the tenant id is only exposed to its own tenant.
+         */
+        PartyView: {
+            role: components["schemas"]["PartyRole"];
+            /** Stir */
+            stir?: string | null;
+            /** Display Name */
+            display_name: string;
+            status: components["schemas"]["PartyStatus"];
+            /** Tenant Id */
+            tenant_id?: string | null;
+        };
+        /**
+         * Pkcs7Request
+         * @description A base64-encoded PKCS#7/CMS body produced by the E-IMZO widget.
+         */
+        Pkcs7Request: {
             /**
+             * Pkcs7
+             * @example MIIHQAYJKoZIhvcNAQcCoIIHNTCCBzECAQEx...
+             */
+            pkcs7: string;
+        };
+        /**
+         * PreferencesResponse
+         * @description The caller's notification preferences.
+         */
+        PreferencesResponse: {
+            document_events: components["schemas"]["DocumentEventsPref"];
+            locale?: components["schemas"]["Locale"] | null;
+        };
+        /**
+         * PreferencesUpdateRequest
+         * @description A full preference replacement (unknown fields are rejected).
+         */
+        PreferencesUpdateRequest: {
+            /**
+             * Document Events
+             * @enum {string}
+             */
+            document_events: "all" | "important" | "none";
+            /** Locale */
+            locale?: ("uz" | "uz-Cyrl" | "ru" | "en") | null;
+        };
+        /**
+         * RegisterCompleteRequest
+         * @description Verify the OTP, set a password and create the account.
+         */
+        RegisterCompleteRequest: {
+            /**
+             * Pending Id
+             * @example b2Fja2luZy1wZW5kaW5nLWlk
+             */
+            pending_id: string;
+            /**
+             * Code
+             * @example 123456
+             */
+            code: string;
+            /**
+             * Password
+             * @example correct horse battery staple
+             */
+            password: string;
+            /**
+             * Full Name
+             * @example ALIYEV ALI
+             */
+            full_name: string;
+        };
+        /**
+         * RegisterStartRequest
+         * @description Start a registration for an email or phone number.
+         */
+        RegisterStartRequest: {
+            /**
+             * Identifier
+             * @example user@example.uz
+             * @example 90 123 45 67
+             */
+            identifier: string;
+        };
+        /**
+         * RegisterStartResponse
+         * @description Opaque pending id and timing hints for the verification step.
+         */
+        RegisterStartResponse: {
+            /**
+             * Pending Id
+             * @example b2Fja2luZy1wZW5kaW5nLWlk
+             */
+            pending_id: string;
+            /**
+             * Expires In
+             * @example 300
+             */
+            expires_in: number;
+            /**
+             * Resend After
+             * @example 60
+             */
+            resend_after: number;
+        };
+        /**
+         * SendRequest
+         * @description Send a draft by signing it as the sender.
+         */
+        SendRequest: {
+            /**
+             * Pkcs7
+             * @example MIIHQAYJKoZIhvcNAQcCoIIHNTCCBzECAQEx...
+             */
+            pkcs7: string;
+            /**
+             * Expected Revision
+             * @example 1
+             */
+            expected_revision: number;
+        };
+        /**
+         * SignRequest
+         * @description Sign a pending document as its receiver.
+         */
+        SignRequest: {
+            /**
+             * Pkcs7
+             * @example MIIHQAYJKoZIhvcNAQcCoIIHNTCCBzECAQEx...
+             */
+            pkcs7: string;
+        };
+        /**
+         * SignatureView
+         * @description A signature summary (no PKCS#7, never the PINFL).
+         */
+        SignatureView: {
+            party_role: components["schemas"]["PartyRole"];
+            /** Signer Name */
+            signer_name: string;
+            /** Signer Stir */
+            signer_stir?: string | null;
+            /** Cert Serial */
+            cert_serial: string;
+            /**
+             * Signing Time
              * Format: date-time
-             * @description When the email address was confirmed through the change flow; null for accounts that never completed it (including every pre-existing account).
              */
-            email_verified_at?: string | null;
-        };
-        ChangePasswordRequest: {
-            /** @description Verified against the stored bcrypt hash. */
-            current_password: string;
-            /** @description Must differ from the current password and satisfy the 8-72 byte rule. */
-            new_password: string;
-        };
-        ChangeEmailRequest: {
+            signing_time: string;
             /**
-             * Format: email
-             * @description Trimmed before validation. Must differ from the current address and must not be used by another account.
+             * Timestamp Time
+             * Format: date-time
              */
-            new_email: string;
-            /** @description Verified against the stored bcrypt hash. */
-            current_password: string;
+            timestamp_time: string;
         };
-        ConfirmEmailChangeRequest: {
+        /**
+         * SigningPayloadView
+         * @description The canonical bytes a party signs plus their hash and revision.
+         */
+        SigningPayloadView: {
+            role: components["schemas"]["PartyRole"];
+            /** Payload B64 */
+            payload_b64: string;
+            /** Payload Sha256 */
+            payload_sha256: string;
+            /** Payload Version */
+            payload_version: number;
+            /** Revision */
+            revision: number;
+        };
+        /**
+         * SwitchTenantRequest
+         * @description Switch the session to one of the tenants the user belongs to.
+         */
+        SwitchTenantRequest: {
             /**
-             * @description The 6-digit code sent to the new address.
-             * @example 042913
+             * Tenant Id
+             * Format: uuid
+             * @example 018f6b2c-1a4b-7cc0-9f2e-5d3b1a2c4d5e
+             */
+            tenant_id: string;
+        };
+        /**
+         * SystemActivateRequest
+         * @description Confirm a pending TOTP enrollment with a current code.
+         */
+        SystemActivateRequest: {
+            /**
+             * Code
+             * @example 123456
              */
             code: string;
         };
-        EmailChangeResponse: {
-            /** @description Seconds the verification code stays valid. */
-            expires_in?: number;
-            /** @description Seconds until the change request may be repeated. */
-            resend_after?: number;
+        /**
+         * SystemActivateResponse
+         * @description Shown ONCE: the single-use recovery codes (hashed server-side).
+         */
+        SystemActivateResponse: {
+            /** Recovery Codes */
+            recovery_codes: string[];
         };
-        UpdateUserLanguageRequest: {
+        /**
+         * SystemAuditEntriesResponse
+         * @description A page of system-chain entries plus the seq cursor for the next page.
+         */
+        SystemAuditEntriesResponse: {
+            /** Items */
+            items: components["schemas"]["SystemAuditEntryResponse"][];
             /**
-             * @description Must match an active language code.
-             * @example ru
+             * Next Cursor
+             * @description scope_seq cursor for the next page, absent on the last page
              */
+            next_cursor?: number | null;
+        };
+        /**
+         * SystemAuditEntryResponse
+         * @description One SYSTEM-chain audit entry (no hash fields; the tenant response has none either).
+         */
+        SystemAuditEntryResponse: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Seq */
+            seq: number;
+            /**
+             * Occurred At
+             * Format: date-time
+             */
+            occurred_at: string;
+            /** Action */
+            action: string;
+            /**
+             * Outcome
+             * @enum {string}
+             */
+            outcome: "success" | "failure" | "denied";
+            /** Actor User Id */
+            actor_user_id?: string | null;
+            /**
+             * Actor Type
+             * @enum {string}
+             */
+            actor_type: "user" | "system" | "anonymous";
+            /** Auth Method */
+            auth_method?: string | null;
+            /** Cert Serial */
+            cert_serial?: string | null;
+            /** Resource Type */
+            resource_type?: string | null;
+            /** Resource Id */
+            resource_id?: string | null;
+            /** Details */
+            details: {
+                [key: string]: unknown;
+            };
+            /** Ip */
+            ip?: string | null;
+            /** Request Id */
+            request_id?: string | null;
+        };
+        /**
+         * SystemAuditVerifyResponse
+         * @description Bounded system-chain verification: re-hashed suffix + head check.
+         */
+        SystemAuditVerifyResponse: {
+            /** Ok */
+            ok: boolean;
+            /** Rows Checked */
+            rows_checked: number;
+            /**
+             * Verified From Seq
+             * @description First verified sequence number (None when the chain is empty).
+             */
+            verified_from_seq?: number | null;
+            /**
+             * Truncated
+             * @description True when only the newest rows were verified (bounded range).
+             * @default false
+             */
+            truncated: boolean;
+            /**
+             * First Bad Seq
+             * @description First inconsistent position; None when ok.
+             */
+            first_bad_seq?: number | null;
+            /** Head Seq */
+            head_seq?: number | null;
+        };
+        /**
+         * SystemEnrollResponse
+         * @description Shown ONCE: store the secret in the authenticator app now.
+         */
+        SystemEnrollResponse: {
+            /** Secret */
+            secret: string;
+            /** Otpauth Uri */
+            otpauth_uri: string;
+        };
+        /**
+         * SystemImportConflictResponse
+         * @description An input value that differs from the stored value (reported, never applied).
+         */
+        SystemImportConflictResponse: {
+            /** Page Key */
+            page_key: string;
+            /** Phrase Key */
+            phrase_key: string;
+            /** Language Code */
             language_code: string;
         };
-        /** @description A PERSON/ORG account on the admin surface. External UUID only; never the internal bigint id. */
-        AdminUser: {
-            /** Format: uuid */
-            uuid?: string;
-            /** @enum {string} */
-            user_type?: "PERSON" | "ORG";
-            email?: string | null;
-            phone_number?: string | null;
-            is_active?: boolean;
-            language_code?: string;
-            /** Format: date-time */
-            email_verified_at?: string | null;
-            /** Format: date-time */
-            created_at?: string;
-            /** Format: date-time */
-            updated_at?: string;
+        /**
+         * SystemImportPage
+         * @description One page of an import payload (legacy seed page shape).
+         */
+        SystemImportPage: {
+            /** Key */
+            key: string;
+            /** Description */
+            description?: string | null;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
         };
-        AdminSystemUser: components["schemas"]["AdminUser"] & {
-            roles: string[];
+        /**
+         * SystemImportReportResponse
+         * @description What an import did (or would do): counts and key locations only.
+         */
+        SystemImportReportResponse: {
+            /** Pages Created */
+            pages_created: number;
+            /** Phrases Created */
+            phrases_created: number;
+            /** Inserted */
+            inserted: number;
+            /** Updated */
+            updated: number;
+            /** Unchanged */
+            unchanged: number;
+            /** Conflicts */
+            conflicts: components["schemas"]["SystemImportConflictResponse"][];
+            /** Per Language */
+            per_language: {
+                [key: string]: number;
+            };
+            /** Missing Per Language */
+            missing_per_language: {
+                [key: string]: number;
+            };
+            /** Dry Run */
+            dry_run: boolean;
+            /** Revision */
+            revision?: number | null;
         };
-        AdminOrg: {
-            /** Format: uuid */
-            uuid?: string;
-            tin?: string;
-            name?: string;
-            is_active?: boolean;
-            /** Format: date-time */
-            created_at?: string;
-            /** Format: date-time */
-            updated_at?: string;
+        /**
+         * SystemImportRequest
+         * @description Legacy seed shape: pages list plus `{page: {word: {lang: value}}}` phrases.
+         */
+        SystemImportRequest: {
+            /** Pages */
+            pages?: (string | components["schemas"]["SystemImportPage"])[] | null;
+            /** Phrases */
+            phrases?: {
+                [key: string]: {
+                    [key: string]: {
+                        [key: string]: string;
+                    };
+                };
+            } | null;
+            /**
+             * Overwrite
+             * @default false
+             */
+            overwrite: boolean;
+            /**
+             * Dry Run
+             * @default false
+             */
+            dry_run: boolean;
         };
-        AdminRole: {
-            code?: string;
-            description?: string;
-            permissions?: string[];
+        /**
+         * SystemLanguageListResponse
+         * @description All catalog languages (the four codes are fixed; no create endpoint).
+         */
+        SystemLanguageListResponse: {
+            /** Items */
+            items: components["schemas"]["SystemLanguageResponse"][];
         };
-        AdminPermission: {
-            code?: string;
-            description?: string;
+        /**
+         * SystemLanguageResponse
+         * @description One interface language (active and inactive rows are both listed).
+         */
+        SystemLanguageResponse: {
+            /** Code */
+            code: string;
+            /** Name */
+            name: string;
+            /** Native Name */
+            native_name: string;
+            /** Script */
+            script: string;
+            /** Is Active */
+            is_active: boolean;
+            /** Is Default */
+            is_default: boolean;
+            /** Sort Order */
+            sort_order: number;
         };
-        SetRolesRequest: {
-            /** @description The complete replacement role set. */
-            roles: string[];
+        /**
+         * SystemLanguageUpdateRequest
+         * @description Patch visibility and/or the default flag (invariants enforced server-side).
+         */
+        SystemLanguageUpdateRequest: {
+            /** Is Active */
+            is_active?: boolean | null;
+            /** Is Default */
+            is_default?: boolean | null;
         };
-        /** @description The authenticated SYSTEM caller: external UUID plus the roles and permission codes resolved for this request. */
-        AdminMe: {
-            /** Format: uuid */
-            uuid?: string;
-            email?: string | null;
-            roles?: string[];
-            permissions?: string[];
+        /**
+         * SystemLoginRequest
+         * @description Step 1: email + password (the response carries the pre-auth token).
+         */
+        SystemLoginRequest: {
+            /**
+             * Email
+             * @example ops@example.uz
+             */
+            email: string;
+            /** Password */
+            password: string;
+        };
+        /**
+         * SystemMeResponse
+         * @description The authenticated system user with the effective permission set.
+         */
+        SystemMeResponse: {
+            /** Id */
+            id: string;
+            /** Email */
+            email: string;
+            /** Display Name */
+            display_name: string;
+            /** Role */
+            role: string;
+            /** Permissions */
+            permissions: string[];
+            /** Totp Enrolled */
+            totp_enrolled: boolean;
+        };
+        /**
+         * SystemMissingLanguageResponse
+         * @description Missing-value counts of one language, grouped by page (key names only).
+         */
+        SystemMissingLanguageResponse: {
+            /** Code */
+            code: string;
+            /** Total */
+            total: number;
+            /** Pages */
+            pages: {
+                [key: string]: number;
+            };
+        };
+        /**
+         * SystemMissingReportResponse
+         * @description The missing-translations report for every ACTIVE language.
+         */
+        SystemMissingReportResponse: {
+            /** Items */
+            items: components["schemas"]["SystemMissingLanguageResponse"][];
+        };
+        /**
+         * SystemPageCreateRequest
+         * @description Create an EMPTY page; phrases are added through the phrase endpoints.
+         */
+        SystemPageCreateRequest: {
+            /**
+             * Key
+             * @example billing.invoices
+             */
+            key: string;
+            /** Description */
+            description?: string | null;
+            /**
+             * Is Active
+             * @default true
+             */
+            is_active: boolean;
+        };
+        /**
+         * SystemPageListResponse
+         * @description Every catalog page (the list is complete; no paging).
+         */
+        SystemPageListResponse: {
+            /** Items */
+            items: components["schemas"]["SystemPageResponse"][];
+        };
+        /**
+         * SystemPageResponse
+         * @description One translation page with its phrase count.
+         */
+        SystemPageResponse: {
+            /** Key */
+            key: string;
+            /** Description */
+            description?: string | null;
+            /** Is Active */
+            is_active: boolean;
+            /** Phrase Count */
+            phrase_count: number;
+        };
+        /**
+         * SystemPageUpdateRequest
+         * @description Patch the page description and/or visibility.
+         */
+        SystemPageUpdateRequest: {
+            /** Description */
+            description?: string | null;
+            /** Is Active */
+            is_active?: boolean | null;
+        };
+        /**
+         * SystemPermissionsResponse
+         * @description The fixed permission catalog: every permission and its role grants.
+         */
+        SystemPermissionsResponse: {
+            /** Permissions */
+            permissions: string[];
+            /** Roles */
+            roles: {
+                [key: string]: string[];
+            };
+        };
+        /**
+         * SystemPhraseListResponse
+         * @description A page of phrases (ordered by key) plus the key cursor for the next page.
+         */
+        SystemPhraseListResponse: {
+            /** Items */
+            items: components["schemas"]["SystemPhraseResponse"][];
+            /**
+             * Next Cursor
+             * @description Key cursor for the next page, absent on the last page
+             */
+            next_cursor?: string | null;
+        };
+        /**
+         * SystemPhraseResponse
+         * @description One phrase with the values it has per language (absent = no value yet).
+         */
+        SystemPhraseResponse: {
+            /** Page Key */
+            page_key: string;
+            /** Phrase Key */
+            phrase_key: string;
+            /** Values */
+            values: {
+                [key: string]: string;
+            };
+        };
+        /**
+         * SystemPhraseUpsertRequest
+         * @description Create-or-update one phrase; every provided language in one call.
+         */
+        SystemPhraseUpsertRequest: {
+            /**
+             * Values
+             * @description Language code -> value; `uzc` normalizes to `uz-Cyrl`.
+             * @example {
+             *       "en": "Hello",
+             *       "ru": "Привет",
+             *       "uz": "Salom",
+             *       "uzc": "Салом"
+             *     }
+             */
+            values: {
+                [key: string]: string;
+            };
+        };
+        /**
+         * SystemPreAuthResponse
+         * @description Password accepted; continue with X-System-Pre-Auth on /auth/totp.
+         */
+        SystemPreAuthResponse: {
+            /** Pre Auth Token */
+            pre_auth_token: string;
+            /** Expires In */
+            expires_in: number;
+            /** Totp Enrolled */
+            totp_enrolled: boolean;
+        };
+        /**
+         * SystemStatusCount
+         * @description One document status and its zero-filled count.
+         */
+        SystemStatusCount: {
+            /** Status */
+            status: string;
+            /** Count */
+            count: number;
+        };
+        /**
+         * SystemTenantDetailResponse
+         * @description Tenant metadata, member count and per-status document counts.
+         */
+        SystemTenantDetailResponse: {
+            tenant: components["schemas"]["SystemTenantResponse"];
+            /** Member Count */
+            member_count: number;
+            /** Document Counts */
+            document_counts: components["schemas"]["SystemStatusCount"][];
+        };
+        /**
+         * SystemTenantListResponse
+         * @description A page of tenants plus the total for the applied filters.
+         */
+        SystemTenantListResponse: {
+            /** Items */
+            items: components["schemas"]["SystemTenantResponse"][];
+            /** Total */
+            total: number;
+        };
+        /**
+         * SystemTenantMemberResponse
+         * @description One tenant user with ALREADY-MASKED contact data (no raw PII).
+         */
+        SystemTenantMemberResponse: {
+            /** User Id */
+            user_id: string;
+            /** Role */
+            role: string;
+            /** Status */
+            status: string;
+            /** Full Name */
+            full_name: string;
+            /** Email Masked */
+            email_masked?: string | null;
+            /** Phone Masked */
+            phone_masked?: string | null;
+            /** Identity Status */
+            identity_status: string;
+        };
+        /**
+         * SystemTenantMembersResponse
+         * @description A page of a tenant's users plus the total.
+         */
+        SystemTenantMembersResponse: {
+            /** Items */
+            items: components["schemas"]["SystemTenantMemberResponse"][];
+            /** Total */
+            total: number;
+        };
+        /**
+         * SystemTenantResponse
+         * @description Tenant metadata (documents and member contacts are separate fields).
+         */
+        SystemTenantResponse: {
+            /** Id */
+            id: string;
+            /** Type */
+            type: string;
+            /** Name */
+            name: string;
+            /** Stir */
+            stir?: string | null;
+            /** Status */
+            status: string;
+            /** Created At */
+            created_at?: string | null;
+        };
+        /**
+         * SystemTenantStatusRequest
+         * @description Lifecycle change with the reason stored in the audit record.
+         */
+        SystemTenantStatusRequest: {
+            /**
+             * Reason
+             * @example court order 2026-11-09
+             */
+            reason: string;
+        };
+        /**
+         * SystemTokenResponse
+         * @description Access token in the body; refresh token in the HttpOnly cookie.
+         */
+        SystemTokenResponse: {
+            /** Access Token */
+            access_token: string;
+            /** Expires In */
+            expires_in: number;
+        };
+        /**
+         * SystemTotpRequest
+         * @description Step 2: the second factor. The pre-auth token travels in X-System-Pre-Auth.
+         */
+        SystemTotpRequest: {
+            /**
+             * Code
+             * @example 123456
+             */
+            code: string;
+        };
+        /**
+         * SystemUserCreateRequest
+         * @description Create a staff account; the password satisfies the system policy.
+         */
+        SystemUserCreateRequest: {
+            /**
+             * Email
+             * @example ops2@example.uz
+             */
+            email: string;
+            /** Display Name */
+            display_name: string;
+            /**
+             * Role
+             * @enum {string}
+             */
+            role: "superadmin" | "operator" | "i18n_editor";
+            /** Password */
+            password: string;
+        };
+        /**
+         * SystemUserListResponse
+         * @description A page of staff accounts plus the total for the applied filters.
+         */
+        SystemUserListResponse: {
+            /** Items */
+            items: components["schemas"]["SystemUserResponse"][];
+            /** Total */
+            total: number;
+        };
+        /**
+         * SystemUserResponse
+         * @description One staff account (TOTP and password state are never exposed).
+         */
+        SystemUserResponse: {
+            /** Id */
+            id: string;
+            /** Email */
+            email: string;
+            /** Display Name */
+            display_name: string;
+            /** Role */
+            role: string;
+            /** Status */
+            status: string;
+            /** Totp Enrolled */
+            totp_enrolled: boolean;
+            /** Created At */
+            created_at?: string | null;
+            /** Updated At */
+            updated_at?: string | null;
+        };
+        /**
+         * SystemUserUpdateRequest
+         * @description Patch display name, role and/or status (self-protection in the use case).
+         */
+        SystemUserUpdateRequest: {
+            /** Display Name */
+            display_name?: string | null;
+            /** Role */
+            role?: ("superadmin" | "operator" | "i18n_editor") | null;
+            /** Status */
+            status?: ("active" | "disabled") | null;
+        };
+        /**
+         * TenantMembershipSchema
+         * @description One active tenant membership shown in the profile.
+         */
+        TenantMembershipSchema: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /** Type */
+            type: string;
+            /** Name */
+            name: string;
+            /** Role */
+            role: string;
+            /** Status */
+            status: string;
+            /** Is Current */
+            is_current: boolean;
+        };
+        /**
+         * TenantSummarySchema
+         * @description Tenant and role chosen for the issued access token.
+         */
+        TenantSummarySchema: {
+            /**
+             * Id
+             * Format: uuid
+             */
+            id: string;
+            /**
+             * Type
+             * @example personal
+             */
+            type: string;
+            /**
+             * Name
+             * @example ALIYEV ALI
+             */
+            name: string;
+            /**
+             * Role
+             * @example owner
+             */
+            role: string;
+        };
+        /**
+         * TokenResponse
+         * @description The access token and tenant summary; refresh tokens travel only in cookies.
+         */
+        TokenResponse: {
+            /** Access Token */
+            access_token: string;
+            /**
+             * Token Type
+             * @default Bearer
+             * @constant
+             */
+            token_type: "Bearer";
+            /**
+             * Expires In
+             * @example 900
+             */
+            expires_in: number;
+            tenant: components["schemas"]["TenantSummarySchema"];
+        };
+        /**
+         * TranslationsResponse
+         * @description Assembled UI messages keyed by page then word, with the actual language.
+         */
+        TranslationsResponse: {
+            /**
+             * Lang
+             * @description The ACTUAL language code of the returned content.
+             * @example uz-Cyrl
+             */
+            lang: string;
+            /** Revision */
+            revision: number;
+            /** Messages */
+            messages: {
+                [key: string]: {
+                    [key: string]: string;
+                };
+            };
+        };
+        /**
+         * UpdateDraftRequest
+         * @description Patch a draft; omitted fields are untouched, explicit null clears them.
+         */
+        UpdateDraftRequest: {
+            /**
+             * Expected Revision
+             * @example 1
+             */
+            expected_revision: number;
+            /** Title */
+            title?: string | null;
+            /** Number */
+            number?: string | null;
+            /** Doc Date */
+            doc_date?: string | null;
+            /** Content */
+            content?: {
+                [key: string]: unknown;
+            } | null;
         };
     };
-    responses: {
-        /** @description Invalid input. */
-        BadRequest: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
-        /** @description Missing or invalid credentials/token. Login-style endpoints intentionally return a single generic 401 for every failure reason (unknown account, wrong password, inactive account, non-matching user type). */
-        Unauthorized: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
-        /** @description Authenticated but not permitted (wrong principal type, or an unresolved user/tenant). */
-        Forbidden: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
-        /** @description Resource not found. */
-        NotFound: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
-        /** @description Unique constraint violation. */
-        Conflict: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
-        /** @description Request body exceeded the 2 MiB limit. */
-        RequestEntityTooLarge: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
-        /** @description Rate limit exceeded. */
-        TooManyRequests: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
-        /** @description Unexpected error. */
-        InternalServerError: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
-        /** @description Not implemented. */
-        NotImplemented: {
-            headers: {
-                [name: string]: unknown;
-            };
-            content: {
-                "application/json": components["schemas"]["ErrorResponse"];
-            };
-        };
-    };
-    parameters: {
-        /**
-         * @description Response language. Resolution order when omitted: Accept-Language, then the active default language (uz).
-         * @example uz
-         */
-        LangQuery: string;
-        /**
-         * @description Comma-separated page slugs, each matching ^[a-z0-9_]+(\.[a-z0-9_]+)*$.
-         * @example common,settings.profile
-         */
-        PagesQuery: string;
-        /** @description When true, include the full translations map. */
-        IncludeTranslationsQuery: boolean;
-        /** @description Filter phrases by page UUID. */
-        PageUUIDQuery: string;
-        SearchQuery: string;
-        /** @description Page size. Default 20, maximum 100 (employees: default 50, maximum 200). */
-        LimitQuery: number;
-        OffsetQuery: number;
-        /** @example 2026-09-01T00:00:00Z */
-        StartQuery: string;
-        /** @example 2026-09-30T23:59:59Z */
-        EndQuery: string;
-        /** @description ETag from a previous response; a match returns 304. */
-        IfNoneMatchHeader: string;
-        /**
-         * @description Used when ?lang= is absent to pick the response language; falls back to the active default language.
-         * @example uz
-         */
-        AcceptLanguageHeader: string;
-        /**
-         * @description Country code (immutable external key).
-         * @example UZ
-         */
-        CountryCodePath: string;
-        /** @example uz */
-        LanguageCodePath: string;
-        /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-        UUIDPath: string;
-        /** @example settings.profile */
-        SlugPath: string;
-        /** @example uz */
-        PhraseLangPath: string;
-    };
+    responses: never;
+    parameters: never;
     requestBodies: never;
     headers: never;
     pathItems: never;
 }
 export type $defs = Record<string, never>;
 export interface operations {
-    getHealthz: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Process is alive. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        status?: "ok";
-                    };
-                };
-            };
-        };
-    };
-    getReadyz: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Dependencies reachable. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        /** @constant */
-                        status?: "ready";
-                    };
-                };
-            };
-            /** @description A dependency (database or redis) is unavailable. */
-            503: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": {
-                        status?: string;
-                        /** @enum {string} */
-                        reason?: "database" | "redis";
-                    };
-                };
-            };
-        };
-    };
-    getChallenge: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description A freshly generated challenge. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["ChallengeResponse"];
-                };
-            };
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    register: {
+    register_start_api_v1_identity_register_start_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2218,29 +2545,149 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["RegisterRequest"];
+                "application/json": components["schemas"]["RegisterStartRequest"];
             };
         };
         responses: {
-            /** @description Registered and authenticated. */
-            200: {
+            /** @description Successful Response */
+            202: {
                 headers: {
-                    /** @description refresh_token=<opaque>; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict */
-                    "Set-Cookie"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AuthResult"];
+                    "application/json": components["schemas"]["RegisterStartResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            409: components["responses"]["Conflict"];
-            429: components["responses"]["TooManyRequests"];
-            500: components["responses"]["InternalServerError"];
+            /** @description Conflict. Machine codes: identifier_already_registered. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests. Machine codes: rate_limited. */
+            429: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Seconds to wait before retrying (set by RateLimited, 429 only). */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Bad Gateway. Machine codes: otp_delivery_failed. */
+            502: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service Unavailable. Machine codes: sms_budget_exceeded. */
+            503: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
-    loginWithPassword: {
+    register_complete_api_v1_identity_register_complete_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["RegisterCompleteRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description Bad Request. Machine codes: otp_invalid, registration_expired. */
+            400: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: identifier_already_registered. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: weak_password. */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests. Machine codes: rate_limited, too_many_otp_attempts. */
+            429: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Seconds to wait before retrying (set by RateLimited, 429 only). */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    login_api_v1_identity_login_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2253,24 +2700,247 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Authenticated. */
+            /** @description Successful Response */
             200: {
                 headers: {
-                    /** @description refresh_token=<opaque>; Path=/api/v1/auth; HttpOnly; Secure; SameSite=Strict */
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: invalid_credentials. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: account_blocked. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests. Machine codes: rate_limited. */
+            429: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Seconds to wait before retrying (set by RateLimited, 429 only). */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    refresh_api_v1_identity_refresh_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["TokenResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: invalid_refresh_token, refresh_token_reused. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
                     "Set-Cookie"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AuthResult"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            429: components["responses"]["TooManyRequests"];
+            /** @description Forbidden. Machine codes: csrf_header_required, origin_not_allowed. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
-    loginWithSignature: {
+    logout_api_v1_identity_logout_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Forbidden. Machine codes: csrf_header_required, origin_not_allowed. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    logout_all_api_v1_identity_logout_all_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_me_api_v1_identity_me_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    eimzo_challenge_api_v1_identity_eimzo_challenge_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EimzoChallengeResponse"];
+                };
+            };
+            /** @description Too Many Requests. Machine codes: rate_limited. */
+            429: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Seconds to wait before retrying (set by RateLimited, 429 only). */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service Unavailable. Machine codes: eimzo_unavailable. */
+            503: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    eimzo_login_api_v1_identity_eimzo_login_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2279,38 +2949,85 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["LoginWithSignatureRequest"];
+                "application/json": components["schemas"]["Pkcs7Request"];
             };
         };
         responses: {
-            /** @description Authenticated. */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AuthResult"];
+                    "application/json": components["schemas"]["TokenResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            429: components["responses"]["TooManyRequests"];
+            /** @description Unauthorized. Machine codes: eimzo_error, invalid_certificate, invalid_credentials. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: account_blocked. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Bad Gateway. Machine codes: eimzo_error. */
+            502: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service Unavailable. Machine codes: eimzo_unavailable. */
+            503: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
-    loginWithUSB: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            429: components["responses"]["TooManyRequests"];
-            501: components["responses"]["NotImplemented"];
-        };
-    };
-    selectWorkspace: {
+    eimzo_link_api_v1_identity_eimzo_link_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2319,26 +3036,66 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SelectWorkspaceRequest"];
+                "application/json": components["schemas"]["Pkcs7Request"];
             };
         };
         responses: {
-            /** @description Workspace selected. */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AuthResult"];
+                    "application/json": components["schemas"]["EimzoLinkResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            429: components["responses"]["TooManyRequests"];
+            /** @description Unauthorized. Machine codes: eimzo_error, invalid_certificate, unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Bad Gateway. Machine codes: eimzo_error. */
+            502: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Service Unavailable. Machine codes: eimzo_unavailable. */
+            503: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
-    switchWorkspace: {
+    switch_tenant_api_v1_identity_switch_tenant_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2347,26 +3104,59 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["SwitchWorkspaceRequest"];
+                "application/json": components["schemas"]["SwitchTenantRequest"];
             };
         };
         responses: {
-            /** @description Workspace switched. */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AuthResult"];
+                    "application/json": components["schemas"]["TokenResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            429: components["responses"]["TooManyRequests"];
+            /** @description Unauthorized. Machine codes: invalid_refresh_token, unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: csrf_header_required, origin_not_allowed, tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
-    listWorkspaces: {
+    list_types_api_v1_documents_types_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -2375,22 +3165,1176 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The person's workspaces. */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["WorkspaceList"];
+                    "application/json": components["schemas"]["DocumentTypeView"][];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            429: components["responses"]["TooManyRequests"];
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
-    refreshToken: {
+    create_draft_api_v1_documents_drafts_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["CreateDraftRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentView"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: insufficient_role, tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: request_in_progress. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: content_invalid, idempotency_key_reuse, invalid_idempotency_key, unknown_document_type. */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests. Machine codes: rate_limited. */
+            429: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Seconds to wait before retrying (set by RateLimited, 429 only). */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_documents_api_v1_documents_get: {
+        parameters: {
+            query?: {
+                box?: "outbox" | "inbox";
+                status?: ("draft" | "pending" | "completed" | "rejected" | "cancelled" | "expired" | "discarded") | null;
+                doc_type?: string | null;
+                limit?: number;
+                cursor?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentListView"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: invalid_cursor. */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_document_api_v1_documents__document_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentView"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: document_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_draft_api_v1_documents__document_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["UpdateDraftRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentView"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: insufficient_role, tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: document_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: document_not_draft, revision_conflict. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: content_invalid. */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    discard_draft_api_v1_documents__document_id__discard_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DiscardDraftRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentView"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: insufficient_role, tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: document_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: document_not_draft, revision_conflict. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_signing_payload_api_v1_documents__document_id__signing_payload_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SigningPayloadView"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: document_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: document_not_pending, party_already_signed. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: content_invalid. */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    send_document_api_v1_documents__document_id__send_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SendRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentView"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: insufficient_role, tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: document_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: document_expired, document_not_draft, invalid_transition, request_in_progress, revision_conflict. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: content_invalid, idempotency_key_reuse, invalid_idempotency_key, receiver_is_sender. */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    sign_document_api_v1_documents__document_id__sign_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SignRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentView"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: insufficient_role, tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: document_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: document_expired, invalid_transition, request_in_progress. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: idempotency_key_reuse, invalid_idempotency_key. */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    reject_document_api_v1_documents__document_id__reject_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentView"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: insufficient_role, tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: document_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: document_expired, invalid_transition. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    cancel_document_api_v1_documents__document_id__cancel_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["DecisionRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["DocumentView"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: insufficient_role, tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: document_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: invalid_transition. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_evidence_api_v1_documents__document_id__evidence_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["EvidenceView"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: document_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: document_not_pending. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    attach_file_api_v1_documents__document_id__files_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "multipart/form-data": components["schemas"]["Body_attach_file_api_v1_documents__document_id__files_post"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["FileView"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: insufficient_role, tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: document_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: document_not_draft, duplicate_primary_file, too_many_files. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Content Too Large. Machine codes: file_too_large. */
+            413: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Unsupported Media Type. Machine codes: unsupported_file_type. */
+            415: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    remove_file_api_v1_documents__document_id__files__file_id__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: insufficient_role, tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: document_not_found, file_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: document_not_draft. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    download_file_api_v1_documents__document_id__files__file_id__content_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                document_id: string;
+                file_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: document_not_found, file_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_entries_api_v1_audit_entries_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: number | null;
+                action?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["AuditEntriesResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: insufficient_role, tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_preferences_api_v1_notifications_preferences_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -2399,20 +4343,75 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Rotated token pair. */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TokenPair"];
+                    "application/json": components["schemas"]["PreferencesResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            429: components["responses"]["TooManyRequests"];
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
-    logout: {
+    update_preferences_api_v1_notifications_preferences_put: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["PreferencesUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["PreferencesResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_active_languages_api_v1_public_languages_active_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -2421,51 +4420,123 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Logged out. */
+            /** @description Successful Response */
             200: {
                 headers: {
+                    /** @description Strong entity tag of the representation (catalog revision + language + page set). Send it back as If-None-Match to receive 304. */
+                    ETag?: string;
+                    /** @description Public caching directive: max-age plus stale-while-revalidate (seconds). */
+                    "Cache-Control"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    /**
-                     * @example {
-                     *       "message": "logged_out"
-                     *     }
-                     */
-                    "application/json": components["schemas"]["MessageResponse"];
+                    "application/json": components["schemas"]["LanguagesResponse"];
+                };
+            };
+            /** @description Not modified: the If-None-Match header matched the current ETag (no body). */
+            304: {
+                headers: {
+                    /** @description Strong entity tag of the representation (catalog revision + language + page set). Send it back as If-None-Match to receive 304. */
+                    ETag?: string;
+                    /** @description Public caching directive: max-age plus stale-while-revalidate (seconds). */
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Too Many Requests. Machine codes: rate_limited. */
+            429: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Seconds to wait before retrying (set by RateLimited, 429 only). */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
         };
     };
-    logoutAll: {
+    get_translations_api_v1_public_translations_get: {
         parameters: {
-            query?: never;
+            query?: {
+                /** @description Page slug to fetch (canonical, repeatable); each value may also be comma-separated. */
+                page?: string[] | null;
+                /** @description Legacy alias: ONE comma-separated string of page slugs (page= wins when both are sent). */
+                pages?: string | null;
+                /** @description Response language (aliases `uzc`/`uz-Cyrl-UZ` normalize to `uz-Cyrl`; `en-US`->`en`, `ru-RU`->`ru`). Unknown/inactive languages and region-qualified unknown tags (de-DE) fall back to the default language; only non-language tags are 404. Omitted: the catalog default language. */
+                lang?: string | null;
+            };
             header?: never;
             path?: never;
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description All sessions revoked. */
+            /** @description Successful Response */
             200: {
                 headers: {
+                    /** @description Strong entity tag of the representation (catalog revision + language + page set). Send it back as If-None-Match to receive 304. */
+                    ETag?: string;
+                    /** @description Public caching directive: max-age plus stale-while-revalidate (seconds). */
+                    "Cache-Control"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    /**
-                     * @example {
-                     *       "message": "logged_out_all"
-                     *     }
-                     */
-                    "application/json": components["schemas"]["MessageResponse"];
+                    "application/json": components["schemas"]["TranslationsResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            429: components["responses"]["TooManyRequests"];
+            /** @description Not modified: the If-None-Match header matched the current ETag (no body). */
+            304: {
+                headers: {
+                    /** @description Strong entity tag of the representation (catalog revision + language + page set). Send it back as If-None-Match to receive 304. */
+                    ETag?: string;
+                    /** @description Public caching directive: max-age plus stale-while-revalidate (seconds). */
+                    "Cache-Control"?: string;
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Not Found. Machine codes: language_not_found, page_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: too_many_pages. */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests. Machine codes: rate_limited. */
+            429: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Seconds to wait before retrying (set by RateLimited, 429 only). */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
-    systemLogin: {
+    login_api_v1_system_auth_login_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2478,23 +4549,164 @@ export interface operations {
             };
         };
         responses: {
-            /** @description Authenticated. */
+            /** @description Successful Response */
             200: {
                 headers: {
-                    /** @description system_refresh_token=<opaque>; Path=/api/v1/system/auth; HttpOnly; Secure; SameSite=Strict */
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemPreAuthResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_invalid_credentials. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_account_disabled. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Error. Machine codes: system_account_locked. */
+            423: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests. Machine codes: rate_limited. */
+            429: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Seconds to wait before retrying (set by RateLimited, 429 only). */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    verify_totp_api_v1_system_auth_totp_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SystemTotpRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemTokenResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: recovery_code_invalid, system_pre_auth_invalid, totp_invalid. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
                     "Set-Cookie"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AuthResult"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            429: components["responses"]["TooManyRequests"];
+            /** @description Forbidden. Machine codes: system_account_disabled. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: totp_not_enrolled. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests. Machine codes: rate_limited. */
+            429: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Seconds to wait before retrying (set by RateLimited, 429 only). */
+                    "Retry-After"?: number;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
-    systemRefreshToken: {
+    enroll_totp_api_v1_system_auth_totp_enroll_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2503,306 +4715,62 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Rotated token pair. */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["TokenPair"];
+                    "application/json": components["schemas"]["SystemEnrollResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    systemLogout: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: {
-            content: {
-                "application/json": components["schemas"]["SystemLogoutRequest"];
-            };
-        };
-        responses: {
-            /** @description Logged out. */
-            200: {
+            /** @description Unauthorized. Machine codes: system_pre_auth_invalid, system_unauthenticated. */
+            401: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    /**
-                     * @example {
-                     *       "message": "logged_out"
-                     *     }
-                     */
-                    "application/json": components["schemas"]["MessageResponse"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            429: components["responses"]["TooManyRequests"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    listActiveLanguages: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Active languages. */
-            200: {
+            /** @description Forbidden. Machine codes: system_account_disabled. */
+            403: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PublicLanguage"][];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    getPublicLanguageByCode: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example uz */
-                language_code: components["parameters"]["LanguageCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The language. */
-            200: {
+            /** @description Not Found. Machine codes: system_user_not_found. */
+            404: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PublicLanguage"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            404: components["responses"]["NotFound"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    listActivePages: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Active pages. */
-            200: {
+            /** @description Conflict. Machine codes: totp_already_enrolled. */
+            409: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["PublicPage"][];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            429: components["responses"]["TooManyRequests"];
         };
     };
-    getPublicPageBySlug: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example settings.profile */
-                slug: components["parameters"]["SlugPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The page. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicPage"];
-                };
-            };
-            404: components["responses"]["NotFound"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    listPublicPhrases: {
-        parameters: {
-            query?: {
-                /**
-                 * @description Response language. Resolution order when omitted: Accept-Language, then the active default language (uz).
-                 * @example uz
-                 */
-                lang?: components["parameters"]["LangQuery"];
-                /** @description Filter phrases by page UUID. */
-                page_uuid?: components["parameters"]["PageUUIDQuery"];
-                search?: components["parameters"]["SearchQuery"];
-                /** @description When true, include the full translations map. */
-                include_translations?: components["parameters"]["IncludeTranslationsQuery"];
-                /** @description Page size. Default 20, maximum 100 (employees: default 50, maximum 200). */
-                limit?: components["parameters"]["LimitQuery"];
-                offset?: components["parameters"]["OffsetQuery"];
-            };
-            header?: {
-                /**
-                 * @description Used when ?lang= is absent to pick the response language; falls back to the active default language.
-                 * @example uz
-                 */
-                "Accept-Language"?: components["parameters"]["AcceptLanguageHeader"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Phrases. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicPhrase"][];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    listPublicCountries: {
-        parameters: {
-            query?: {
-                /**
-                 * @description Response language. Resolution order when omitted: Accept-Language, then the active default language (uz).
-                 * @example uz
-                 */
-                lang?: components["parameters"]["LangQuery"];
-            };
-            header?: {
-                /**
-                 * @description Used when ?lang= is absent to pick the response language; falls back to the active default language.
-                 * @example uz
-                 */
-                "Accept-Language"?: components["parameters"]["AcceptLanguageHeader"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Localized countries. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["PublicCountry"][];
-                };
-            };
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    getTranslations: {
-        parameters: {
-            query: {
-                /**
-                 * @description Comma-separated page slugs, each matching ^[a-z0-9_]+(\.[a-z0-9_]+)*$.
-                 * @example common,settings.profile
-                 */
-                pages: components["parameters"]["PagesQuery"];
-                /**
-                 * @description Response language. Resolution order when omitted: Accept-Language, then the active default language (uz).
-                 * @example uz
-                 */
-                lang?: components["parameters"]["LangQuery"];
-            };
-            header?: {
-                /**
-                 * @description Used when ?lang= is absent to pick the response language; falls back to the active default language.
-                 * @example uz
-                 */
-                "Accept-Language"?: components["parameters"]["AcceptLanguageHeader"];
-                /** @description ETag from a previous response; a match returns 304. */
-                "If-None-Match"?: components["parameters"]["IfNoneMatchHeader"];
-            };
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Translation bundles keyed by page slug. */
-            200: {
-                headers: {
-                    /** @description public, max-age=300 */
-                    "Cache-Control"?: string;
-                    /** @description Hash of the response body. */
-                    ETag?: string;
-                    [name: string]: unknown;
-                };
-                content: {
-                    /**
-                     * @example {
-                     *       "common": {
-                     *         "save": "Saqlash",
-                     *         "cancel": "Bekor qilish"
-                     *       },
-                     *       "settings.profile": {
-                     *         "title": "Profil"
-                     *       }
-                     *     }
-                     */
-                    "application/json": components["schemas"]["TranslationBundle"];
-                };
-            };
-            /** @description Not modified; the If-None-Match ETag matches. Empty body. */
-            304: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            400: components["responses"]["BadRequest"];
-            404: components["responses"]["NotFound"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    listLanguages: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description All languages (active and inactive). */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Language"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    createLanguage: {
+    activate_totp_api_v1_system_auth_totp_activate_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2811,109 +4779,90 @@ export interface operations {
         };
         requestBody: {
             content: {
-                "application/json": components["schemas"]["CreateLanguageRequest"];
+                "application/json": components["schemas"]["SystemActivateRequest"];
             };
         };
         responses: {
-            /** @description Created. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Language"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            409: components["responses"]["Conflict"];
-        };
-    };
-    updateLanguage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example uz */
-                language_code: components["parameters"]["LanguageCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateLanguageRequest"];
-            };
-        };
-        responses: {
-            /** @description Updated. */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Language"];
+                    "application/json": components["schemas"]["SystemActivateResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    deleteLanguage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example uz */
-                language_code: components["parameters"]["LanguageCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deleted. Body is null. */
-            200: {
+            /** @description Unauthorized. Machine codes: system_pre_auth_invalid, system_unauthenticated, totp_invalid. */
+            401: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": null;
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    setDefaultLanguage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example uz */
-                language_code: components["parameters"]["LanguageCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The new default language. */
-            200: {
+            /** @description Forbidden. Machine codes: system_account_disabled. */
+            403: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Language"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
+            /** @description Not Found. Machine codes: system_user_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: totp_already_enrolled, totp_not_enrolled. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Too Many Requests. Machine codes: rate_limited. */
+            429: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Seconds to wait before retrying (set by RateLimited, 429 only). */
+                    "Retry-After"?: number;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
-    listPages: {
+    refresh_api_v1_system_auth_refresh_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -2922,815 +4871,44 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description All pages. */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Page"][];
+                    "application/json": components["schemas"]["SystemTokenResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-        };
-    };
-    createPage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreatePageRequest"];
-            };
-        };
-        responses: {
-            /** @description Created. */
-            201: {
+            /** @description Unauthorized. Machine codes: system_refresh_invalid, system_refresh_reused. */
+            401: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Page"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            409: components["responses"]["Conflict"];
-        };
-    };
-    getPageByUUID: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The page. */
-            200: {
+            /** @description Forbidden. Machine codes: csrf_header_required, origin_not_allowed, system_account_disabled. */
+            403: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Page"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            404: components["responses"]["NotFound"];
         };
     };
-    updatePage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdatePageRequest"];
-            };
-        };
-        responses: {
-            /** @description Updated. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Page"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-        };
-    };
-    deletePage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deleted. Body is null. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": null;
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    createPhrase: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreatePhraseRequest"];
-            };
-        };
-        responses: {
-            /** @description Created. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Phrase"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            409: components["responses"]["Conflict"];
-        };
-    };
-    getPhraseByUUID: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The phrase with all translations. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Phrase"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    updatePhrase: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdatePhraseRequest"];
-            };
-        };
-        responses: {
-            /** @description Updated. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Phrase"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-        };
-    };
-    deletePhrase: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deleted. Body is null. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": null;
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    deletePhraseTranslation: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-                /** @example uz */
-                lang: components["parameters"]["PhraseLangPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deleted. Body is null. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": null;
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    listCountries: {
-        parameters: {
-            query?: {
-                search?: components["parameters"]["SearchQuery"];
-                /** @description Page size. Default 20, maximum 100 (employees: default 50, maximum 200). */
-                limit?: components["parameters"]["LimitQuery"];
-                offset?: components["parameters"]["OffsetQuery"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Countries. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Country"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-        };
-    };
-    createCountry: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateCountryRequest"];
-            };
-        };
-        responses: {
-            /** @description Created. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Country"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            409: components["responses"]["Conflict"];
-        };
-    };
-    getCountryByCode: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Country code (immutable external key).
-                 * @example UZ
-                 */
-                code: components["parameters"]["CountryCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The country. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Country"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    updateCountry: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Country code (immutable external key).
-                 * @example UZ
-                 */
-                code: components["parameters"]["CountryCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateCountryRequest"];
-            };
-        };
-        responses: {
-            /** @description Updated. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Country"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    deleteCountry: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Country code (immutable external key).
-                 * @example UZ
-                 */
-                code: components["parameters"]["CountryCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deleted. Body is null. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": null;
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    listCountryTranslations: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Country code (immutable external key).
-                 * @example UZ
-                 */
-                code: components["parameters"]["CountryCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Translations. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CountryTranslation"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    upsertCountryTranslation: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Country code (immutable external key).
-                 * @example UZ
-                 */
-                code: components["parameters"]["CountryCodePath"];
-                /** @example uz */
-                language_code: components["parameters"]["LanguageCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpsertTranslationRequest"];
-            };
-        };
-        responses: {
-            /** @description Upserted. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CountryTranslation"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    deleteCountryTranslation: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Country code (immutable external key).
-                 * @example UZ
-                 */
-                code: components["parameters"]["CountryCodePath"];
-                /** @example uz */
-                language_code: components["parameters"]["LanguageCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deleted. Body is null. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": null;
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    getOrgByUUID: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The organization. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Org"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    signDocument: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SignDocumentRequest"];
-            };
-        };
-        responses: {
-            /** @description Signed document metadata. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Document"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            413: components["responses"]["RequestEntityTooLarge"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    listDocuments: {
-        parameters: {
-            query?: {
-                /** @description Page size. Default 20, maximum 100 (employees: default 50, maximum 200). */
-                limit?: components["parameters"]["LimitQuery"];
-                offset?: components["parameters"]["OffsetQuery"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Documents. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Document"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-        };
-    };
-    getDocumentByUUID: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The document. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Document"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    listAudit: {
-        parameters: {
-            query: {
-                /** @example 2026-09-01T00:00:00Z */
-                start: components["parameters"]["StartQuery"];
-                /** @example 2026-09-30T23:59:59Z */
-                end: components["parameters"]["EndQuery"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Audit entries. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AuditLog"][];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-        };
-    };
-    getAuditByUUID: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The audit entry. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AuditLog"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    listEmployees: {
-        parameters: {
-            query?: {
-                /** @description Page size. Default 20, maximum 100 (employees: default 50, maximum 200). */
-                limit?: components["parameters"]["LimitQuery"];
-                offset?: components["parameters"]["OffsetQuery"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Employees. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Employee"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-        };
-    };
-    createEmployee: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EmployeeRequest"];
-            };
-        };
-        responses: {
-            /** @description Created. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Employee"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-        };
-    };
-    listEmployeesByUser: {
-        parameters: {
-            query?: {
-                /** @description Page size. Default 20, maximum 100 (employees: default 50, maximum 200). */
-                limit?: components["parameters"]["LimitQuery"];
-                offset?: components["parameters"]["OffsetQuery"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Employees. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Employee"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-        };
-    };
-    getEmployeeByUUID: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The employee. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Employee"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    updateEmployee: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["EmployeeRequest"];
-            };
-        };
-        responses: {
-            /** @description Updated. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Employee"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    getUserMe: {
+    logout_api_v1_system_auth_logout_post: {
         parameters: {
             query?: never;
             header?: never;
@@ -3739,196 +4917,1124 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The current user. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserMe"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            404: components["responses"]["NotFound"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    updateUserMe: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateUserLanguageRequest"];
-            };
-        };
-        responses: {
-            /** @description Updated. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserMe"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            404: components["responses"]["NotFound"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    getSystemUserMe: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The current system user. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserMe"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    updateSystemUserMe: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateUserLanguageRequest"];
-            };
-        };
-        responses: {
-            /** @description Updated. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["UserMe"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    changeAccountPassword: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ChangePasswordRequest"];
-            };
-        };
-        responses: {
-            /** @description Password changed. */
+            /** @description Successful Response */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            429: components["responses"]["TooManyRequests"];
-        };
-    };
-    requestAccountEmailChange: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ChangeEmailRequest"];
-            };
-        };
-        responses: {
-            /** @description Verification code sent to the new address. */
-            202: {
+            /** @description Forbidden. Machine codes: csrf_header_required, origin_not_allowed. */
+            403: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    /** @description Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity. */
+                    "Set-Cookie"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["EmailChangeResponse"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            429: components["responses"]["TooManyRequests"];
-            500: components["responses"]["InternalServerError"];
         };
     };
-    confirmAccountEmailChange: {
+    get_me_api_v1_system_auth_me_get: {
         parameters: {
             query?: never;
             header?: never;
             path?: never;
             cookie?: never;
         };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["ConfirmEmailChangeRequest"];
-            };
-        };
+        requestBody?: never;
         responses: {
-            /** @description Email address changed. */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["UserMe"];
+                    "application/json": components["schemas"]["SystemMeResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            429: components["responses"]["TooManyRequests"];
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_account_disabled. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
-    adminListAudit: {
+    list_system_users_api_v1_system_users_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                role?: ("superadmin" | "operator" | "i18n_editor") | null;
+                status?: ("active" | "disabled") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemUserListResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    create_system_user_api_v1_system_users_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SystemUserCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemUserResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: system_email_exists. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: weak_system_password. */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_system_user_api_v1_system_users__user_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemUserResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: system_user_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_system_user_api_v1_system_users__user_id__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                user_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SystemUserUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemUserResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: system_user_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: last_superadmin_protection, system_self_disable_forbidden. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_permissions_api_v1_system_permissions_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemPermissionsResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_system_tenants_api_v1_system_tenants_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+                type?: ("personal" | "organization") | null;
+                status?: ("active" | "suspended") | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemTenantListResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    get_system_tenant_api_v1_system_tenants__tenant_id__get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemTenantDetailResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: tenant_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_system_tenant_users_api_v1_system_tenants__tenant_id__users_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                offset?: number;
+            };
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemTenantMembersResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: tenant_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    suspend_system_tenant_api_v1_system_tenants__tenant_id__suspend_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SystemTenantStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemTenantResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: tenant_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: tenant_status_conflict. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    reactivate_system_tenant_api_v1_system_tenants__tenant_id__reactivate_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                tenant_id: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SystemTenantStatusRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemTenantResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: tenant_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: tenant_status_conflict. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_i18n_languages_api_v1_system_i18n_languages_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemLanguageListResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_i18n_language_api_v1_system_i18n_languages__code__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                code: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SystemLanguageUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemLanguageResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: language_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: language_default_required, language_inactive, language_last_active. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_i18n_pages_api_v1_system_i18n_pages_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemPageListResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    create_i18n_page_api_v1_system_i18n_pages_post: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SystemPageCreateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            201: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemPageResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: page_key_taken. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: invalid_translation_key, invalid_translation_value, translation_value_too_long. */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    delete_i18n_page_api_v1_system_i18n_pages__page_key__delete: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                page_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            204: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content?: never;
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: page_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: page_not_empty. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_i18n_page_api_v1_system_i18n_pages__page_key__patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path: {
+                page_key: string;
+            };
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SystemPageUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemPageResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: page_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: invalid_translation_value. */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_i18n_phrases_api_v1_system_i18n_phrases_get: {
         parameters: {
             query: {
-                /** @example 2026-09-01T00:00:00Z */
-                start: components["parameters"]["StartQuery"];
-                /** @example 2026-09-30T23:59:59Z */
-                end: components["parameters"]["EndQuery"];
+                page: string;
+                limit?: number;
+                cursor?: string | null;
             };
             header?: never;
             path?: never;
@@ -3936,1195 +6042,288 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description Audit entries. */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AuditLog"][];
+                    "application/json": components["schemas"]["SystemPhraseListResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-        };
-    };
-    adminGetAuditByUUID: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The audit entry. */
-            200: {
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AuditLog"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminListCountries: {
-        parameters: {
-            query?: {
-                search?: components["parameters"]["SearchQuery"];
-                /** @description Page size. Default 20, maximum 100 (employees: default 50, maximum 200). */
-                limit?: components["parameters"]["LimitQuery"];
-                offset?: components["parameters"]["OffsetQuery"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Countries. */
-            200: {
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Country"][];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-        };
-    };
-    adminCreateCountry: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateCountryRequest"];
-            };
-        };
-        responses: {
-            /** @description Created. */
-            201: {
+            /** @description Not Found. Machine codes: page_not_found. */
+            404: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["Country"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            409: components["responses"]["Conflict"];
-        };
-    };
-    adminGetCountryByCode: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Country code (immutable external key).
-                 * @example UZ
-                 */
-                code: components["parameters"]["CountryCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The country. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Country"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminUpdateCountry: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Country code (immutable external key).
-                 * @example UZ
-                 */
-                code: components["parameters"]["CountryCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateCountryRequest"];
-            };
-        };
-        responses: {
-            /** @description Updated. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Country"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminDeleteCountry: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Country code (immutable external key).
-                 * @example UZ
-                 */
-                code: components["parameters"]["CountryCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deleted. Body is null. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": null;
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminListCountryTranslations: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Country code (immutable external key).
-                 * @example UZ
-                 */
-                code: components["parameters"]["CountryCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Translations. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CountryTranslation"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminUpsertCountryTranslation: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Country code (immutable external key).
-                 * @example UZ
-                 */
-                code: components["parameters"]["CountryCodePath"];
-                /** @example uz */
-                language_code: components["parameters"]["LanguageCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpsertTranslationRequest"];
-            };
-        };
-        responses: {
-            /** @description Upserted. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["CountryTranslation"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminDeleteCountryTranslation: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /**
-                 * @description Country code (immutable external key).
-                 * @example UZ
-                 */
-                code: components["parameters"]["CountryCodePath"];
-                /** @example uz */
-                language_code: components["parameters"]["LanguageCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deleted. Body is null. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": null;
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminListLanguages: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description All languages (active and inactive). */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Language"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            500: components["responses"]["InternalServerError"];
-        };
-    };
-    adminCreateLanguage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreateLanguageRequest"];
-            };
-        };
-        responses: {
-            /** @description Created. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Language"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            409: components["responses"]["Conflict"];
-        };
-    };
-    adminUpdateLanguage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example uz */
-                language_code: components["parameters"]["LanguageCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdateLanguageRequest"];
-            };
-        };
-        responses: {
-            /** @description Updated. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Language"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminDeleteLanguage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example uz */
-                language_code: components["parameters"]["LanguageCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deleted. Body is null. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": null;
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminSetDefaultLanguage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example uz */
-                language_code: components["parameters"]["LanguageCodePath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The new default language. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Language"];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminListPages: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description All pages. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Page"][];
-                };
-            };
-            401: components["responses"]["Unauthorized"];
-        };
-    };
-    adminCreatePage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreatePageRequest"];
-            };
-        };
-        responses: {
-            /** @description Created. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Page"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            409: components["responses"]["Conflict"];
-        };
-    };
-    adminGetPageByUUID: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The page. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Page"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminUpdatePage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdatePageRequest"];
-            };
-        };
-        responses: {
-            /** @description Updated. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Page"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-        };
-    };
-    adminDeletePage: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deleted. Body is null. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": null;
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminCreatePhrase: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["CreatePhraseRequest"];
-            };
-        };
-        responses: {
-            /** @description Created. */
-            201: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Phrase"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            409: components["responses"]["Conflict"];
-        };
-    };
-    adminGetPhraseByUUID: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The phrase with all translations. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Phrase"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminUpdatePhrase: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["UpdatePhraseRequest"];
-            };
-        };
-        responses: {
-            /** @description Updated. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["Phrase"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-        };
-    };
-    adminDeletePhrase: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deleted. Body is null. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": null;
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminDeletePhraseTranslation: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-                /** @example uz */
-                lang: components["parameters"]["PhraseLangPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Deleted. Body is null. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": null;
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminListOrgs: {
-        parameters: {
-            query?: {
-                search?: components["parameters"]["SearchQuery"];
-                /** @description Page size. Default 20, maximum 100 (employees: default 50, maximum 200). */
-                limit?: components["parameters"]["LimitQuery"];
-                offset?: components["parameters"]["OffsetQuery"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Organizations. */
-            200: {
-                headers: {
-                    /** @description Total rows matching the search, ignoring limit/offset. */
-                    "X-Total-Count"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminOrg"][];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-        };
-    };
-    adminGetOrg: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The organization. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminOrg"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminBlockOrg: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The blocked organization. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminOrg"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            503: components["responses"]["InternalServerError"];
-        };
-    };
-    adminUnblockOrg: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The unblocked organization. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminOrg"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminListPermissions: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The permission catalogue. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminPermission"][];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-        };
-    };
-    adminListRoles: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Role bundles with their permissions. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminRole"][];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-        };
-    };
-    adminListSystemUsers: {
-        parameters: {
-            query?: {
-                search?: components["parameters"]["SearchQuery"];
-                /** @description Page size. Default 20, maximum 100 (employees: default 50, maximum 200). */
-                limit?: components["parameters"]["LimitQuery"];
-                offset?: components["parameters"]["OffsetQuery"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description SYSTEM accounts with their roles. */
-            200: {
-                headers: {
-                    /** @description Total rows matching the search, ignoring limit/offset. */
-                    "X-Total-Count"?: number;
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminSystemUser"][];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-        };
-    };
-    adminGetSystemUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The SYSTEM user. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminSystemUser"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminSetSystemUserRoles: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody: {
-            content: {
-                "application/json": components["schemas"]["SetRolesRequest"];
-            };
-        };
-        responses: {
-            /** @description The SYSTEM user with its new roles. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminSystemUser"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            /** @description The target account is not a SYSTEM user; role changes are only allowed for SYSTEM users. */
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
             422: {
                 headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    adminListUsers: {
-        parameters: {
-            query?: {
-                search?: components["parameters"]["SearchQuery"];
-                /** @description Page size. Default 20, maximum 100 (employees: default 50, maximum 200). */
-                limit?: components["parameters"]["LimitQuery"];
-                offset?: components["parameters"]["OffsetQuery"];
-            };
-            header?: never;
-            path?: never;
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description PERSON and ORG users. SYSTEM accounts are only on /admin/system-users. */
-            200: {
-                headers: {
-                    /** @description Total rows matching the search, ignoring limit/offset. */
-                    "X-Total-Count"?: number;
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminUser"][];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
         };
     };
-    adminGetUser: {
+    upsert_i18n_phrase_api_v1_system_i18n_phrases__page_key___phrase_key__put: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
+                page_key: string;
+                phrase_key: string;
             };
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SystemPhraseUpsertRequest"];
+            };
+        };
         responses: {
-            /** @description The user. */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminUser"];
+                    "application/json": components["schemas"]["SystemPhraseResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminBlockUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The blocked user. */
-            200: {
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminUser"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            /** @description The target account is a SYSTEM user; block it through /admin/system-users/{uuid}/block. */
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: language_not_found, page_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Conflict. Machine codes: phrase_key_taken. */
+            409: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: invalid_translation_key, invalid_translation_value, translation_value_too_long. */
             422: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            503: components["responses"]["InternalServerError"];
         };
     };
-    adminRevokeUserSessions: {
+    delete_i18n_phrase_api_v1_system_i18n_phrases__page_key___phrase_key__delete: {
         parameters: {
             query?: never;
             header?: never;
             path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
+                page_key: string;
+                phrase_key: string;
             };
             cookie?: never;
         };
         requestBody?: never;
         responses: {
-            /** @description Sessions revoked. No body. */
+            /** @description Successful Response */
             204: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content?: never;
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            /** @description The target account is a SYSTEM user; revoke it through /admin/system-users/{uuid}/sessions/revoke. */
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: page_not_found, phrase_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
             422: {
                 headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
                     [name: string]: unknown;
                 };
-                content?: never;
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
             };
-            503: components["responses"]["InternalServerError"];
         };
     };
-    adminUnblockUser: {
+    import_i18n_translations_api_v1_system_i18n_import_post: {
         parameters: {
             query?: never;
             header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
+            path?: never;
             cookie?: never;
         };
-        requestBody?: never;
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SystemImportRequest"];
+            };
+        };
         responses: {
-            /** @description The unblocked user. */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminUser"];
+                    "application/json": components["schemas"]["SystemImportReportResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            /** @description The target account is a SYSTEM user; unblock it through /admin/system-users/{uuid}/unblock. */
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Not Found. Machine codes: language_not_found. */
+            404: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Content Too Large. Machine codes: import_too_large. */
+            413: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: invalid_translation_key, invalid_translation_value, translation_value_too_long. */
             422: {
                 headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-        };
-    };
-    adminBlockSystemUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The blocked SYSTEM user. */
-            200: {
-                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminUser"];
+                    "application/json": components["schemas"]["ErrorResponse"];
                 };
             };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            503: components["responses"]["InternalServerError"];
         };
     };
-    adminUnblockSystemUser: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description The unblocked SYSTEM user. */
-            200: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content: {
-                    "application/json": components["schemas"]["AdminUser"];
-                };
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-        };
-    };
-    adminRevokeSystemUserSessions: {
-        parameters: {
-            query?: never;
-            header?: never;
-            path: {
-                /** @example 018f2b3c-4d5e-7f80-9abc-def012345678 */
-                uuid: components["parameters"]["UUIDPath"];
-            };
-            cookie?: never;
-        };
-        requestBody?: never;
-        responses: {
-            /** @description Sessions revoked. No body. */
-            204: {
-                headers: {
-                    [name: string]: unknown;
-                };
-                content?: never;
-            };
-            400: components["responses"]["BadRequest"];
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
-            404: components["responses"]["NotFound"];
-            409: components["responses"]["Conflict"];
-            503: components["responses"]["InternalServerError"];
-        };
-    };
-    adminGetMe: {
+    report_i18n_missing_api_v1_system_i18n_missing_get: {
         parameters: {
             query?: never;
             header?: never;
@@ -5133,17 +6332,141 @@ export interface operations {
         };
         requestBody?: never;
         responses: {
-            /** @description The caller's identity and resolved grants. */
+            /** @description Successful Response */
             200: {
                 headers: {
                     [name: string]: unknown;
                 };
                 content: {
-                    "application/json": components["schemas"]["AdminMe"];
+                    "application/json": components["schemas"]["SystemMissingReportResponse"];
                 };
             };
-            401: components["responses"]["Unauthorized"];
-            403: components["responses"]["Forbidden"];
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    list_system_audit_entries_api_v1_system_audit_entries_get: {
+        parameters: {
+            query?: {
+                limit?: number;
+                cursor?: number | null;
+                action?: string | null;
+                actor_id?: string | null;
+                resource_type?: string | null;
+                resource_id?: string | null;
+                occurred_from?: string | null;
+                occurred_to?: string | null;
+            };
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemAuditEntriesResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    verify_system_audit_chain_api_v1_system_audit_verify_get: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody?: never;
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemAuditVerifyResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_permission_denied. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
         };
     };
 }
