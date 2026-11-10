@@ -10,17 +10,16 @@ export interface AuthOutcomeNavigation {
   applyOutcome(outcome: AuthOutcome): void
 }
 
-/** Shared success handling for every sign-in panel and the register view. */
+/**
+ * Shared success handling for every sign-in panel. The new contract has no
+ * pending-workspace step: every outcome is a complete session, so it is stored
+ * and the user lands on the area its tenant owns.
+ */
 export const useAuthOutcome = (): AuthOutcomeNavigation => {
   const router = useRouter()
   const session = useAuthSessionStore()
 
   const applyOutcome = (outcome: AuthOutcome): void => {
-    if (outcome.kind === 'workspace_required') {
-      session.setWorkspaceRequired(outcome.principal, outcome.workspaces)
-      void router.push({ name: 'workspaces' })
-      return
-    }
     session.setAuthenticated(outcome.principal)
     void router.push({ name: regularDashboardRoute(outcome.principal) })
   }

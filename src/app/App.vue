@@ -63,7 +63,7 @@ const layout = computed(() => {
 })
 
 // The skip link targets `<main id="main">`, which every layout renders except the
-// auth layout (login/register/workspaces), so it is only shown elsewhere.
+// auth layout (login/register), so it is only shown elsewhere.
 const showSkipLink = computed(() => route.meta.layout !== 'auth')
 </script>
 

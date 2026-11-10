@@ -3,7 +3,6 @@ import type { AuthOutcome } from '@/features/auth'
 import { loadAccountWorkspaces } from '@/features/auth'
 import { createAuthUseCases } from '@/features/auth/application/useCases'
 import { createAuthRepository } from '@/features/auth/infrastructure/authRepository'
-import { createEimzoAdapter } from '@/features/auth/infrastructure/eimzo/createEimzoAdapter'
 import { createI18nFeature } from '@/features/i18n'
 import { createI18nUseCases } from '@/features/i18n/application/useCases'
 import {
@@ -58,7 +57,7 @@ export interface AppContainer {
  * setter, which the root UI renders).
  */
 export const createContainer = (): AppContainer => {
-  const { apiBaseUrl, baseUrl } = readEnv()
+  const { apiBaseUrl } = readEnv()
   const idlePolicies = readIdlePolicies()
 
   // Two independent contexts: separate in-memory token stores (and therefore
@@ -107,7 +106,8 @@ export const createContainer = (): AppContainer => {
     onLoggedOut: () => authRuntime.announceLogout(),
     onLogoutStart: () => authRuntime.beginLogout(),
     onLogoutFailed: () => authRuntime.endLogout(),
-    onSession: (accessToken) => authRuntime.noteAuthenticated(accessToken),
+    onSession: (accessToken, expiresInSec) =>
+      authRuntime.noteAuthenticated(accessToken, expiresInSec),
     // A workspace switch changes the session in place; tell sibling tabs to resync.
     onSessionChanged: () => authRuntime.announceSessionChanged(),
     // A workspace switch rotates the shared refresh cookie: run it under the same
@@ -131,10 +131,7 @@ export const createContainer = (): AppContainer => {
     repository: createAdminRepository({ client: systemClient }),
   })
 
-  const authUseCases = createAuthUseCases({
-    repository: authRepository,
-    eimzo: createEimzoAdapter({ baseUrl }),
-  })
+  const authUseCases = createAuthUseCases({ repository: authRepository })
 
   const systemAuthUseCases = createSystemAuthUseCases({ repository: systemAuthRepository })
 
@@ -228,14 +225,9 @@ export const createContainer = (): AppContainer => {
       if (!result.ok) return
 
       const outcome = result.value
-      if (outcome.kind === 'workspace_required') {
-        store.setWorkspaceRequired(outcome.principal, outcome.workspaces)
-        await router.push({ name: 'workspaces' })
-        return
-      }
-
       store.setAuthenticated(outcome.principal)
-      if (outcome.principal.type === 'PERSON') await loadAccountWorkspaces(authUseCases)
+      // Refresh the cached tenant list/label for the new scope (any tenant type).
+      await loadAccountWorkspaces(authUseCases)
 
       const current = router.currentRoute.value
       if (
@@ -251,7 +243,9 @@ export const createContainer = (): AppContainer => {
     context: 'regular',
     tokens: authTokens,
     performRefresh: () => authRepository.performRefresh(),
-    toOutcome: (accessToken) => authRepository.toOutcome(accessToken),
+    // A sibling tab's fresh token is resolved through `/identity/me`; the regular
+    // context never decodes a token.
+    adoptToken: (accessToken, expiresAt) => authRepository.adoptSession(accessToken, expiresAt),
     onActivity: (at) => authIdle.receiveActivity(at),
     onSessionChanged: resyncRegularSession,
     onSessionEnded: (reason) => {
@@ -267,6 +261,9 @@ export const createContainer = (): AppContainer => {
     tokens: systemTokens,
     performRefresh: () => systemAuthRepository.performRefresh(),
     toOutcome: (accessToken) => systemAuthRepository.toOutcome(accessToken),
+    // Transitional SYSTEM-only JWT fallback: REMOVE together with `toOutcome` once
+    // `/system/auth` returns `expires_in` and a tenant summary like `/identity/*`.
+    readExpiryFromToken: true,
     onActivity: (at) => systemIdle.receiveActivity(at),
     onSessionEnded: (reason) => {
       useSystemSessionStore().setAnonymous()

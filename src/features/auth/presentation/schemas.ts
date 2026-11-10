@@ -18,15 +18,20 @@ const issue = (message: string) => ({ code: z.ZodIssueCode.custom, message })
  */
 export const normalizePhone = (value: string): string => value.replace(/[^0-9]/g, '')
 
-/** The single login identifier, mapped to the one key the API expects. */
-export type LoginIdentifier = { readonly email: string } | { readonly phoneNumber: string }
+/**
+ * The single login identifier, mapped to the one field the API expects
+ * (`LoginRequest.identifier` accepts either an email or a phone number).
+ */
+export type LoginIdentifier = { readonly identifier: string }
 
 /**
  * The schema below guarantees the identifier is a valid email (which always
  * contains "@") or a valid phone number, so an "@" reliably means email here.
+ * A phone number is normalised to the digits-only form the backend validator
+ * accepts; an email is passed through unchanged.
  */
 export const toLoginIdentifier = (value: string): LoginIdentifier =>
-  value.includes('@') ? { email: value } : { phoneNumber: normalizePhone(value) }
+  value.includes('@') ? { identifier: value } : { identifier: normalizePhone(value) }
 
 /**
  * One identifier (email OR phone) plus a password, never both: an "@" makes it an

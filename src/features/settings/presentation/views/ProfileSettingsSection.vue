@@ -7,9 +7,9 @@ import { useAuthUseCases } from '@/features/auth'
 import ProfileAvatarCard from '../components/ProfileAvatarCard.vue'
 
 /**
- * Profile settings. The account model currently exposes an email but no name,
- * so initials are derived from the account email exactly as the authenticated
- * user menu does. If the profile request fails, the avatar card falls back to
+ * Profile settings. The account's display name comes from `/identity/me`
+ * (`full_name`); the masked email is only a fallback source for initials when no
+ * name is exposed. If the profile request fails, the avatar card falls back to
  * the neutral default avatar rather than inventing user details.
  */
 const { t } = useI18n()
@@ -17,6 +17,7 @@ const auth = useAuthUseCases()
 const titleId = useId()
 
 const profileLoading = ref(true)
+const profileName = ref<string | null>(null)
 const profileEmail = ref<string | null>(null)
 const profileAvailable = ref(false)
 
@@ -24,8 +25,9 @@ onMounted(async () => {
   try {
     const profile = await auth.getProfile()
     if (profile.ok) {
+      profileName.value = profile.value.fullName ?? null
       profileEmail.value = profile.value.email
-      profileAvailable.value = profile.value.email !== null
+      profileAvailable.value = profile.value.fullName != null || profile.value.email !== null
     }
   } catch {
     profileAvailable.value = false
@@ -35,6 +37,16 @@ onMounted(async () => {
 })
 
 const initials = computed(() => {
+  const name = profileName.value?.trim() ?? ''
+  if (name.length > 0) {
+    return name
+      .split(/\s+/)
+      .filter((part) => part.length > 0)
+      .slice(0, 2)
+      .map((word) => word.charAt(0).toUpperCase())
+      .join('')
+  }
+
   const email = profileEmail.value
   if (email === null) return null
 

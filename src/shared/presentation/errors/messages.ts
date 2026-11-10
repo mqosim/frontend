@@ -45,9 +45,12 @@ export const errorMessageKey = (error: AppError): string => {
 
 /**
  * Login-style endpoints deliberately return one generic 401 for every failure
- * (no user enumeration), and must treat a 403 the same way.
+ * (no user enumeration), and must treat a 403 the same way — except a blocked
+ * account, which the contract reports with its own machine code so the user is
+ * told to contact support instead of retrying a password.
  */
 export const credentialErrorMessageKey = (error: AppError): string => {
+  if ('code' in error && error.code === 'account_blocked') return 'errors.account_blocked'
   if (error.kind === 'Unauthorized' || error.kind === 'Forbidden') {
     return 'errors.invalid_credentials'
   }

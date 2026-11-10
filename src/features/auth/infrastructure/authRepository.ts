@@ -4,35 +4,14 @@ import { toResult } from '@/shared/infrastructure/api/client'
 import type { ApiClient } from '@/shared/infrastructure/api/client'
 import type { TokenStore } from '@/shared/infrastructure/session/tokenStore'
 
+import type { AuthOutcome } from '../domain/entities'
+import type { AuthRepository } from '../domain/ports'
+import { toAuthOutcome, toAuthOutcomeFromMe, toUserProfile, toWorkspaceList } from './mappers'
 import type {
-  AuthOutcome,
-  ChangeEmailInput,
-  ChangePasswordInput,
-  ConfirmEmailChangeInput,
-  LoginInput,
-  RegisterInput,
-  WorkspaceChoice,
-} from '../domain/entities'
-import type { AuthRepository, EimzoSignature } from '../domain/ports'
-import {
-  toAuthOutcome,
-  toEmailChangePending,
-  toPrincipal,
-  toTokenPairOutcome,
-  toUserProfile,
-  toWorkspaceList,
-} from './mappers'
-import type {
-  AuthResultDto,
-  ChangeEmailRequestDto,
-  ChangePasswordRequestDto,
-  ConfirmEmailChangeRequestDto,
   LoginRequestDto,
-  LoginWithSignatureRequestDto,
-  RegisterRequestDto,
-  SelectWorkspaceRequestDto,
-  SwitchWorkspaceRequestDto,
-  UpdateUserLanguageRequestDto,
+  MeResponseDto,
+  SwitchTenantRequestDto,
+  TokenResponseDto,
 } from './mappers'
 
 export interface AuthRepositoryDeps {
@@ -50,27 +29,36 @@ export interface AuthRepositoryDeps {
   readonly onLogoutStart: () => void
   /** Clears the runtime's intentional-logout mark when the logout request fails. */
   readonly onLogoutFailed: () => void
-  /** Reports the current access token (or `null`) so the runtime can schedule renewal. */
-  readonly onSession: (accessToken: string | null) => void
+  /**
+   * Reports the current access token (or `null`) and its lifetime so the runtime
+   * can schedule renewal from `expires_in` instead of decoding the JWT.
+   */
+  readonly onSession: (accessToken: string | null, expiresInSec: number | null) => void
   /**
    * Tells sibling tabs that this tab changed the session's scope in place (a
-   * workspace switch), so they re-bootstrap into the new workspace.
+   * tenant switch), so they re-bootstrap into the new tenant.
    */
   readonly onSessionChanged: () => void
   /**
    * Runs `run` while holding the runtime's cross-tab lock (the one shared with
-   * refresh). A workspace switch rotates the shared refresh cookie, so it must not
+   * refresh). A tenant switch rotates the shared refresh cookie, so it must not
    * run concurrently with a sibling tab's renewal.
    */
   readonly runExclusive: <R>(run: () => Promise<R>) => Promise<R>
 }
 
-/** The two hooks the session runtime needs from the repository itself. */
+/** The hooks the session runtime needs from the repository itself. */
 export interface AuthSessionPorts {
   /** Network refresh: stores the new token on success, clears it on failure. */
   performRefresh(): Promise<Result<AuthOutcome>>
-  /** Maps an access token adopted from another tab to an outcome. */
-  toOutcome(accessToken: string): Result<AuthOutcome>
+  /**
+   * Resolves a token adopted from a sibling tab into an outcome by reading
+   * `GET /identity/me` with it — the tenant and the user id live on the server,
+   * and the token response carries neither a user id nor an expiry the runtime
+   * can schedule from. Stores the token for the request and clears it when the
+   * request fails, so the runtime can fall back to one network refresh.
+   */
+  adoptSession(accessToken: string, expiresAtMs: number): Promise<Result<AuthOutcome>>
 }
 
 export type AuthRepositoryImpl = AuthRepository & AuthSessionPorts
@@ -86,121 +74,67 @@ export const createAuthRepository = ({
   onSessionChanged,
   runExclusive,
 }: AuthRepositoryDeps): AuthRepositoryImpl => {
-  /** Stores the access token, notifies the runtime, and wraps the mapped outcome. */
-  const finish = (
-    accessToken: string | undefined,
-    outcome: AuthOutcome | null,
-  ): Result<AuthOutcome> => {
-    if (accessToken === undefined || outcome === null) return err({ kind: 'Unknown', status: null })
-    tokens.set(accessToken)
-    onSession(accessToken)
+  /** Stores the access token and its lifetime, then wraps the mapped outcome. */
+  const finish = (dto: TokenResponseDto | undefined): Result<AuthOutcome> => {
+    const outcome = toAuthOutcome(dto)
+    if (dto === undefined || outcome === null) return err({ kind: 'Unknown', status: null })
+    tokens.set(dto.access_token)
+    onSession(dto.access_token, dto.expires_in)
     return ok(outcome)
   }
 
-  const outcomeFromAuthResult = (data: AuthResultDto | undefined): Result<AuthOutcome> =>
-    finish(data?.tokens?.access_token, toAuthOutcome(data))
-
   const performRefresh = async (): Promise<Result<AuthOutcome>> => {
-    const result = toResult(await client.POST('/api/v1/auth/refresh'))
+    const result = toResult(await client.POST('/api/v1/identity/refresh'))
     if (!result.ok) {
       // A failed refresh means the session is unrecoverable: drop the token.
       tokens.clear()
-      onSession(null)
+      onSession(null, null)
       return result
     }
-    return finish(result.value?.access_token, toTokenPairOutcome(result.value))
+    return finish(result.value)
   }
 
-  const toOutcome = (accessToken: string): Result<AuthOutcome> => {
-    const principal = toPrincipal(accessToken)
-    if (principal === null) return err({ kind: 'Unknown', status: null })
-    return ok({ kind: 'authenticated', principal })
+  // `/identity/me` is read by the profile, the workspace list and the guard's
+  // bootstrap. Concurrent readers share one request (no time-based cache): the
+  // guard's bootstrap and a simultaneously mounted consumer must not double it.
+  let meInFlight: Promise<Result<MeResponseDto | undefined>> | null = null
+  const fetchMe = (): Promise<Result<MeResponseDto | undefined>> => {
+    if (meInFlight === null) {
+      const request = (async (): Promise<Result<MeResponseDto | undefined>> =>
+        toResult(await client.GET('/api/v1/identity/me')))()
+      meInFlight = request.finally(() => {
+        meInFlight = null
+      })
+    }
+    return meInFlight
   }
 
   return {
-    async getChallenge() {
-      const result = toResult(await client.GET('/api/v1/auth/challenge'))
-      if (!result.ok) return result
-      const challenge = result.value?.challenge
-      if (challenge === undefined) return err({ kind: 'Unknown', status: null })
-      return ok(challenge)
-    },
-
-    async register(input: RegisterInput & EimzoSignature) {
-      const body: RegisterRequestDto = {
-        challenge: input.challenge,
-        pkcs7: input.pkcs7,
-        email: input.email,
-        password: input.password,
-        phone_number: input.phoneNumber,
-      }
-      if (input.languageCode !== undefined && input.languageCode.length > 0) {
-        body.language_code = input.languageCode
-      }
-      const result = toResult(await client.POST('/api/v1/auth/register', { body }))
-      if (!result.ok) return result
-      return outcomeFromAuthResult(result.value)
-    },
-
-    async login(input: LoginInput) {
-      const hasEmail = input.email !== undefined && input.email.length > 0
-      const hasPhone = input.phoneNumber !== undefined && input.phoneNumber.length > 0
-      if (hasEmail === hasPhone) {
-        // Exactly one identifier is required; the form enforces this too.
+    async login(input) {
+      if (input.identifier.length === 0) {
+        // The form enforces a non-empty identifier; keep the port honest too.
         return err({ kind: 'Validation', status: 400, fields: {} })
       }
-
-      const body: LoginRequestDto = { password: input.password }
-      if (hasEmail) body.email = input.email
-      else body.phone_number = input.phoneNumber
-
-      const result = toResult(await client.POST('/api/v1/auth/login', { body }))
-      if (!result.ok) return result
-      return outcomeFromAuthResult(result.value)
-    },
-
-    async loginWithSignature(signature: EimzoSignature) {
-      const body: LoginWithSignatureRequestDto = {
-        challenge: signature.challenge,
-        pkcs7: signature.pkcs7,
+      const body: LoginRequestDto = {
+        identifier: input.identifier,
+        password: input.password,
       }
-      // Like password login, this sets the httpOnly refresh cookie.
-      const result = toResult(await client.POST('/api/v1/auth/login_with_signature', { body }))
+      const result = toResult(await client.POST('/api/v1/identity/login', { body }))
       if (!result.ok) return result
-      return outcomeFromAuthResult(result.value)
+      return finish(result.value)
     },
 
-    async selectWorkspace(choice: WorkspaceChoice) {
-      const body: SelectWorkspaceRequestDto =
-        choice.kind === 'org'
-          ? { workspace: 'org', org_id: choice.orgId }
-          : { workspace: 'personal' }
-      // The pending-workspace access token is injected as a Bearer by the client.
-      const result = toResult(await client.POST('/api/v1/auth/select_workspace', { body }))
-      if (!result.ok) return result
-      return outcomeFromAuthResult(result.value)
-    },
-
-    async listWorkspaces() {
-      const result = toResult(await client.GET('/api/v1/auth/workspaces'))
-      if (!result.ok) return result
-      return ok(toWorkspaceList(result.value))
-    },
-
-    async switchWorkspace(choice: WorkspaceChoice) {
-      const body: SwitchWorkspaceRequestDto =
-        choice.kind === 'org'
-          ? { workspace: 'org', org_id: choice.orgId }
-          : { workspace: 'personal' }
+    async switchTenant(choice) {
+      const body: SwitchTenantRequestDto = { tenant_id: choice.tenantId }
       // The current access token is injected as a Bearer; the rotated refresh
       // cookie comes back on the same response (see COOKIE_ENDPOINTS). Run it under
       // the runtime's cross-tab lock (shared with refresh) so the rotating cookie is
       // never presented concurrently with a sibling tab's renewal. `finish()` stores
       // the new token and reschedules proactive renewal, still inside the lock.
       const outcome = await runExclusive(async (): Promise<Result<AuthOutcome>> => {
-        const result = toResult(await client.POST('/api/v1/auth/switch_workspace', { body }))
+        const result = toResult(await client.POST('/api/v1/identity/switch-tenant', { body }))
         if (!result.ok) return result
-        return outcomeFromAuthResult(result.value)
+        return finish(result.value)
       })
       // Broadcast only after the lock is released: a sibling tab re-bootstraps from
       // the already-rotated cookie, never racing this tab.
@@ -213,71 +147,53 @@ export const createAuthRepository = ({
     refresh: () => refreshRunner(),
 
     performRefresh,
-    toOutcome,
+
+    async adoptSession(accessToken, expiresAtMs) {
+      // The runtime holds its cross-tab lock and has already discarded the old
+      // token; this GET is the only way to learn the tenant/user id for the adopted
+      // token. The runtime suppresses its 401-retry hook for the duration, so a
+      // stale token fails here instead of recursing into the same renewal.
+      tokens.set(accessToken)
+      const result = toResult(await client.GET('/api/v1/identity/me'))
+      if (!result.ok) {
+        tokens.clear()
+        return result
+      }
+      const outcome = toAuthOutcomeFromMe(result.value, expiresAtMs)
+      if (outcome === null) {
+        tokens.clear()
+        return err({ kind: 'Unknown', status: null })
+      }
+      return ok(outcome)
+    },
 
     async getProfile() {
-      const result = toResult(await client.GET('/api/v1/auth/me'))
+      const result = await fetchMe()
       if (!result.ok) return result
       const profile = toUserProfile(result.value)
       if (profile === null) return err({ kind: 'Unknown', status: null })
       return ok(profile)
     },
 
-    async updateLanguage(languageCode) {
-      const body: UpdateUserLanguageRequestDto = { language_code: languageCode }
-      const result = toResult(await client.PUT('/api/v1/master/users/me', { body }))
+    async listWorkspaces() {
+      const result = await fetchMe()
       if (!result.ok) return result
-      const profile = toUserProfile(result.value)
-      if (profile === null) return err({ kind: 'Unknown', status: null })
-      return ok(profile)
-    },
-
-    // Bearer-only endpoints (no cookie in COOKIE_ENDPOINTS): the identity comes
-    // from the access token, and the httpOnly refresh cookie still rides along
-    // same-origin, which is what lets the password change keep this session.
-    // A wrong current password answers 401 like login; the client's single
-    // refresh-and-retry recovers an expired access token and lets the retry
-    // surface the credential failure instead.
-    async changePassword(input: ChangePasswordInput) {
-      const body: ChangePasswordRequestDto = {
-        current_password: input.currentPassword,
-        new_password: input.newPassword,
-      }
-      // 204 with no body; `toResult` yields `ok(undefined)`.
-      const result = toResult<void>(await client.POST('/api/v1/auth/me/password', { body }))
-      return result
-    },
-
-    async requestEmailChange(input: ChangeEmailInput) {
-      const body: ChangeEmailRequestDto = {
-        new_email: input.newEmail,
-        current_password: input.currentPassword,
-      }
-      const result = toResult(await client.POST('/api/v1/auth/me/email/change', { body }))
-      if (!result.ok) return result
-      return ok(toEmailChangePending(result.value))
-    },
-
-    async confirmEmailChange(input: ConfirmEmailChangeInput) {
-      const body: ConfirmEmailChangeRequestDto = { code: input.code }
-      const result = toResult(await client.POST('/api/v1/auth/me/email/confirm', { body }))
-      if (!result.ok) return result
-      const profile = toUserProfile(result.value)
-      if (profile === null) return err({ kind: 'Unknown', status: null })
-      return ok(profile)
+      const list = toWorkspaceList(result.value)
+      if (list === null) return err({ kind: 'Unknown', status: null })
+      return ok(list)
     },
 
     async logout() {
-      // Mark the logout before the request: a request already in flight (e.g. the
-      // Settings page's `/auth/me`) may answer 401 once the endpoint has revoked
-      // the cookie, and that must not be read as an expired session.
+      // Mark the logout before the request: a request already in flight may answer
+      // 401 once the endpoint has revoked the cookie, and that must not be read as
+      // an expired session.
       onLogoutStart()
-      const result = toResult(await client.POST('/api/v1/auth/logout'))
+      const result = toResult(await client.POST('/api/v1/identity/logout'))
       // A failed logout clears the mark so the app can renew again; the local
       // session is still cleared below and the other tabs are told to end too.
       if (!result.ok) onLogoutFailed()
       tokens.clear()
-      onSession(null)
+      onSession(null, null)
       onLoggedOut()
       return result.ok ? ok(undefined) : result
     },

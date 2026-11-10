@@ -499,6 +499,7 @@ export const fallbackMessages: Record<string, string> = {
   'errors.unauthorized': 'Authentication is required.',
   'errors.forbidden': 'You do not have access.',
   'errors.invalid_credentials': 'Incorrect email/phone or password.',
+  'errors.account_blocked': 'Your account is blocked. Contact support.',
   'errors.rate_limited': 'Too many attempts. Please wait and try again.',
   'errors.conflict': 'This record already exists.',
   'errors.unprocessable': 'The request could not be processed.',

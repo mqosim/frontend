@@ -9,7 +9,6 @@ export interface Principal {
   readonly type: PrincipalType
   readonly userId: string | null
   readonly orgId: string | null
-  readonly needsWorkspace: boolean
   /** Epoch milliseconds, or `null` when the token carries no `exp`. */
   readonly expiresAt: number | null
 }

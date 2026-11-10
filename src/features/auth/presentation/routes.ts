@@ -33,16 +33,6 @@ export const authRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/workspaces',
-    name: 'workspaces',
-    component: () => import('./views/WorkspaceSelectionPage.vue'),
-    meta: {
-      layout: 'auth',
-      requiresPendingWorkspace: true,
-      translationPages: ['auth.workspace', 'errors'],
-    },
-  },
-  {
     path: '/app/home',
     name: 'app-home',
     // The personal workspace shares the org application shell; the page lives
@@ -59,5 +49,8 @@ export const authRoutes: RouteRecordRaw[] = [
   },
   // ── Backward-compatible aliases ──────────────────────────────────────────
   { path: '/dashboard', redirect: { name: 'app-home' } },
-  { path: '/workspace', redirect: { name: 'workspaces' } },
+  // The old pending-workspace step no longer exists; the tenant is chosen inside
+  // the app, so an old bookmark lands on the dashboard (the guard sends an
+  // anonymous visitor to login).
+  { path: '/workspace', redirect: { name: 'app-home' } },
 ]

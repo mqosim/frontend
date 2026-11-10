@@ -13,6 +13,7 @@ export type { AuthUseCases } from './application/useCases'
 export type {
   AuthOutcome,
   EimzoKey,
+  LoginInput,
   WorkspaceChoice,
   WorkspaceList,
   WorkspaceOption,

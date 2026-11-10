@@ -33,25 +33,23 @@ const loadErrorKey = ref('')
 const errorKey = ref('')
 const options = ref<readonly WorkspaceOption[]>([])
 const current = ref<WorkspaceState | null>(null)
-// The value of the radio group: `'personal'` or an org id, or `''` for none.
+// The selected tenant id, or `''` for none. Every row — including the personal
+// tenant — is one of the ids `/identity/me` returns.
 const selectedKey = ref('')
 
 const isUnchanged = computed(() => {
   const state = current.value
   if (state === null) return false
-  if (selectedKey.value === 'personal') return state.workspace === 'personal'
-  return state.workspace === 'org' && state.orgId === selectedKey.value
+  return selectedKey.value === state.tenantId
 })
 
 const canSubmit = computed(
   () => selectedKey.value !== '' && !isUnchanged.value && !submitting.value,
 )
 
-/** The initial selection: the current workspace when it maps to a listed option. */
-const initialKey = (state: WorkspaceState, list: readonly WorkspaceOption[]): string => {
-  if (state.workspace === 'personal') return 'personal'
-  return state.orgId !== null && list.some((org) => org.id === state.orgId) ? state.orgId : ''
-}
+/** The initial selection: the current tenant when it is in the returned list. */
+const initialKey = (state: WorkspaceState, list: readonly WorkspaceOption[]): string =>
+  list.some((option) => option.id === state.tenantId) ? state.tenantId : ''
 
 const load = async (): Promise<void> => {
   loading.value = true
@@ -73,8 +71,7 @@ const load = async (): Promise<void> => {
   selectedKey.value = initialKey(result.value.current, result.value.options)
 }
 
-const toChoice = (key: string): WorkspaceChoice =>
-  key === 'personal' ? { kind: 'personal' } : { kind: 'org', orgId: key }
+const toChoice = (tenantId: string): WorkspaceChoice => ({ tenantId })
 
 const close = (): void => {
   if (submitting.value) return
@@ -86,7 +83,7 @@ const submit = async (): Promise<void> => {
   submitting.value = true
   errorKey.value = ''
 
-  const result = await auth.switchWorkspace(toChoice(selectedKey.value))
+  const result = await auth.switchTenant(toChoice(selectedKey.value))
   if (!result.ok) {
     submitting.value = false
     if (result.error.kind === 'Unauthorized') {
@@ -101,18 +98,9 @@ const submit = async (): Promise<void> => {
   }
 
   const outcome = result.value
-  if (outcome.kind === 'workspace_required') {
-    // Defensive: the token came back pending (should not happen for a switch).
-    session.setWorkspaceRequired(outcome.principal, outcome.workspaces)
-    submitting.value = false
-    emit('close')
-    void router.push({ name: 'workspaces' })
-    return
-  }
-
   session.setAuthenticated(outcome.principal)
-  // Refresh the cached org list/label for the new workspace, then land on the
-  // area the new principal owns (org shell or personal home).
+  // Refresh the cached tenant list/label for the new scope, then land on the area
+  // the new principal owns (org shell or personal home).
   await loadAccountWorkspaces(auth)
   submitting.value = false
   emit('close')
@@ -177,28 +165,19 @@ onBeforeUnmount(() => {
         <fieldset class="workspace-switch__options" :disabled="submitting">
           <legend class="workspace-switch__legend">{{ t('action.switch_workspace') }}</legend>
 
-          <label class="workspace-switch__option">
+          <label v-for="option in options" :key="option.id" class="workspace-switch__option">
             <input
               v-model="selectedKey"
               type="radio"
               :name="groupName"
-              value="personal"
-              :disabled="submitting"
-            />
-            <span>{{ t('workspace.personal') }}</span>
-          </label>
-
-          <label v-for="org in options" :key="org.id" class="workspace-switch__option">
-            <input
-              v-model="selectedKey"
-              type="radio"
-              :name="groupName"
-              :value="org.id"
+              :value="option.id"
               :disabled="submitting"
             />
             <span>
-              {{ org.name }}
-              <small v-if="org.tin !== ''" class="workspace-switch__tin">{{ org.tin }}</small>
+              {{ option.type === 'personal' ? t('workspace.personal') : option.name }}
+              <small v-if="option.type !== 'personal' && option.tin !== ''" class="workspace-switch__tin">
+                {{ option.tin }}
+              </small>
             </span>
           </label>
         </fieldset>

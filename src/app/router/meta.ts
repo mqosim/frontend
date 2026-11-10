@@ -12,8 +12,6 @@ declare module 'vue-router' {
     requiresAuth?: boolean
     /** Only reachable while anonymous (login/register). */
     guestOnly?: boolean
-    /** Reachable only with a pending-workspace token (no refresh cookie). */
-    requiresPendingWorkspace?: boolean
     /** Principal types the session must have; others are rejected. */
     principals?: readonly PrincipalType[]
     /**

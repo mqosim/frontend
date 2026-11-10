@@ -26,8 +26,8 @@ export default defineConfig({
       // stored over plain HTTP; `127.0.0.1` is not a secure context in Safari and
       // the cookies are dropped there.
       '/api': {
-        // Dev backend port is still the previous assumption (audit: UNKNOWN).
-        target: 'http://127.0.0.1:8080',
+        // FastAPI dev server: uvicorn app.main:app --reload --port 8000.
+        target: 'http://127.0.0.1:8000',
         changeOrigin: false,
       },
     },

@@ -33,21 +33,37 @@ export interface GuardDeps {
 }
 
 /**
+ * Applies a loaded profile's saved language. Shared by the regular and SYSTEM
+ * paths so the switch logic lives in one place.
+ */
+const applyAccountLanguage = async (
+  profile: UserProfile,
+  i18n: I18nFeature,
+  pages: readonly string[],
+): Promise<void> => {
+  const code = profile.languageCode
+  if (code === null || code.length === 0 || code === i18n.currentLocale()) return
+  await i18n.switchTo(code, pages)
+}
+
+/**
  * Adopts the account's saved language once a session is established, so the app
  * renders in the user's language from the first authenticated page. Translations
  * are loaded before the locale switches (see `I18nFeature.switchTo`), and any
  * failure keeps the current language without blocking navigation.
+ *
+ * Returns the loaded profile (or `null` on failure) so the regular bootstrap can
+ * reuse it for the user id instead of issuing a second `/identity/me`.
  */
 const adoptAccountLanguage = async (
   loadProfile: () => Promise<Result<UserProfile>>,
   i18n: I18nFeature,
   pages: readonly string[],
-): Promise<void> => {
+): Promise<UserProfile | null> => {
   const profile = await loadProfile()
-  if (!profile.ok) return
-  const code = profile.value.languageCode
-  if (code === null || code.length === 0 || code === i18n.currentLocale()) return
-  await i18n.switchTo(code, pages)
+  if (!profile.ok) return null
+  await applyAccountLanguage(profile.value, i18n, pages)
+  return profile.value
 }
 
 // The saved language is adopted at most once per authenticated session, so a
@@ -55,7 +71,7 @@ const adoptAccountLanguage = async (
 // session ends, so a fresh sign-in always re-adopts the account language.
 let regularLanguageApplied = false
 let systemLanguageApplied = false
-// The PERSON's switchable workspaces are fetched at most once per authenticated
+// The person's switchable tenants are fetched at most once per authenticated
 // session (for the account label); the switch dialog re-fetches on open.
 let regularWorkspacesLoaded = false
 // The sidebar default (expanded) is applied at most once per authenticated
@@ -188,34 +204,26 @@ export const createAuthGuard = ({
     // refresh restore, not a fresh sign-in.
     const restoredHere = store.status === 'unknown'
 
-    // A pending-workspace token has no refresh cookie: restoring is impossible, so
-    // a reload here (or a missing pending session) must return to login WITHOUT
-    // attempting `/auth/refresh`.
-    if (meta.requiresPendingWorkspace) {
-      if (store.status === 'authenticated') {
-        return { name: regularDashboardRoute(store.principal) }
-      }
-      // A pending-workspace token is not a full session, so no idle tracking.
-      idle.deactivate('regular')
-      if (store.status !== 'workspace_required') {
-        store.setAnonymous()
-        return { name: 'login' }
-      }
-      await ensureTranslations()
-      return true
-    }
+    // The profile fetched during the bootstrap, reused for language adoption so
+    // the first authenticated navigation issues only one `/identity/me`.
+    let bootstrapProfile: UserProfile | null = null
 
+    // Bootstrap once per context: the refresh cookie restores the session, then
+    // `/identity/me` supplies the user id the token response does not carry.
     if (store.status === 'unknown') {
       store.startRestoring()
       const result = await auth.refresh()
       if (result.ok) {
-        const outcome = result.value
-        if (outcome.kind === 'workspace_required') {
-          store.setWorkspaceRequired(outcome.principal, outcome.workspaces)
-        } else {
-          store.setAuthenticated(outcome.principal)
+        let principal = result.value.principal
+        const profile = await auth.getProfile()
+        if (profile.ok) {
+          bootstrapProfile = profile.value
+          principal = { ...principal, userId: profile.value.uuid }
         }
+        store.setAuthenticated(principal)
       } else {
+        // A first-time anonymous visitor (or an expired refresh cookie) is silent:
+        // the runtime's `restore()` never raises the session-expired notice.
         store.setAnonymous()
       }
     }
@@ -237,10 +245,7 @@ export const createAuthGuard = ({
     // page it does not own.
     const allowed = meta.principals
     if (meta.requiresAuth || allowed !== undefined || meta.workspace !== undefined) {
-      if (!store.isAuthenticated) {
-        if (store.needsWorkspace) return { name: 'workspaces' }
-        return { name: 'login' }
-      }
+      if (!store.isAuthenticated) return { name: 'login' }
     }
     if (
       allowed !== undefined &&
@@ -271,11 +276,22 @@ export const createAuthGuard = ({
       return { name: regularDashboardRoute(store.principal) }
     }
 
-    // Adopt the account's saved language once per session (login, register,
-    // workspace selection and refresh restore all funnel through here).
+    // Adopt the account's saved language once per session (login and refresh
+    // restore both funnel through here), reusing the bootstrap profile when one
+    // was fetched. The loaded profile also fills the informational user id.
     if (store.isAuthenticated && !regularLanguageApplied) {
       regularLanguageApplied = true
-      await adoptAccountLanguage(() => auth.getProfile(), i18n, pages())
+      let profile = bootstrapProfile
+      if (profile === null) {
+        const loaded = await auth.getProfile()
+        if (loaded.ok) profile = loaded.value
+      }
+      if (profile !== null) {
+        await applyAccountLanguage(profile, i18n, pages())
+        if (store.principal !== null && store.principal.userId === null) {
+          store.setAuthenticated({ ...store.principal, userId: profile.uuid })
+        }
+      }
     }
 
     // Expand the sidebar once per authenticated session, but only for a fresh
@@ -285,9 +301,10 @@ export const createAuthGuard = ({
       resetToExpanded()
     }
 
-    // Load the PERSON's switchable workspaces once per session for the account
-    // label; ORG/SYSTEM and the pending state never call this.
-    if (store.isAuthenticated && !regularWorkspacesLoaded && store.principal?.type === 'PERSON') {
+    // Load the person's switchable tenants once per session for the account label
+    // and the switch dialog. Any authenticated regular session may have more than
+    // one membership (including a PERSON currently scoped to an organization).
+    if (store.isAuthenticated && !regularWorkspacesLoaded) {
       regularWorkspacesLoaded = true
       void loadAccountWorkspaces(auth)
     }

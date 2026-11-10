@@ -33,37 +33,50 @@ const { requestWorkspaceSwitch } = useWorkspaceSwitch()
 
 const loggingOut = computed(() => (props.system ? systemLoggingOut.value : orgLoggingOut.value))
 
-// UserMe carries no name, so the display name and initials are derived from the
-// account email (`muhammad.yusuf@x.com` → "Muhammad Yusuf" / "MY") and never
-// stored anywhere.
+// `/identity/me` carries the account's full name (contact details are masked),
+// so the display name and initials come from `full_name`; the email local part is
+// the fallback for a profile that exposes no name (the SYSTEM realm).
+const fullName = ref<string | null>(null)
 const email = ref<string | null>(null)
 
 onMounted(async () => {
   const profile = props.system ? await systemAuth?.getProfile() : await auth.getProfile()
-  if (profile?.ok) email.value = profile.value.email
+  if (profile?.ok) {
+    fullName.value = profile.value.fullName ?? null
+    email.value = profile.value.email
+  }
 })
 
-const localPart = computed(() => (email.value ?? '').split('@')[0] ?? '')
-
-const nameWords = computed(() =>
-  localPart.value
+const nameWords = computed(() => {
+  const name = fullName.value?.trim() ?? ''
+  if (name.length > 0) {
+    return name
+      .split(/\s+/)
+      .filter((part) => part.length > 0)
+      .slice(0, 2)
+  }
+  const localPart = (email.value ?? '').split('@')[0] ?? ''
+  return localPart
     .split(/[._\-+]+/)
     .filter((part) => part.length > 0 && /^[a-zA-Z0-9]+$/.test(part))
-    .slice(0, 2),
-)
+    .slice(0, 2)
+})
 
 const displayName = computed(() => {
-  if (nameWords.value.length === 0) return localPart.value
-  return nameWords.value
-    .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
-    .join(' ')
+  if (nameWords.value.length > 0) {
+    return nameWords.value
+      .map((word) => word.charAt(0).toUpperCase() + word.slice(1).toLowerCase())
+      .join(' ')
+  }
+  return fullName.value?.trim() ?? (email.value ?? '').split('@')[0] ?? ''
 })
 
 const initials = computed(() => {
   if (nameWords.value.length > 0) {
     return nameWords.value.map((word) => word.charAt(0).toUpperCase()).join('')
   }
-  const letters = localPart.value.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2)
+  const localPart = (email.value ?? '').split('@')[0] ?? ''
+  const letters = localPart.replace(/[^a-zA-Z0-9]/g, '').slice(0, 2)
   return letters.length > 0 ? letters.toUpperCase() : '··'
 })
 
@@ -79,9 +92,15 @@ const roleKey = computed(() => {
   }
 })
 
-// Only a PERSON can switch workspaces; a real ORG account has just the one and
-// the SYSTEM area has no workspace concept at all.
-const canSwitch = computed(() => !props.system && session.principal?.type === 'PERSON')
+// A PERSON can always open the picker (its tenant list is rendered as returned);
+// an ORG-scoped session can switch only when the account actually has more than
+// one tenant, so a single-tenant organization keeps the old one-workspace UI.
+// The SYSTEM area has no tenant concept at all.
+const canSwitch = computed(
+  () =>
+    !props.system &&
+    (session.principal?.type === 'PERSON' || session.accountWorkspaces.length > 1),
+)
 
 // ── Dropdown state: disclosure pattern ──────────────────────────────────────
 const open = ref(false)

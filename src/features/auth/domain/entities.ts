@@ -1,36 +1,58 @@
 import type { Principal, Workspace } from '@/shared/domain'
 
-/** An organisation a PERSON may switch into. */
+/**
+ * One tenant the person may switch into, as returned by
+ * `GET /api/v1/identity/me`. `personal` is the person's own tenant; `org` is an
+ * organization membership.
+ */
 export interface WorkspaceOption {
   readonly id: string
   readonly name: string
+  readonly type: 'personal' | 'org'
+  /**
+   * The organization's TIN. The current contract does not expose it on a tenant
+   * membership, so this is always empty and the UI hides the field.
+   */
   readonly tin: string
 }
 
-/** The workspace a token is currently scoped to (`GET /auth/workspaces`). */
+/** The tenant the session is currently scoped to. */
 export interface WorkspaceState {
   readonly workspace: Workspace
-  /** The active org's uuid, or `null` (personal, or an org that was deactivated). */
+  /** The active tenant's uuid (`/identity/me.tenant.id`). */
+  readonly tenantId: string
+  /** The active org tenant's uuid, or `null` for the personal tenant. */
   readonly orgId: string | null
 }
 
-/** The PERSON's switchable organizations plus the current workspace. */
+/** The person's switchable tenants plus the current one. */
 export interface WorkspaceList {
   readonly options: readonly WorkspaceOption[]
   readonly current: WorkspaceState
 }
 
 export interface LoginInput {
-  /** Exactly one of `email` / `phoneNumber` must be present. */
-  readonly email?: string
-  readonly phoneNumber?: string
+  /** Email or phone number; the backend accepts either in one field. */
+  readonly identifier: string
   readonly password: string
+}
+
+/**
+ * The tenant the caller picked in the switch dialog
+ * (`POST /identity/switch-tenant`). A personal tenant is just another tenant id;
+ * the dialog renders the list `/identity/me` returns.
+ */
+export interface WorkspaceChoice {
+  readonly tenantId: string
 }
 
 /**
  * One signable key reported by the local E-IMZO client. `id` is an opaque
  * handle the infrastructure adapter maps back to its E-IMZO key object; the
  * other fields are display-only.
+ *
+ * E-IMZO sign-in/registration is not part of the current migration step; the
+ * local adapter types are kept so that code is preserved in git history.
  */
 export interface EimzoKey {
   readonly id: string
@@ -42,55 +64,11 @@ export interface EimzoKey {
   readonly validTo: string | null
 }
 
-export interface RegisterInput {
-  readonly email: string
-  readonly phoneNumber: string
-  readonly password: string
-  /** Optional; the backend falls back to its default language. */
-  readonly languageCode?: string
-}
-
-/** The workspace the caller picked after a pending-workspace login. */
-export type WorkspaceChoice =
-  { readonly kind: 'personal' } | { readonly kind: 'org'; readonly orgId: string }
-
-/** Payload for rotating the caller's own password (`POST /auth/me/password`). */
-export interface ChangePasswordInput {
-  readonly currentPassword: string
-  readonly newPassword: string
-}
-
-/** Payload for starting an email change (`POST /auth/me/email/change`). */
-export interface ChangeEmailInput {
-  readonly newEmail: string
-  readonly currentPassword: string
-}
-
 /**
- * Confirms a started email change has a code delivered to the NEW address;
- * the API contract fixes it to 6 digits, so the UI validates the shape too.
+ * Outcome of password login, refresh and tenant switch. Every one of them
+ * produces a complete session: the new contract has no pending-workspace step.
  */
-export interface ConfirmEmailChangeInput {
-  readonly code: string
+export type AuthOutcome = {
+  readonly kind: 'authenticated'
+  readonly principal: Principal
 }
-
-/** The 202 body of the email-change request: both values are seconds. */
-export interface EmailChangePending {
-  /** How long the verification code stays valid. */
-  readonly expiresInSec: number
-  /** How long until the same request may be repeated (resend cooldown). */
-  readonly resendAfterSec: number
-}
-
-/**
- * Outcome of register / login / select_workspace. A `workspace_required` result
- * carries a pending token with no refresh cookie: it must be completed through
- * `selectWorkspace`, and a reload before that returns the user to login.
- */
-export type AuthOutcome =
-  | { readonly kind: 'authenticated'; readonly principal: Principal }
-  | {
-      readonly kind: 'workspace_required'
-      readonly principal: Principal
-      readonly workspaces: readonly WorkspaceOption[]
-    }

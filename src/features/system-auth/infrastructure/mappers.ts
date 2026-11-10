@@ -23,7 +23,6 @@ export const toSystemPrincipal = (accessToken: string): Principal | null => {
     type: 'SYSTEM',
     userId: claims.uid ?? claims.sub ?? null,
     orgId: null,
-    needsWorkspace: false,
     expiresAt: typeof claims.exp === 'number' ? claims.exp * 1000 : null,
   }
 }

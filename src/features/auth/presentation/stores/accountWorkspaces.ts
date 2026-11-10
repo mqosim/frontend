@@ -6,18 +6,19 @@ import type { AuthUseCases } from '../../application/useCases'
 import { useAuthSessionStore } from './sessionStore'
 
 /**
- * Loads the PERSON's switchable workspaces into the session store so the org
- * shell can show a readable account label and the switch dialog can list the
- * options from the same cached data.
+ * Loads the person's switchable tenants into the session store so the shell can
+ * show a readable workspace label and the switch dialog can list the options from
+ * the same data.
  *
- * Only a PERSON with a selected workspace may call this (never ORG, SYSTEM or the
- * pending-workspace state): those get a `Forbidden` result and no fetch. Failures
- * are returned (never thrown) so the caller can fall back to a generic label; the
- * label simply stays generic and the dialog retries on open.
+ * Any authenticated regular session may call this: a PERSON who switched into an
+ * organization still owns the other tenant memberships and must be able to switch
+ * back. Only an unauthenticated store gets a `Forbidden` result and no fetch.
+ * Failures are returned (never thrown) so the caller can fall back to a generic
+ * label; the label stays generic and the dialog retries on open.
  */
 export const loadAccountWorkspaces = async (auth: AuthUseCases): Promise<Result<WorkspaceList>> => {
   const session = useAuthSessionStore()
-  if (session.status !== 'authenticated' || session.principal?.type !== 'PERSON') {
+  if (session.status !== 'authenticated') {
     return err({ kind: 'Forbidden', status: 403 })
   }
 
