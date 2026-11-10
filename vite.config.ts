@@ -13,8 +13,9 @@ export default defineConfig({
   server: {
     port: 5173,
     proxy: {
-      // The backend sets its refresh cookies as `Secure; SameSite=Strict` on the
-      // paths /api/v1/auth and /api/v1/system/auth. Serving the SPA and the API
+      // The FastAPI backend sets the httpOnly refresh cookie as
+      // `Secure; SameSite=None` (path /api/v1/identity; the SYSTEM realm keeps
+      // its own cookie on /api/v1/system/auth). Serving the SPA and the API
       // from one origin via this proxy keeps those cookies first-party.
       //
       // No rewrite: the spec paths already include `/api/v1`, and the proxy must
@@ -25,6 +26,7 @@ export default defineConfig({
       // stored over plain HTTP; `127.0.0.1` is not a secure context in Safari and
       // the cookies are dropped there.
       '/api': {
+        // Dev backend port is still the previous assumption (audit: UNKNOWN).
         target: 'http://127.0.0.1:8080',
         changeOrigin: false,
       },

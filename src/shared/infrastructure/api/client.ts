@@ -8,11 +8,34 @@ import { networkError, toAppError } from '@/shared/infrastructure/http/errors'
 import type { paths } from './schema'
 
 /**
- * Endpoints that authenticate with an httpOnly cookie. Only these send
- * `credentials: 'include'`; everything else keeps the fetch default
- * (`same-origin`) so cookies are not attached where they are not needed.
+ * Endpoints that SET, ROTATE or CLEAR the backend's httpOnly refresh cookie.
+ * Only these send `credentials: 'include'`; everything else keeps the fetch
+ * default (`same-origin`) so cookies are not attached where they are not
+ * needed.
+ *
+ * Two contract generations live here while the feature slices migrate:
+ * - the current FastAPI contract — the refresh cookie lives on
+ *   `/api/v1/identity` (set by login / eimzo login / register completion,
+ *   rotated by refresh and switch-tenant, cleared by logout; the SYSTEM realm
+ *   keeps its own cookie on `/api/v1/system/auth`, set by login / TOTP);
+ * - the previous contract — entries kept only for the not-yet-migrated slices
+ *   and removed together with them.
  */
 const COOKIE_ENDPOINTS = [
+  // Current contract: the identity cookie lives on /api/v1/identity.
+  '/identity/login',
+  '/identity/eimzo/login',
+  '/identity/register/complete',
+  '/identity/refresh',
+  '/identity/logout',
+  '/identity/switch-tenant',
+  // Current contract: the SYSTEM realm cookie lives on /api/v1/system/auth.
+  '/system/auth/login',
+  '/system/auth/totp',
+  '/system/auth/totp/activate',
+  '/system/auth/refresh',
+  '/system/auth/logout',
+  // Previous contract — removed together with its slices.
   '/auth/login',
   '/auth/login_with_signature',
   '/auth/login_with_usb',
@@ -21,18 +44,52 @@ const COOKIE_ENDPOINTS = [
   '/auth/logout',
   '/auth/select_workspace',
   '/auth/switch_workspace',
-  '/system/auth/login',
+]
+
+/**
+ * Endpoints the backend guards with its CSRF check: exactly the requests that
+ * present the httpOnly refresh cookie (refresh, logout and switch-tenant, in
+ * both realms). The check requires the `X-Requested-With: XMLHttpRequest`
+ * header — a missing header is `csrf_header_required` (403) — and validates
+ * `Origin` only when that header carries one. This is a header check, not a
+ * double-submit token scheme: there is no CSRF cookie and no bootstrap
+ * endpoint, so there is nothing to read or rotate client-side. The header is
+ * attached ONLY to these requests, never to unrelated ones.
+ */
+const CSRF_ENDPOINTS = [
+  '/identity/refresh',
+  '/identity/logout',
+  '/identity/switch-tenant',
   '/system/auth/refresh',
   '/system/auth/logout',
 ]
+
+const CSRF_HEADER = 'X-Requested-With'
+const CSRF_HEADER_VALUE = 'XMLHttpRequest'
 
 /**
  * Endpoints whose 401 is a credential/session result the caller handles, never a
  * recoverable expiry. These must NOT trigger the shared refresh-and-retry: a bad
  * login must not rotate the session, and a failed refresh/logout must surface as
- * an error instead of recursing into itself.
+ * an error instead of recursing into itself. Same two-generation split as
+ * `COOKIE_ENDPOINTS`: anonymous entry points and cookie-only operations of both
+ * contracts; bearer-only endpoints (e.g. `/identity/me`) stay retryable.
  */
 const NO_RETRY_ENDPOINTS = [
+  // Current contract: anonymous entry points and cookie-only operations.
+  '/identity/login',
+  '/identity/eimzo/login',
+  '/identity/eimzo/challenge',
+  '/identity/register/start',
+  '/identity/register/complete',
+  '/identity/refresh',
+  '/identity/logout',
+  '/identity/logout-all',
+  '/identity/switch-tenant',
+  '/system/auth/login',
+  '/system/auth/refresh',
+  '/system/auth/logout',
+  // Previous contract — removed together with its slices.
   '/auth/login',
   '/auth/login_with_signature',
   '/auth/login_with_usb',
@@ -43,9 +100,6 @@ const NO_RETRY_ENDPOINTS = [
   '/auth/logout_all',
   '/auth/select_workspace',
   '/auth/switch_workspace',
-  '/system/auth/login',
-  '/system/auth/refresh',
-  '/system/auth/logout',
 ]
 
 export interface ApiClientOptions {
@@ -119,6 +173,27 @@ const guardNetworkErrors = (
     },
   })
 
+/**
+ * Builds the one shared openapi-fetch client used by every feature repository.
+ *
+ * Request behaviour (all centralised here, never in feature code):
+ * - JSON request/response handling and query-parameter serialization come from
+ *   openapi-fetch; a call passes `query` (and any `RequestInit` field such as
+ *   `signal` for cancellation or `AbortSignal.timeout(ms)` for timeouts)
+ *   directly in its options.
+ * - `Authorization: Bearer` is injected from the in-memory token store.
+ * - `credentials: 'include'` is set only for the cookie-authenticated
+ *   endpoints (see `COOKIE_ENDPOINTS`).
+ * - The CSRF header is attached only to the cookie-presenting endpoints (see
+ *   `CSRF_ENDPOINTS`).
+ * - One silent recovery: an authenticated 401 renews the access token once and
+ *   retries once (see `onUnauthorized`); it never loops.
+ * - Any thrown transport error (backend down, proxy unreachable, abort) is
+ *   normalised to a `Network` result instead of escaping as an exception.
+ *
+ * The client is independent of Vue and UI concerns: it never shows messages
+ * and never redirects.
+ */
 export const createApiClient = ({ baseUrl, getAccessToken, onUnauthorized }: ApiClientOptions) => {
   const client = createClient<paths>({ baseUrl })
 
@@ -140,7 +215,21 @@ export const createApiClient = ({ baseUrl, getAccessToken, onUnauthorized }: Api
     },
   }
 
-  client.use(bearer, cookies)
+  /**
+   * Attaches the CSRF header to the cookie-presenting endpoints only (see
+   * `CSRF_ENDPOINTS`). Matched against the spec path (`schemaPath`), which is
+   * the exact contract path and therefore independent of the base URL.
+   */
+  const csrf: Middleware = {
+    onRequest({ request, schemaPath }) {
+      if (CSRF_ENDPOINTS.some((suffix) => schemaPath.endsWith(suffix))) {
+        request.headers.set(CSRF_HEADER, CSRF_HEADER_VALUE)
+      }
+      return request
+    },
+  }
+
+  client.use(bearer, cookies, csrf)
 
   // Dev-only safety net. Spec paths already start with `/api/v1`, so a base URL
   // that also carries it yields `/api/v1/api/v1/…`. Report that once per client

@@ -1,6 +1,6 @@
 /**
  * The API version prefix. Every generated spec path already begins with it
- * (`/api/v1/auth/login`, `/api/v1/public/translations`, …), so the configured
+ * (`/api/v1/identity/login`, `/api/v1/public/translations`, …), so the configured
  * base URL must NOT repeat it — those paths are absolute on their own.
  */
 export const API_PREFIX = '/api/v1'
