@@ -54,6 +54,55 @@
 - The settings section's displayed "saved" language comes from `/identity/me.language_code` (fallback to the locale store on failure/null) — the notification-preferences read on mount was removed.
 - Language codes are typed end to end: `ApiLanguageCode` (`'uz' | 'uz-Cyrl' | 'ru' | 'en'`) lives in `features/i18n/domain/localeCodes.ts` with `toApiLanguageCode()` (null for unsupported, canonical spelling, `uzc → uz-Cyrl`); `auth/infrastructure/mappers.ts` derives `ApiLanguageCodeDto` from the generated schema and asserts equality at compile time (`API_LANGUAGE_CODE_MATCHES_SCHEMA`) — drift breaks the build, no casts. Repositories/ports/use cases take `ApiLanguageCode`; unsupported values are omitted from the request body or fail the save locally, never sent as `null`.
 
+## SYSTEM admin control plane (2026-11-12)
+
+- The control plane is FastAPI-only: `/api/v1/system/{tenants,users,permissions,audit}`;
+  the retired `/api/v1/admin/*` surface has no references left in the frontend.
+- **D1 (organization members):** the global Users directory, its detail page and
+  member block/unblock/session-revoke actions were removed (no such backend
+  capability). Members are listed read-only on the tenant detail page via
+  `GET /system/tenants/{id}/users` (offset + body `total`). Route params renamed to
+  `:tenantId`/`:userId`; the `users` menu entry was removed.
+- **D2 (audit detail):** rows expand from the list item — `SystemAuditEntryResponse`
+  carries every displayable field and no detail endpoint exists. Audit listing is
+  cursor-paginated (`next_cursor` → Load-more) with `occurred_from`/`occurred_to`
+  window presets.
+- **D3 (search):** the backend supports no text search on these lists; filtering is
+  client-side over the loaded page with an explicit scope notice
+  (`system.admin_filter_scope`).
+- Tenant suspend/reactivate require a **reason** (1..200 chars, stored in the audit
+  record): the shared `ConfirmDialog` gained an optional reason input and disables
+  Confirm until it is non-blank; `useAdminAction` passes the reason to `run`.
+- Lists are offset-paged with `total` in the body (`toBodyPage`); the
+  `X-Total-Count` header is no longer read. Only the audit endpoint is cursor-based.
+- The permission catalogue is the backend's fixed 9-code set (see
+  `domain/permissions.ts`); staff PATCH values are validated client-side against
+  derived guards (`isSystemUserRole`/`isSystemUserStatus` in `mappers.ts`) and an
+  out-of-contract value becomes a local validation error, never a request.
+- Staff role editing is single-choice (`SystemUserUpdateRequest.role` is singular);
+  staff disable/enable is `PATCH {status}`; there are no staff block/unblock or
+  session-revoke endpoints.
+
+## Language selector display (2026-11-12)
+
+- Language names are always shown in their own language. The source of truth is the
+  active-languages API's `native_name` (mapped to `Language.nativeName`), with a
+  built-in native fallback table (`NATIVE_NAMES` in `languageLabels.ts`) holding the
+  same exact labels; neither is translated into the active UI language.
+- Flag resolution normalizes any code form through `fromApiLang` (explicit
+  `uz_Cyrl → uzc` underscore alias added to `localeCodes.ts`), so `uz`, `uzc`,
+  `uz-Cyrl` and `uz_Cyrl` all resolve to the Uzbekistan flag artwork.
+- The compact header selector keeps its short native abbreviations (`O'z`, `Ўз`,
+  `Ру`, `En`); full native names appear in the Settings selector, as before.
+
+## Per-realm logout composables (2026-11-12)
+
+- Architecture-audit verdict kept as a convention: each realm's post-auth feature
+  hosts its logout UI orchestrator — `useOrgLogout` in org-dashboard,
+  `useSystemLogout` in system-admin — while the logout *mechanism* (use case,
+  session store, token clearing) stays in the auth feature and shared
+  infrastructure. Do not "centralize" these into system-auth or app.
+
 ## Process and environment (2026-11-10)
 
 - Migration work stays on `main`. The AGENTS.md rule requiring an `api-migration` branch is obsolete for this work (explicit user decision).
