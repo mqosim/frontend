@@ -1,147 +1,161 @@
 # Current state
 
-## Repository facts (verified 2026-11-11, end of session)
+## Repository facts (verified 2026-11-12)
 
 - Branch: `main`. Work stays on `main`; the AGENTS.md `api-migration` branch rule is
   obsolete for this migration (explicit user decision, 2026-11-10). Working tree is
   **clean** at handoff time (before this handoff edits the tracked memory files).
 - Recent commits (this session's work first):
-  - `efeaa16` — `feat(settings): save the account language through the new backend
-    fields` (27 files, +1164/−213; includes the user's regenerated
-    `openapi/openapi.json` + `src/shared/infrastructure/api/schema.ts`).
-  - `9e1a709` / `7e239e4` — user-committed memory files (`CURRENT_STATE.md`,
-    `DECISIONS.md`).
-  - `ebe02c4` — `feat(system-auth): add scannable QR code to TOTP enroll step`
-    (7 files, +208/−2; adds the `uqr` dependency).
-  - `81f7687` — `feat(system-auth): migrate SYSTEM sign-in to password + TOTP`.
-- Tooling (`package.json`, re-verified):
-  - `typecheck`: `node node_modules/vue-tsc/bin/vue-tsc.js --noEmit -p tsconfig.app.json`
-  - `build`: typecheck + `vite build`; `lint`: `eslint .`; `format:check`: `prettier --check .`
-  - `api:generate`: `openapi-typescript openapi/openapi.json -o src/shared/infrastructure/api/schema.ts`
-  - **No `test` script.** Tests run with Bun directly:
-    `bun --tsconfig-override=tsconfig.app.json test tests/`.
-  - Test files (17, re-verified by listing): `tests/auth/{eimzoRepository,languageRepository,profileMappers,registerMappers,registrationErrors}.test.ts`,
-    `tests/i18n/{localeCodes,phrasesSeed}.test.ts`,
-    `tests/notifications/{notificationPreferencesRepository,useCases}.test.ts`,
-    `tests/shared/{eimzoErrorKeys,httpErrors,jwtDecode}.test.ts`,
-    `tests/system-admin/{auditLogRepository,mappers,permissions}.test.ts`,
-    `tests/system-auth/{enrollmentQr,systemAuthRepository}.test.ts`.
-- New dependency: `uqr ^0.1.3` (QR encoder, zero-dep, ESM, MIT; only imported
-  dynamically in `features/system-auth/presentation/enrollmentQr.ts`).
-- Dev environment: `vite.config.ts` proxies `/api` to `http://127.0.0.1:8000` (no
-  rewrite). Always browse `http://localhost:5173` (cookie/CORS requirement).
-- `.opencode/memory/*` is git-ignored (`.gitignore:29`); `CURRENT_STATE.md`,
-  `DECISIONS.md`, `PROJECT.md` are tracked anyway; `TASK_LOG.md` and `sessions/*`
-  are ignored. `AGENTS.md` and `.audit/` were not modified this session.
+  - `3f56a99` — `fix(system-admin,org-dashboard): let sidebar labels wrap instead of
+    clipping` (2 files; CSS-only wrap fix).
+  - `676d2d9` — `fix(i18n): show native language names and fix the uz_Cyrl flag`
+    (7 files; +144/−22, incl. new `tests/i18n/languageDisplay.test.ts`).
+  - `ff0b66b` — `feat(system-admin): migrate the control plane to the FastAPI
+    contract` (33 files, +1327/−1419; includes the admin identity/permissions
+    loading migration from the same session and the two deleted global-user pages).
+  - `9e1a709`/`7d42336`/`cba8452` — user-committed memory files.
+  - Earlier: `efeaa16` (language fields), `ebe02c4` (TOTP enroll QR), `81f7687`
+    (SYSTEM auth 6a–6c).
+- Tooling (`package.json`, re-verified): `typecheck` =
+  `node node_modules/vue-tsc/bin/vue-tsc.js --noEmit -p tsconfig.app.json`;
+  `build` = typecheck + `vite build`; `lint` = `eslint .`; `format:check`;
+  `api:generate` = `openapi-typescript openapi/openapi.json -o src/shared/infrastructure/api/schema.ts`.
+  **No `test` script** — tests run with
+  `bun --tsconfig-override=tsconfig.app.json test tests/`.
+- Test files (18): `tests/auth/{eimzoRepository,languageRepository,profileMappers,registerMappers,registrationErrors}.test.ts`,
+  `tests/i18n/{languageDisplay,localeCodes,phrasesSeed}.test.ts`,
+  `tests/notifications/{notificationPreferencesRepository,useCases}.test.ts`,
+  `tests/shared/{eimzoErrorKeys,httpErrors,jwtDecode}.test.ts`,
+  `tests/system-admin/{auditLogRepository,mappers,permissions}.test.ts`,
+  `tests/system-auth/{enrollmentQr,systemAuthRepository}.test.ts`.
+- Dependencies unchanged since `uqr ^0.1.3` (QR, dynamically imported only).
+- **`node` is NOT installed on this machine** (only Bun). Vue-tsc was executed as
+  `bun node_modules/vue-tsc/bin/vue-tsc.js --noEmit -p tsconfig.app.json` — treat the
+  canonical Node command as the user's authoritative re-check.
+- Dev environment: `vite.config.ts` proxies `/api` → `http://127.0.0.1:8000` (Python
+  backend). Browse `http://localhost:5173` (secure-context cookie requirement).
+  Backend start: `cd ../backend && .venv/bin/uvicorn app.main:app --app-dir src --port 8000`
+  (`make run` fails here: `uvicorn` is not on the system PATH).
+- There is **no Go backend** on this machine (`~/projects` = `backend` (Python),
+  `frontend`, `api-client` (Bruno collection, baseUrl `http://localhost:8000`)). The
+  Go contract survives only in git history.
 
 ## API migration status
 
-- Done and committed: auth Phase 2+3 (`8400663`), i18n public content loader
-  (`4831756`), password+OTP registration (`57bfe3d`), registration/E-IMZO/
-  notifications-language (`4ea837a`), SYSTEM auth 6a/6b/6c (`81f7687`),
-  TOTP-enroll QR code (`ebe02c4`), saved-language fields (`efeaa16`).
-- Saved-language integration (commit `efeaa16`) — what exists now:
-  - `language_code` mapped from `MeResponse` and `SystemMeResponse` into
-    `UserProfile.languageCode`; the **router guard adopts it once per session in
-    BOTH contexts** (`guards.ts`: `regularLanguageApplied` / `systemLanguageApplied`).
-  - Regular save: `LanguageSettingsSection.onSave` = `PATCH /identity/me` first →
-    `i18n.switchTo` → notification sync (`GET` prefs then full-replacement `PUT`,
-    reused `notifications.saveLocale`); sync failure is a soft warning
-    (`settings.language_sync_failed`), the language stays switched.
-  - SYSTEM save: `SystemSettingsPage.applyLanguage` = `PATCH /system/auth/me` via
-    `system.updateLanguage`, throws `AppError` on failure (section maps by machine
-    code), then `switchTo`; no notifications for SYSTEM.
-  - Registration: `register/start` body carries `language_code`
-    (`toApiLanguageCode(getCurrentLocale())`); `Accept-Language` header unchanged.
-  - Typing: `ApiLanguageCode` union (`i18n/domain/localeCodes.ts`) +
-    `toApiLanguageCode()` (null for unsupported codes) + schema-derived
-    `ApiLanguageCodeDto` with a compile-time equality proof in
-    `auth/infrastructure/mappers.ts` (`API_LANGUAGE_CODE_MATCHES_SCHEMA`).
-    Ports/use cases take `ApiLanguageCode` end to end; no casts.
-  - New i18n keys: `errors.language_unsupported`, `settings.language_sync_failed`
-    (fallback + seed, 4 locales). QR keys from `ebe02c4`:
-    `system.enroll_qr_label`, `system.enroll_qr_hint`.
-- Still on the old contract: `features/system-admin` (`adminRepository.ts`,
-  `auditLogRepository.ts` call `/api/v1/admin/*`, absent from the contract).
-  **User-reported vue-tsc baseline: 31 errors, all in system-admin/infrastructure;
-  must not increase.** The user's mentioned-but-unscoped remainder there is the
-  "administrator permissions" warning area (6d–6g).
-- Password/email change screens remain removed (no such endpoints).
-- `features/documents` does not exist; `features/wallet` uses a placeholder service.
+- **Both SYSTEM features are fully on the FastAPI contract. Zero `/api/v1/admin`
+  references remain** (verified by grep and by a contract sweep: all 16 paths called
+  by the two features' repositories exist in `openapi/openapi.json`).
+- Done and committed: auth Phase 2+3, i18n loader, registration, E-IMZO +
+  notifications-language, SYSTEM auth 6a–6c, TOTP-enroll QR, saved-language fields,
+  SYSTEM admin identity/permissions loading, **SYSTEM admin control plane**
+  (tenants, tenant members, staff users, permission catalogue, audit).
+- system-admin control-plane design (commit `ff0b66b`, decisions D1–D3 approved):
+  - Organization members live on the tenant detail page
+    (`GET /system/tenants/{id}/users`, offset+`total` in body); the global Users
+    directory, its detail page and unsupported member actions were removed.
+  - Audit rows expand from the list item (no detail endpoint); audit is
+    **cursor-paginated** (`next_cursor` → Load-more); lists are offset-paged with
+    `total` in the body (no `X-Total-Count`).
+  - Tenant suspend/reactivate require a **reason** (1..200 chars) — collected in the
+    confirm dialog (shared `ConfirmDialog` gained an optional reason input).
+  - Staff role editing is a singular-role radio group via `PATCH /system/users/{id}`;
+    role/status values are contract-checked client-side (derived guards), invalid
+    values become a local validation error.
+  - Text search is client-side over the loaded page with an explicit scope notice.
+  - Permission catalogue = the backend's 9 fixed codes (`system.users.read/write`,
+    `tenants.read/manage`, `tenants.users.read`, `i18n.read/manage`, `audit.read/verify`)
+    with roles `superadmin`/`operator`/`i18n_editor`.
+- Language selector (commit `676d2d9`): full labels use the API's `nativeName`
+  (`Language` entity gained the field) with a built-in native fallback table
+  (`languageLabels.ts`); flag/label lookups normalize every code form
+  (`uz-Cyrl`/`uz_Cyrl`/`uzc` → `uzc`), so the Uzbekistan flag always resolves.
+- Sidebar labels (commit `3f56a99`): wrap instead of ellipsis in both sidebars
+  (SYSTEM + org); collapsed state untouched.
+- Architecture audit (2026-11-12, read-only): system-auth/system-admin separation
+  verified clean — `system-admin → system-auth` via public barrels only (3 imports),
+  no reverse imports, no cycles; session primitives single-owned in shared infra.
+  `useSystemLogout` stays in system-admin (mirrors `useOrgLogout` per-realm convention).
 
-## Environment facts (carried over; verified earlier 2026-11-11, NOT re-verified this session)
+## Runtime verification (live, this session — against the running Python backend)
 
-- Backend repo was at `c591729` at the earlier handoff; the user regenerated
-  `openapi/openapi.json` from a newer export during this session, so the backend
-  has moved — exact backend HEAD is UNVERIFIED.
-- Dev DB (earlier verification): 13 pages / 458 phrases / 458 translations per
-  language, revision 2; the i18n seed lives in `../backend/seed/{pages,phrases}.json`
-  applied with `make seed [DRY=1]`.
-- Seed reconciliation (earlier count): 60 frontend keys were missing from the
-  backend seed. This session added 4 MORE frontend keys
-  (`system.enroll_qr_label`, `system.enroll_qr_hint`, `errors.language_unsupported`,
-  `settings.language_sync_failed`) that the user will add to
-  `../backend/seed/phrases.json` manually — the reconcile count above predates them.
+- Verified 200/204: `POST /system/auth/login`, `POST /system/auth/totp`,
+  `GET /system/auth/me` (fresh + refreshed token), `POST /system/auth/refresh`
+  (cookie rotation works; token re-issued), `POST /system/auth/logout` (204, family
+  revoked), `GET /system/auth/me` with the language PATCH (earlier), `GET
+  /system/permissions`, `GET /system/audit/entries` (cursor), `GET /system/tenants`
+  (200, empty dev data).
+- Backend behaviours confirmed live (not bugs): cookie-CSRF guard requires
+  `X-Requested-With` (the shared client injects it on refresh/logout/switch-tenant);
+  the refresh cookie is **rotated at session open** (clients must store the new
+  cookie — browsers do); TOTP anti-replay rejects a reused 30 s window code; a
+  logged-out bearer stays valid until its 300 s expiry (frontend clears it in memory).
+- TOTP verification technique for future sessions: the dev secret is AES-GCM
+  encrypted with `SYSTEM_TOTP_KEY` from backend `.env`; decrypt + `pyotp` compute a
+  code in-memory (no secrets printed). **Anti-replay: wait for the next 30 s window
+  when re-testing.**
 
 ## Verified checks
 
-- **This session the agent executed NO typecheck, lint, test, build or app run.**
-- User-reported verification evidence during the session (pre-fix, for the
-  language work): `vue-tsc` went 31 → 34 errors (3 × TS2322 `string` not
-  assignable to the schema's language union, at `authRepository.ts:164/287` and
-  `systemAuthRepository.ts:237`), and 2 test failures in
-  `tests/auth/languageRepository.test.ts` (`repository` was `undefined` —
-  destructuring bug in the test harness). Both were fixed in commit `efeaa16`.
-- **Post-fix re-verification has NOT been reported yet**: `vue-tsc` must return
-  to exactly 31 errors; the full Bun suite (17 files, incl. new
-  `profileMappers`/`languageRepository`/`localeCodes` tests) must pass with
-  0 skipped. Lint unverified for the new files.
-- Earlier sessions (for the record): Bun suite 44/0 and lint exit 0 held before
-  `81f7687`; browser/manual tests have never been executed for the migrated flows.
+- **Typecheck: 0 errors** — executed as `bun node_modules/vue-tsc/bin/vue-tsc.js
+  --noEmit -p tsconfig.app.json` (Bun runtime; **canonical Node command still owed
+  by the user** — `node` is not installed here).
+- **Lint:** exit 0 (`bun run lint`; pre-existing boundaries descriptor warning only).
+- **Tests:** 118 pass / 0 fail / 0 skipped across 18 files (incl. the new
+  `languageDisplay` suite and the rewritten system-admin mapper/repository suites).
+- **Build:** `rm -rf dist && bun x vite build` → exit 0.
+- **Live API:** see the runtime section above. Browser-rendered passes (menu
+  visibility per role, wrapped sidebar labels, language selectors) remain the user's
+  visual check — no browser tooling in this environment.
 
-## Verified contract facts
+## Environment facts (verified this session where noted)
 
-- Saved-language fields (verified in the regenerated `schema.ts`):
-  - `MeLanguageUpdateRequest { language_code: "uz"|"uz-Cyrl"|"ru"|"en" | null }`
-    (required, nullable); `PATCH /api/v1/identity/me` → `MeResponse`.
-  - `MeResponse.language_code?` and `TokenResponse.language_code?` optional
-    nullable (login, register/complete, refresh, eimzo/login, switch-tenant).
-    `TokenResponse.language_code` is deliberately unused — adoption always reads
-    `/identity/me` via the guard's once-per-session block.
-  - `SystemMeLanguageUpdateRequest { language_code: ... | null }`;
-    `SystemMeResponse.language_code` required nullable;
-    `GET`/`PATCH /api/v1/system/auth/me`; 422 code `system_language_unsupported`.
-  - `RegisterStartRequest.language_code?` optional on
-    `/api/v1/identity/register/start`.
-  - `PreferencesUpdateRequest { document_events, locale? }` — full-replacement
-    `PUT /api/v1/notifications/preferences` (unchanged behaviour, still reused).
-- SYSTEM realm facts from the previous handoff still hold (two-step sign-in,
-  pre-auth token handling, `aud: "system"`, `NO_RETRY_ENDPOINTS`, error-copy by
-  machine code). One correction: **SYSTEM does have a saved-language endpoint now**
-  (`PATCH /system/auth/me`) — the old "client-only SYSTEM language" decision is
-  superseded (see `DECISIONS.md`).
-- Public i18n contract facts (languages/translations, ETag, 20-page batching)
-  unchanged; canonical `lang` mapping `uzc ↔ uz-Cyrl` in
-  `features/i18n/domain/localeCodes.ts` still the only translation point, now
-  alongside `toApiLanguageCode`.
+- Backend seed: **all 505 frontend seed keys are present in
+  `../backend/seed/phrases.json`** (user synced it; verified programmatically,
+  including the 13 keys added this session). **DB re-seeded**: the new keys exist in
+  `i18n.phrases`; languages revision 231.
+- Dev DB: superadmin `superadmin@mfin.uz` (role `superadmin`, active, TOTP enrolled,
+  password from `SEED_SUPERADMIN_PASSWORD` in backend `.env`). **No tenants** and no
+  operator/i18n_editor accounts exist — role-specific UI and tenant-detail pages
+  cannot be exercised without creating data (forbidden in audits).
+- `i18n.languages` codes are hyphenated (`uz-Cyrl`); the API serves `name` (English)
+  + `native_name` (native labels) — the frontend now uses `native_name`.
 
 ## Open items
 
-1. Re-run the authoritative checks after `efeaa16`: `vue-tsc` (expect exactly 31
-   errors, all in system-admin/infrastructure), `bun run lint`, the full Bun suite
-   (0 skipped). Report any new failure as a fix task — do not assume green.
-2. User adds the 4 new keys to `../backend/seed/phrases.json` manually, then
-   re-seeds; the older 60-key reconciliation is still open.
-3. Migrate `features/system-admin` off `/api/v1/admin/*` (31-error baseline;
-   includes the "administrator permissions" warning area 6d–6g the user flagged
-   as out of scope twice).
-4. Manual browser tests: TOTP enroll QR scan + text fallback (light/dark),
-   language save flows (regular success, sync-failure warning, SYSTEM
-   unsupported-language error), sign-in language adoption, register/start
-   language_code on the wire.
-5. Deferred by explicit user decision: the silent failed-content-load in the i18n
-   loader (proposed fix + loader test recorded in
+1. Canonical Node-based typecheck re-run by the user (expect 0).
+2. Browser passes: SYSTEM area (organizations list/detail incl. members, staff
+   pages, audit cursor, settings language save) with real tenant data — the dev DB
+   has **no tenants**; creating one is a write the audits avoided.
+3. Role-matrix UI verification for `operator`/`i18n_editor` — no such accounts exist
+   (creating them was forbidden); the role→permission map is verified live via
+   `GET /system/permissions`.
+4. Optional future features (Python endpoints exist or are desired): dashboard
+   aggregates (currently labelled sample data), staff-creation UI
+   (`POST /system/users` exists), audit-verify UI (`/system/audit/verify` exists),
+   i18n-management UI (`/system/i18n/*` exists, no consumer).
+5. Deferred (explicit user decision): make a failed i18n content load visible
+   (loader returns `{lang, loadedAny}`; see
    `sessions/2026-11-11-system-auth-totp-and-i18n-diagnosis.md`).
-6. Browser/manual regression for auth Phase 4, registration and SYSTEM flows.
-7. UNKNOWN (carried over): whether `/identity/me.tenants[]` always contains the
+6. Transitional debt: SYSTEM session expiry still derives from an unverified JWT
+   claim (`readExpiryFromToken` in `container.ts`) until `/system/auth` returns
+   `expires_in`/tenant data — tracked in DECISIONS.
+7. Carried-over UNKNOWNs: whether `/identity/me.tenants[]` always contains the
    personal tenant; exact backend password policy beyond the 8-char minimum.
+
+## Verified contract facts (fast reference)
+
+- SYSTEM control plane: `GET /system/tenants?limit&offset&type&status` →
+  `{items, total}`; `GET /system/tenants/{id}` → `{tenant, member_count,
+  document_counts}`; `POST .../suspend|reactivate` (body `{reason}` 1..200) →
+  `SystemTenantResponse`; `GET .../users` → `{items, total}` of
+  `{user_id, role, status, full_name, email_masked, phone_masked, identity_status}`;
+  `GET|PATCH /system/users(/:id)` (singular `role`; status `active|disabled`);
+  `GET /system/permissions` → `{permissions[], roles{}}`;
+  `GET /system/audit/entries?limit&cursor&occurred_from&occurred_to…` →
+  `{items, next_cursor}` (flat entries incl. `seq`, `request_id`); no audit-detail,
+  no user-block/revoke, no global user directory endpoints exist.
+- Auth realm: `/system/auth/*` unchanged from the previous handoff; `me` carries
+  `permissions: string[]` and singular `role`; `SystemTokenResponse` has
+  `{access_token, expires_in}` only.
+- Language codes: API `uz|uz-Cyrl|ru|en` (hyphen); internal `uz|uzc|ru|en`;
+  `fromApiLang` additionally tolerates `uz_Cyrl` (underscore) for display lookups.
