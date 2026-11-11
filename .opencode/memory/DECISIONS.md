@@ -36,8 +36,23 @@
 - A session is accepted only when the token's `aud` is `system` (string or list). The pre-auth token's `aud: "system-preauth"` and regular PERSON/ORG tokens are rejected. Signature is never verified client-side; the server remains the authority.
 - `/system/auth/totp`, `/totp/enroll`, `/totp/activate`, `/login`, `/refresh`, `/logout` are in `NO_RETRY_ENDPOINTS`: the client's silent 401 refresh-and-retry never applies to them.
 - First login order is enforced in the UI: credentials → enroll → activate → recovery codes → totp → dashboard. A `totp_not_enrolled`/`totp_already_enrolled` code re-routes to the matching step instead of surfacing an error.
-- SYSTEM has no saved-language endpoint: the SYSTEM settings language section switches this browser only (`SystemSettingsPage.vue` `apply` prop), and the guard no longer adopts a SYSTEM account language.
+- ~~SYSTEM has no saved-language endpoint: the SYSTEM settings language section switches this browser only, and the guard no longer adopts a SYSTEM account language.~~ **Superseded 2026-11-11**: the contract now has `PATCH /system/auth/me`; see "Saved-language fields (2026-11-11)" below.
 - SYSTEM error copy is chosen by backend machine code first (`system_invalid_credentials`, `system_account_locked`, `totp_invalid`, `recovery_code_invalid`, …) and falls back to the shared credential/kind mapping; backend `message` is never surfaced.
+
+## TOTP-enroll QR code (2026-11-11)
+
+- The enroll step renders the one-time `otpauth_uri` as a scannable QR built 100% client-side with `uqr ^0.1.3` (MIT, zero deps, ESM): ECC `M`, 4-module quiet zone, ~220 px black-on-white in both themes, one inline SVG `<path>` — no `v-html`, no canvas, no `data:` URL, no `<img>`; nothing about the URI/secret is logged or stored.
+- `uqr` is loaded only through a dynamic `import()` inside the enroll step (`features/system-auth/presentation/enrollmentQr.ts`), so it never enters the main/sign-in chunk; generation is guarded so a late async result cannot write state after leaving the step, and QR state is cleared in restart/continue/unmount alongside the enrollment payload.
+- Any failure degrades to the existing secret/URI text fallback; the DEV console warning is generic by design.
+
+## Saved-language fields (2026-11-11)
+
+- Product decision: UI language and notification language are the SAME; saving a language writes both.
+- Regular save order is fixed: `PATCH /identity/me` first (failure → error by machine code, no switch, no notification call), then `i18n.switchTo`, then the notification sync (GET current preferences, full-replacement PUT — reused `notifications.saveLocale`). A failed sync leaves the language switched and shows the soft warning `settings.language_sync_failed` (AppAlert `variant="warning"`); no revert.
+- SYSTEM save is `PATCH /system/auth/me` only (no notifications). `SystemSettingsPage.applyLanguage` throws the repository's `AppError`; the shared `LanguageSettingsSection` maps it by machine code (`errorMessageKey` now resolves `system_language_unsupported` → `errors.language_unsupported`).
+- Sign-in adoption rides the existing once-per-session guard `/me` adoption in BOTH contexts (`regularLanguageApplied` / `systemLanguageApplied` flags); `TokenResponse.language_code` is deliberately unused, so refresh/switch-tenant returning `null` can never reset the current language, and a stored code from a later-deactivated language is tolerated (loader falls back to what the backend serves / embedded English).
+- The settings section's displayed "saved" language comes from `/identity/me.language_code` (fallback to the locale store on failure/null) — the notification-preferences read on mount was removed.
+- Language codes are typed end to end: `ApiLanguageCode` (`'uz' | 'uz-Cyrl' | 'ru' | 'en'`) lives in `features/i18n/domain/localeCodes.ts` with `toApiLanguageCode()` (null for unsupported, canonical spelling, `uzc → uz-Cyrl`); `auth/infrastructure/mappers.ts` derives `ApiLanguageCodeDto` from the generated schema and asserts equality at compile time (`API_LANGUAGE_CODE_MATCHES_SCHEMA`) — drift breaks the build, no casts. Repositories/ports/use cases take `ApiLanguageCode`; unsupported values are omitted from the request body or fail the save locally, never sent as `null`.
 
 ## Process and environment (2026-11-10)
 
