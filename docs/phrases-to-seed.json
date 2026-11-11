@@ -940,6 +940,12 @@
       "ru": "Организация",
       "en": "Organization"
     },
+    "system.audit_col_resource": {
+      "uz": "Resurs",
+      "uzc": "Ресурс",
+      "ru": "Ресурс",
+      "en": "Resource"
+    },
     "system.audit_col_ip": {
       "uz": "IP manzil",
       "uzc": "IP манзил",
@@ -975,6 +981,24 @@
       "uzc": "User agent",
       "ru": "User-Agent",
       "en": "User agent"
+    },
+    "system.audit_details_auth_method": {
+      "uz": "Autentifikatsiya usuli",
+      "uzc": "Аутентификация усули",
+      "ru": "Способ аутентификации",
+      "en": "Auth method"
+    },
+    "system.audit_details_cert_serial": {
+      "uz": "Sertifikat seriyasi",
+      "uzc": "Сертификат серияси",
+      "ru": "Серийный номер сертификата",
+      "en": "Certificate serial"
+    },
+    "system.audit_details_request_id": {
+      "uz": "So'rov identifikatori",
+      "uzc": "Сўров идентификатори",
+      "ru": "Идентификатор запроса",
+      "en": "Request ID"
     },
     "system.audit_details_uuid": {
       "uz": "Hodisa ID",
@@ -1192,6 +1216,12 @@
       "ru": "Не удалось загрузить права администратора. Некоторые разделы могут быть скрыты.",
       "en": "Could not load your administrator permissions. Some sections may be hidden."
     },
+    "system.admin_filter_scope": {
+      "uz": "“{term}” uchun mos yozuvlar faqat yuklangan sahifada ko'rsatiladi — barchasi emas.",
+      "uzc": "“{term}” учун мос ёзувлар фақат юкланган саҳифада кўрсатилади — барчаси эмас.",
+      "ru": "Совпадения для «{term}» показаны только на загруженной странице — не по всем записям.",
+      "en": "Showing matches for “{term}” on the loaded page only — not all records."
+    },
     "system.action_error_forbidden": {
       "uz": "Bu amalni bajarish uchun ruxsatingiz yo'q.",
       "uzc": "Бу амални бажариш учун рухсатингиз йўқ.",
@@ -1270,6 +1300,18 @@
       "ru": "Заблокировать",
       "en": "Block"
     },
+    "system.orgs_reason_label": {
+      "uz": "Sabab (audited yozuvga saqlanadi)",
+      "uzc": "Сабаб (аудит ёзувига сақланади)",
+      "ru": "Причина (сохраняется в записи аудита)",
+      "en": "Reason (stored in the audit record)"
+    },
+    "system.orgs_reason_placeholder": {
+      "uz": "Bu tashkilot nima uchun to'xtatiladi yoki qayta faollashtiriladi?",
+      "uzc": "Бу ташкилот нима учун тўхтатилади ёки қайта фаоллаштирилади?",
+      "ru": "Почему эта организация приостанавливается или возобновляется?",
+      "en": "Why is this organization being suspended or reactivated?"
+    },
     "system.orgs_unblock": {
       "uz": "Blokdan chiqarish",
       "uzc": "Блокдан чиқариш",
@@ -1305,6 +1347,18 @@
       "uzc": "Ташкилот маълумотлари",
       "ru": "Сведения об организации",
       "en": "Organization details"
+    },
+    "system.orgs_members_title": {
+      "uz": "Tashkilot a'zolari",
+      "uzc": "Ташкилот аъзолари",
+      "ru": "Участники организации",
+      "en": "Organization members"
+    },
+    "system.orgs_members_count": {
+      "uz": "A'zolar",
+      "uzc": "Аъзолар",
+      "ru": "Участники",
+      "en": "Members"
     },
     "system.users_title": {
       "uz": "Foydalanuvchilar",
@@ -1347,6 +1401,12 @@
       "uzc": "Email",
       "ru": "Почта",
       "en": "Email"
+    },
+    "system.members_col_identity": {
+      "uz": "Identifikatsiya",
+      "uzc": "Идентификация",
+      "ru": "Идентификация",
+      "en": "Identity"
     },
     "system.users_phone": {
       "uz": "Telefon",
@@ -1521,6 +1581,12 @@
       "uzc": "Тизим фойдаланувчиси маълумотлари",
       "ru": "Сведения о системном пользователе",
       "en": "System user details"
+    },
+    "system.system_users_detail_name": {
+      "uz": "Ko'rinadigan nom",
+      "uzc": "Кўринадиган ном",
+      "ru": "Отображаемое имя",
+      "en": "Display name"
     },
     "system.system_users_read_only": {
       "uz": "Tizim foydalanuvchilarini ko'rishingiz mumkin, ammo rollarni boshqarish uchun qo'shimcha ruxsat kerak.",

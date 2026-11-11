@@ -8,7 +8,7 @@ import AppAlert from '@/shared/presentation/components/AppAlert.vue'
 import AppButton from '@/shared/presentation/components/AppButton.vue'
 import ConfirmDialog from '@/shared/presentation/components/ConfirmDialog.vue'
 
-import type { AdminRole } from '../../domain/adminRole'
+import type { AdminRoleOption } from '../../domain/adminRole'
 import type { AdminSystemUser } from '../../domain/adminUser'
 import { formatSystemDateTime } from '../../domain/format'
 import { ADMIN_PERMISSIONS } from '../../domain/permissions'
@@ -18,7 +18,7 @@ import { useAdminAction } from '../composables/useAdminAction'
 import { useAdminUseCases } from '../composables/useAdminUseCases'
 import { usePermissions } from '../composables/usePermissions'
 
-const props = defineProps<{ uuid: string }>()
+const props = defineProps<{ userId: string }>()
 
 const { t, locale } = useI18n()
 const router = useRouter()
@@ -29,10 +29,10 @@ const detail = shallowRef<AdminSystemUser | null>(null)
 const status = ref<'loading' | 'ready' | 'error'>('loading')
 const error = shallowRef<AppError | null>(null)
 
-const roles = shallowRef<readonly AdminRole[]>([])
+const roles = shallowRef<readonly AdminRoleOption[]>([])
 const rolesStatus = ref<'idle' | 'loading' | 'ready' | 'error'>('idle')
 const rolesError = shallowRef<AppError | null>(null)
-const selectedRoles = ref<string[]>([])
+const selectedRole = ref<string | null>(null)
 const rolesSaving = ref(false)
 const rolesSaved = ref(false)
 const rolesSaveErrorKey = ref<string | null>(null)
@@ -41,30 +41,26 @@ const { pending, busy, errorKey, ask, cancel, confirm, dismiss } = useAdminActio
   loadDetail(),
 )
 
-const canManage = computed(() => can(ADMIN_PERMISSIONS.systemRoleManage))
+const canManage = computed(() => can(ADMIN_PERMISSIONS.systemUsersWrite))
 const loadErrorKey = computed(() =>
   error.value === null ? 'errors.generic' : adminLoadErrorKey(error.value),
 )
 const rolesErrorKey = computed(() =>
   rolesError.value === null ? 'errors.generic' : adminLoadErrorKey(rolesError.value),
 )
-const rolesDirty = computed(() => {
-  const current = detail.value?.roles ?? []
-  if (current.length !== selectedRoles.value.length) return true
-  return selectedRoles.value.some((code) => !current.includes(code))
-})
+const rolesDirty = computed(() => selectedRole.value !== (detail.value?.role ?? null))
 
 const loadDetail = async (): Promise<void> => {
   status.value = 'loading'
   error.value = null
-  const result = await admin.getSystemUser(props.uuid)
+  const result = await admin.getSystemUser(props.userId)
   if (!result.ok) {
     status.value = 'error'
     error.value = result.error
     return
   }
   detail.value = result.value
-  selectedRoles.value = [...result.value.roles]
+  selectedRole.value = result.value.role
   rolesSaved.value = false
   status.value = 'ready'
 }
@@ -84,7 +80,7 @@ const loadRoles = async (): Promise<void> => {
 }
 
 // The role catalogue only exists for operators who may change roles; a reader
-// still sees the assigned roles on the detail itself.
+// still sees the assigned role on the detail itself.
 watch(
   canManage,
   (allowed) => {
@@ -98,31 +94,30 @@ onMounted(() => void loadDetail())
 const formatDate = (value: string | null): string =>
   value === null ? '—' : formatSystemDateTime(value, locale.value)
 
-const displayName = (user: AdminSystemUser): string => user.email ?? user.phoneNumber ?? user.uuid
+const isActive = (user: AdminSystemUser): boolean => user.status === 'active'
 
-const toggleRole = (code: string): void => {
+const selectRole = (role: string): void => {
   if (!canManage.value || rolesSaving.value) return
   rolesSaved.value = false
   rolesSaveErrorKey.value = null
-  selectedRoles.value = selectedRoles.value.includes(code)
-    ? selectedRoles.value.filter((value) => value !== code)
-    : [...selectedRoles.value, code]
+  selectedRole.value = role
 }
 
-const saveRoles = async (): Promise<void> => {
+const saveRole = async (): Promise<void> => {
   const user = detail.value
-  if (user === null || !canManage.value || rolesSaving.value) return
+  const role = selectedRole.value
+  if (user === null || role === null || !canManage.value || rolesSaving.value) return
   rolesSaving.value = true
   rolesSaved.value = false
   rolesSaveErrorKey.value = null
-  const result = await admin.setSystemUserRoles(user.uuid, selectedRoles.value)
+  const result = await admin.updateSystemUser(user.id, { role })
   rolesSaving.value = false
   if (!result.ok) {
     rolesSaveErrorKey.value = adminLoadErrorKey(result.error)
     return
   }
   detail.value = result.value
-  selectedRoles.value = [...result.value.roles]
+  selectedRole.value = result.value.role
   rolesSaved.value = true
 }
 
@@ -130,33 +125,23 @@ const back = (): void => {
   void router.push({ name: 'system-system-users' })
 }
 
-const askBlock = (user: AdminSystemUser): void => {
+const askDisable = (user: AdminSystemUser): void => {
   ask({
-    kind: 'block-system-user',
+    kind: 'update-system-user',
     title: t('system.system_users_block_title'),
-    message: t('system.system_users_block_message', { name: displayName(user) }),
+    message: t('system.system_users_block_message', { name: user.displayName || user.email }),
     confirmLabel: t('system.system_users_block'),
-    run: () => admin.blockSystemUser(user.uuid),
+    run: () => admin.updateSystemUser(user.id, { status: 'disabled' }),
   })
 }
 
-const askUnblock = (user: AdminSystemUser): void => {
+const askEnable = (user: AdminSystemUser): void => {
   ask({
-    kind: 'unblock-system-user',
+    kind: 'update-system-user',
     title: t('system.system_users_unblock_title'),
-    message: t('system.system_users_unblock_message', { name: displayName(user) }),
+    message: t('system.system_users_unblock_message', { name: user.displayName || user.email }),
     confirmLabel: t('system.system_users_unblock'),
-    run: () => admin.unblockSystemUser(user.uuid),
-  })
-}
-
-const askRevoke = (user: AdminSystemUser): void => {
-  ask({
-    kind: 'revoke-system-user-sessions',
-    title: t('system.system_users_revoke_title'),
-    message: t('system.system_users_revoke_message', { name: displayName(user) }),
-    confirmLabel: t('system.system_users_revoke'),
-    run: () => admin.revokeSystemUserSessions(user.uuid),
+    run: () => admin.updateSystemUser(user.id, { status: 'active' }),
   })
 }
 </script>
@@ -164,7 +149,7 @@ const askRevoke = (user: AdminSystemUser): void => {
 <template>
   <AdminPage
     :title="t('system.system_users_detail_title')"
-    :subtitle="detail?.email ?? detail?.uuid"
+    :subtitle="detail?.email ?? detail?.id"
   >
     <div class="admin-actions">
       <AppButton variant="ghost" @click="back()">{{ t('system.admin_back') }}</AppButton>
@@ -186,10 +171,10 @@ const askRevoke = (user: AdminSystemUser): void => {
 
       <div class="admin-actions">
         <AppButton
-          v-if="detail.isActive"
+          v-if="isActive(detail)"
           variant="ghost"
           :disabled="!canManage || busy"
-          @click="askBlock(detail)"
+          @click="askDisable(detail)"
         >
           {{ t('system.system_users_block') }}
         </AppButton>
@@ -197,34 +182,39 @@ const askRevoke = (user: AdminSystemUser): void => {
           v-else
           variant="ghost"
           :disabled="!canManage || busy"
-          @click="askUnblock(detail)"
+          @click="askEnable(detail)"
         >
           {{ t('system.system_users_unblock') }}
-        </AppButton>
-        <AppButton variant="ghost" :disabled="!canManage || busy" @click="askRevoke(detail)">
-          {{ t('system.system_users_revoke') }}
         </AppButton>
       </div>
 
       <dl class="admin-detail">
         <div class="admin-detail__item admin-detail__item--wide">
           <dt>{{ t('system.admin_uuid') }}</dt>
-          <dd class="admin-table__mono">{{ detail.uuid }}</dd>
+          <dd class="admin-table__mono">{{ detail.id }}</dd>
         </div>
         <div class="admin-detail__item">
           <dt>{{ t('system.users_email') }}</dt>
-          <dd>{{ detail.email ?? '—' }}</dd>
+          <dd>{{ detail.email }}</dd>
+        </div>
+        <div class="admin-detail__item">
+          <dt>{{ t('system.system_users_detail_name') }}</dt>
+          <dd>{{ detail.displayName || '—' }}</dd>
         </div>
         <div class="admin-detail__item">
           <dt>{{ t('system.admin_status') }}</dt>
           <dd>
             <span
               class="admin-badge"
-              :class="detail.isActive ? 'admin-badge--active' : 'admin-badge--blocked'"
+              :class="isActive(detail) ? 'admin-badge--active' : 'admin-badge--blocked'"
             >
-              {{ t(detail.isActive ? 'system.admin_active' : 'system.admin_blocked') }}
+              {{ t(isActive(detail) ? 'system.admin_active' : 'system.admin_blocked') }}
             </span>
           </dd>
+        </div>
+        <div class="admin-detail__item">
+          <dt>{{ t('system.system_users_col_roles') }}</dt>
+          <dd class="admin-table__mono">{{ detail.role }}</dd>
         </div>
         <div class="admin-detail__item">
           <dt>{{ t('system.admin_created') }}</dt>
@@ -233,15 +223,6 @@ const askRevoke = (user: AdminSystemUser): void => {
         <div class="admin-detail__item">
           <dt>{{ t('system.admin_updated') }}</dt>
           <dd>{{ formatDate(detail.updatedAt) }}</dd>
-        </div>
-        <div class="admin-detail__item admin-detail__item--wide">
-          <dt>{{ t('system.system_users_col_roles') }}</dt>
-          <dd>
-            <span v-if="detail.roles.length === 0" class="admin-table__muted">
-              {{ t('system.system_users_no_roles') }}
-            </span>
-            <span v-else>{{ detail.roles.join(', ') }}</span>
-          </dd>
         </div>
       </dl>
 
@@ -266,18 +247,20 @@ const askRevoke = (user: AdminSystemUser): void => {
           <AppButton variant="ghost" @click="loadRoles()">{{ t('system.admin_retry') }}</AppButton>
         </div>
         <template v-else>
-          <ul class="admin-checkbox-list">
-            <li v-for="role in roles" :key="role.code" class="admin-checkbox">
+          <!-- Exactly one role per staff account (a backend CHECK enforces it),
+               so the former checkbox list becomes a single-choice radio group. -->
+          <ul class="admin-checkbox-list" role="radiogroup" :aria-label="t('system.system_users_col_roles')">
+            <li v-for="role in roles" :key="role.role" class="admin-checkbox">
               <input
-                :id="`role-${role.code}`"
-                type="checkbox"
-                :checked="selectedRoles.includes(role.code)"
+                :id="`role-${role.role}`"
+                type="radio"
+                name="system-user-role"
+                :checked="selectedRole === role.role"
                 :disabled="rolesSaving"
-                @change="toggleRole(role.code)"
+                @change="selectRole(role.role)"
               />
-              <label :for="`role-${role.code}`">
-                <span class="admin-table__mono">{{ role.code }}</span>
-                <span class="admin-table__sub">{{ role.description }}</span>
+              <label :for="`role-${role.role}`">
+                <span class="admin-table__mono">{{ role.role }}</span>
                 <span class="admin-table__sub">
                   {{
                     t('system.system_users_role_permissions', { count: role.permissions.length })
@@ -291,7 +274,7 @@ const askRevoke = (user: AdminSystemUser): void => {
               variant="primary"
               :loading="rolesSaving"
               :disabled="!rolesDirty"
-              @click="saveRoles()"
+              @click="saveRole()"
             >
               {{ t('system.system_users_save_roles') }}
             </AppButton>

@@ -30,10 +30,10 @@ export const systemAdminRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/system/organizations/:uuid',
+    path: '/system/organizations/:tenantId',
     name: 'system-organization-detail',
     component: () => import('./views/SystemOrganizationDetailPage.vue'),
-    props: (route) => ({ uuid: String(route.params.uuid ?? '') }),
+    props: (route) => ({ tenantId: String(route.params.tenantId ?? '') }),
     meta: {
       layout: 'system',
       requiresAuth: true,
@@ -42,33 +42,7 @@ export const systemAdminRoutes: RouteRecordRaw[] = [
       systemModule: 'organizations',
     },
   },
-  // ── Users ────────────────────────────────────────────────────────────────
-  {
-    path: '/system/users',
-    name: 'system-users',
-    component: () => import('./views/SystemUsersPage.vue'),
-    meta: {
-      layout: 'system',
-      requiresAuth: true,
-      principals: ['SYSTEM'],
-      translationPages: ['system.admin'],
-      systemModule: 'users',
-    },
-  },
-  {
-    path: '/system/users/:uuid',
-    name: 'system-user-detail',
-    component: () => import('./views/SystemUserDetailPage.vue'),
-    props: (route) => ({ uuid: String(route.params.uuid ?? '') }),
-    meta: {
-      layout: 'system',
-      requiresAuth: true,
-      principals: ['SYSTEM'],
-      translationPages: ['system.admin'],
-      systemModule: 'users',
-    },
-  },
-  // ── System users ─────────────────────────────────────────────────────────
+  // ── Staff (system users) ─────────────────────────────────────────────────
   {
     path: '/system/system-users',
     name: 'system-system-users',
@@ -82,10 +56,10 @@ export const systemAdminRoutes: RouteRecordRaw[] = [
     },
   },
   {
-    path: '/system/system-users/:uuid',
+    path: '/system/system-users/:userId',
     name: 'system-system-user-detail',
     component: () => import('./views/SystemSystemUserDetailPage.vue'),
-    props: (route) => ({ uuid: String(route.params.uuid ?? '') }),
+    props: (route) => ({ userId: String(route.params.userId ?? '') }),
     meta: {
       layout: 'system',
       requiresAuth: true,

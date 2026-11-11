@@ -31,61 +31,61 @@ const identity = (
 describe('grantsPermission', () => {
   test('matches an exact code', () => {
     expect(
-      grantsPermission([ADMIN_PERMISSIONS.systemUserRead], ADMIN_PERMISSIONS.systemUserRead),
+      grantsPermission([ADMIN_PERMISSIONS.systemUsersRead], ADMIN_PERMISSIONS.systemUsersRead),
     ).toBe(true)
   })
 
   test('does not treat a prefix or another code as a grant', () => {
     expect(
-      grantsPermission([ADMIN_PERMISSIONS.systemUserRead], ADMIN_PERMISSIONS.systemUserBlock),
+      grantsPermission([ADMIN_PERMISSIONS.systemUsersRead], ADMIN_PERMISSIONS.systemUsersWrite),
     ).toBe(false)
-    expect(grantsPermission(['system.user'], ADMIN_PERMISSIONS.systemUserRead)).toBe(false)
+    expect(grantsPermission(['system.users'], ADMIN_PERMISSIONS.systemUsersRead)).toBe(false)
   })
 
   test('an empty grant set denies everything', () => {
-    expect(grantsPermission([], ADMIN_PERMISSIONS.systemAuditRead)).toBe(false)
+    expect(grantsPermission([], ADMIN_PERMISSIONS.auditRead)).toBe(false)
   })
 })
 
 describe('admin permissions store', () => {
-  test('starts empty and unloaded before /admin/me resolves', () => {
+  test('starts empty and unloaded before /system/auth/me resolves', () => {
     setActivePinia(createPinia())
     const store = useAdminPermissionsStore()
 
     expect(store.status).toBe('unknown')
     expect(store.isLoaded).toBe(false)
     expect(store.roles).toEqual([])
-    expect(store.can(ADMIN_PERMISSIONS.systemUserRead)).toBe(false)
+    expect(store.can(ADMIN_PERMISSIONS.systemUsersRead)).toBe(false)
   })
 
   test('exposes the loaded grants and answers can()', () => {
     setActivePinia(createPinia())
     const store = useAdminPermissionsStore()
-    store.setLoaded(identity([ADMIN_PERMISSIONS.systemUserRead], ['system_support']))
+    store.setLoaded(identity([ADMIN_PERMISSIONS.systemUsersRead], ['operator']))
 
     expect(store.status).toBe('ready')
     expect(store.isLoaded).toBe(true)
-    expect(store.roles).toEqual(['system_support'])
-    expect(store.can(ADMIN_PERMISSIONS.systemUserRead)).toBe(true)
-    expect(store.can(ADMIN_PERMISSIONS.systemRoleManage)).toBe(false)
+    expect(store.roles).toEqual(['operator'])
+    expect(store.can(ADMIN_PERMISSIONS.systemUsersRead)).toBe(true)
+    expect(store.can(ADMIN_PERMISSIONS.systemUsersWrite)).toBe(false)
   })
 
   test('a failed load keeps the caller signed in with no grants', () => {
     setActivePinia(createPinia())
     const store = useAdminPermissionsStore()
-    store.setLoaded(identity([ADMIN_PERMISSIONS.systemOrgRead]))
+    store.setLoaded(identity([ADMIN_PERMISSIONS.tenantsRead]))
     store.setError()
 
     expect(store.status).toBe('error')
     expect(store.isLoaded).toBe(false)
     expect(store.identity).toBeNull()
-    expect(store.can(ADMIN_PERMISSIONS.systemOrgRead)).toBe(false)
+    expect(store.can(ADMIN_PERMISSIONS.tenantsRead)).toBe(false)
   })
 
   test('clear() drops a previous session’s grants', () => {
     setActivePinia(createPinia())
     const store = useAdminPermissionsStore()
-    store.setLoaded(identity([ADMIN_PERMISSIONS.systemAuditRead]))
+    store.setLoaded(identity([ADMIN_PERMISSIONS.auditRead]))
     store.clear()
 
     expect(store.status).toBe('unknown')
@@ -98,17 +98,15 @@ describe('usePermissions', () => {
   test('can() and canAny() read the reactive grant set', () => {
     setActivePinia(createPinia())
     const store = useAdminPermissionsStore()
-    store.setLoaded(identity([ADMIN_PERMISSIONS.systemUserRead]))
+    store.setLoaded(identity([ADMIN_PERMISSIONS.systemUsersRead]))
     const { can, canAny, roles, isLoaded } = usePermissions()
 
-    expect(can(ADMIN_PERMISSIONS.systemUserRead)).toBe(true)
-    expect(can(ADMIN_PERMISSIONS.systemRoleManage)).toBe(false)
-    expect(canAny([ADMIN_PERMISSIONS.systemRoleManage, ADMIN_PERMISSIONS.systemUserRead])).toBe(
+    expect(can(ADMIN_PERMISSIONS.systemUsersRead)).toBe(true)
+    expect(can(ADMIN_PERMISSIONS.systemUsersWrite)).toBe(false)
+    expect(canAny([ADMIN_PERMISSIONS.systemUsersWrite, ADMIN_PERMISSIONS.systemUsersRead])).toBe(
       true,
     )
-    expect(canAny([ADMIN_PERMISSIONS.systemRoleManage, ADMIN_PERMISSIONS.systemRoleRead])).toBe(
-      false,
-    )
+    expect(canAny([ADMIN_PERMISSIONS.systemUsersWrite, ADMIN_PERMISSIONS.tenantsRead])).toBe(false)
     expect(roles.value).toEqual([])
     expect(isLoaded.value).toBe(true)
   })
@@ -118,8 +116,8 @@ describe('usePermissions', () => {
     const store = useAdminPermissionsStore()
     const { can } = usePermissions()
 
-    expect(can(ADMIN_PERMISSIONS.systemOrgBlock)).toBe(false)
-    store.setLoaded(identity([ADMIN_PERMISSIONS.systemOrgBlock]))
-    expect(can(ADMIN_PERMISSIONS.systemOrgBlock)).toBe(true)
+    expect(can(ADMIN_PERMISSIONS.tenantsManage)).toBe(false)
+    store.setLoaded(identity([ADMIN_PERMISSIONS.tenantsManage]))
+    expect(can(ADMIN_PERMISSIONS.tenantsManage)).toBe(true)
   })
 })

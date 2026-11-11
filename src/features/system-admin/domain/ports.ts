@@ -1,41 +1,38 @@
 import type { Result } from '@/shared/domain'
 
 import type { AdminIdentity } from './adminAccount'
-import type { AdminOrg } from './adminOrg'
+import type { AdminOrg, AdminOrgDetail } from './adminOrg'
 import type { AdminListQuery, AdminPage } from './adminQuery'
-import type { AdminRole } from './adminRole'
-import type { AdminSystemUser, AdminUser } from './adminUser'
+import type { AdminRoleOption } from './adminRole'
+import type { AdminMember, AdminSystemUser, AdminSystemUserPatch } from './adminUser'
 
 /**
- * Outbound port for the `/api/v1/admin` control-plane surface. Implemented over
- * the SYSTEM API client in infrastructure, so presentation never sees paths or
- * transport details.
+ * Outbound port for the SYSTEM control-plane surface, fully on the FastAPI
+ * contract (`/api/v1/system/*`). Implemented over the SYSTEM API client in
+ * infrastructure, so presentation never sees paths or transport details.
+ *
+ * List endpoints are offset-paged with `total` in the response body. Platform
+ * users are tenant-scoped members (the contract has no global user directory),
+ * and staff accounts are updated through a single PATCH — the contract has no
+ * block/unblock or session-revoke endpoints.
  */
 export interface AdminRepository {
-  /** The caller's own roles and permissions (`GET /admin/me`). */
+  /** The caller's own role and permissions (`GET /system/auth/me`). */
   getMe(): Promise<Result<AdminIdentity>>
 
-  // Organizations
+  // Tenants (organizations). suspend/reactivate require a reason that the
+  // backend stores in the audit record (1..200 chars).
   listOrgs(query: AdminListQuery): Promise<Result<AdminPage<AdminOrg>>>
-  getOrg(uuid: string): Promise<Result<AdminOrg>>
-  blockOrg(uuid: string): Promise<Result<AdminOrg>>
-  unblockOrg(uuid: string): Promise<Result<AdminOrg>>
+  getOrg(id: string): Promise<Result<AdminOrgDetail>>
+  suspendOrg(id: string, reason: string): Promise<Result<AdminOrg>>
+  reactivateOrg(id: string, reason: string): Promise<Result<AdminOrg>>
+  listOrgMembers(id: string, query: AdminListQuery): Promise<Result<AdminPage<AdminMember>>>
 
-  // PERSON/ORG users
-  listUsers(query: AdminListQuery): Promise<Result<AdminPage<AdminUser>>>
-  getUser(uuid: string): Promise<Result<AdminUser>>
-  blockUser(uuid: string): Promise<Result<AdminUser>>
-  unblockUser(uuid: string): Promise<Result<AdminUser>>
-  revokeUserSessions(uuid: string): Promise<Result<void>>
-
-  // SYSTEM users
+  // Staff (system users)
   listSystemUsers(query: AdminListQuery): Promise<Result<AdminPage<AdminSystemUser>>>
-  getSystemUser(uuid: string): Promise<Result<AdminSystemUser>>
-  setSystemUserRoles(uuid: string, roles: readonly string[]): Promise<Result<AdminSystemUser>>
-  blockSystemUser(uuid: string): Promise<Result<AdminUser>>
-  unblockSystemUser(uuid: string): Promise<Result<AdminUser>>
-  revokeSystemUserSessions(uuid: string): Promise<Result<void>>
+  getSystemUser(id: string): Promise<Result<AdminSystemUser>>
+  updateSystemUser(id: string, patch: AdminSystemUserPatch): Promise<Result<AdminSystemUser>>
 
-  // Role catalogue (for the roles editor)
-  listRoles(): Promise<Result<readonly AdminRole[]>>
+  // Fixed permission catalogue (role → permission grants)
+  listRoles(): Promise<Result<readonly AdminRoleOption[]>>
 }

@@ -1,78 +1,119 @@
 /**
- * Unit tests for the audit-log entry mapper and row key.
+ * Unit tests for the SYSTEM audit-log repository: the cursor-paginated list
+ * call, its window/filter parameters and the entry mapping.
  *
  * Run with:
  *
- *   bun --tsconfig-override tsconfig.app.json test tests/
+ *   bun --tsconfig-override=tsconfig.app.json test tests/
  *
  * The `--tsconfig-override` flag is required because the `@/` path alias is
  * declared in `tsconfig.app.json`, which bun does not read by default. The
- * file lives outside `src/` so `vue-tsc -p tsconfig.app.json` never type-checks
- * the `bun:test` imports.
+ * files live outside `src/` so `vue-tsc -p tsconfig.app.json` never
+ * type-checks the `bun:test` imports.
  */
 import { describe, expect, test } from 'bun:test'
 
-import { auditRowKey } from '../../src/features/system-admin/domain/auditLog'
-import { toEntry } from '../../src/features/system-admin/infrastructure/auditLogRepository'
+import { createAuditLogRepository } from '../../src/features/system-admin/infrastructure/auditLogRepository'
+import type { ApiClient } from '../../src/shared/infrastructure/api/client'
 
-describe('toEntry', () => {
-  test('maps UUIDs and numeric ids when both are present', () => {
-    const entry = toEntry({
-      uuid: '5e8f2a1c-9b3d-4e7f-8a2b-1c3d5e7f9a01',
-      occurred_at: '2026-10-24T10:00:00Z',
-      actor_user_id: 7,
-      actor_user_uuid: 'a1b2c3d4-e5f6-4789-a0bc-def012345678',
-      actor_type: 'user',
-      org_id: 42,
-      org_uuid: 'c3d4e5f6-a7b8-4901-bcd2-ef3456789abc',
-      action: 'auth.sign_in',
-      details: { method: 'password' },
-      ip: '203.0.113.7',
-      user_agent: 'Mozilla/5.0',
+interface RecordedCall {
+  readonly path: string
+  readonly init?: { params?: { query?: Record<string, unknown> } }
+}
+
+/** Minimal openapi-fetch call shape `toResult` consumes. */
+type FakeCallResult = {
+  readonly data?: unknown
+  readonly error?: unknown
+  readonly response: Response
+}
+
+const makeRepository = (client: Record<string, unknown>) =>
+  createAuditLogRepository({ client: client as unknown as ApiClient })
+
+const ENTRY_DTO = {
+  id: '5e8f2a1c-9b3d-4e7f-8a2b-1c3d5e7f9a01',
+  seq: 42,
+  occurred_at: '2026-10-24T10:00:00Z',
+  action: 'system.tenant.suspended',
+  outcome: 'success',
+  actor_user_id: '018f0000-0000-7000-8000-000000000003',
+  actor_type: 'user',
+  details: { method: 'password' },
+}
+
+describe('auditLogRepository.list', () => {
+  test('GETs the SYSTEM audit endpoint and maps the cursor page', async () => {
+    const calls: RecordedCall[] = []
+    const client = {
+      async GET(path: string, init?: RecordedCall['init']): Promise<FakeCallResult> {
+        calls.push({ path, init })
+        return {
+          data: { items: [ENTRY_DTO], next_cursor: 43 },
+          response: new Response(null, { status: 200 }),
+        }
+      },
+    }
+    const repository = makeRepository(client)
+
+    const result = await repository.list({
+      limit: 25,
+      cursor: 42,
+      occurredFrom: '2026-10-24T09:00:00Z',
+      occurredTo: '2026-10-24T10:00:00Z',
     })
 
-    expect(entry.uuid).toBe('5e8f2a1c-9b3d-4e7f-8a2b-1c3d5e7f9a01')
-    expect(entry.actorUserUuid).toBe('a1b2c3d4-e5f6-4789-a0bc-def012345678')
-    expect(entry.actorUserId).toBe(7)
-    expect(entry.orgUuid).toBe('c3d4e5f6-a7b8-4901-bcd2-ef3456789abc')
-    expect(entry.orgId).toBe(42)
-    expect(entry.details).toEqual({ method: 'password' })
-  })
-
-  test('falls back to the numeric ids when the UUIDs are null (legacy rows)', () => {
-    const entry = toEntry({
-      actor_user_id: 7,
-      actor_user_uuid: null,
-      org_id: 42,
-      org_uuid: null,
+    expect(calls).toHaveLength(1)
+    expect(calls[0]?.path).toBe('/api/v1/system/audit/entries')
+    expect(calls[0]?.init?.params?.query).toEqual({
+      limit: 25,
+      cursor: 42,
+      occurred_from: '2026-10-24T09:00:00Z',
+      occurred_to: '2026-10-24T10:00:00Z',
     })
-
-    expect(entry.actorUserUuid).toBeNull()
-    expect(entry.actorUserId).toBe(7)
-    expect(entry.orgUuid).toBeNull()
-    expect(entry.orgId).toBe(42)
+    if (!result.ok) throw new Error(`expected ok, got ${JSON.stringify(result.error)}`)
+    expect(result.value.nextCursor).toBe(43)
+    expect(result.value.items).toHaveLength(1)
+    expect(result.value.items[0]?.id).toBe(ENTRY_DTO.id)
+    expect(result.value.items[0]?.seq).toBe(42)
   })
 
-  test('maps missing identifiers to null so the UI shows the placeholder', () => {
-    const entry = toEntry({})
+  test('omits the cursor and window parameters when the query has none', async () => {
+    const calls: RecordedCall[] = []
+    const client = {
+      async GET(path: string, init?: RecordedCall['init']): Promise<FakeCallResult> {
+        calls.push({ path, init })
+        return {
+          data: { items: [], next_cursor: null },
+          response: new Response(null, { status: 200 }),
+        }
+      },
+    }
+    const repository = makeRepository(client)
 
-    expect(entry.uuid).toBeNull()
-    expect(entry.actorUserUuid).toBeNull()
-    expect(entry.actorUserId).toBeNull()
-    expect(entry.orgUuid).toBeNull()
-    expect(entry.orgId).toBeNull()
-    expect(entry.details).toBeUndefined()
+    const result = await repository.list({ limit: 25 })
+
+    expect(calls[0]?.init?.params?.query).toEqual({ limit: 25 })
+    if (!result.ok) throw new Error(`expected ok, got ${JSON.stringify(result.error)}`)
+    expect(result.value.nextCursor).toBeNull()
+    expect(result.value.items).toEqual([])
   })
-})
 
-describe('auditRowKey', () => {
-  test('prefers the entry UUID', () => {
-    expect(auditRowKey({ uuid: '5e8f2a1c-9b3d-4e7f-8a2b-1c3d5e7f9a01' }, 3)).toBe(
-      '5e8f2a1c-9b3d-4e7f-8a2b-1c3d5e7f9a01',
-    )
-  })
+  test('surfaces the error envelope untouched (machine code preserved)', async () => {
+    const client = {
+      async GET(): Promise<FakeCallResult> {
+        return {
+          error: { error: { code: 'system_permission_denied', message: 'developer-facing text' } },
+          response: new Response(null, { status: 403 }),
+        }
+      },
+    }
+    const repository = makeRepository(client)
 
-  test('falls back to the row index — there is no numeric `id` branch', () => {
-    expect(auditRowKey({ uuid: null }, 4)).toBe('row-4')
+    const result = await repository.list({ limit: 25 })
+
+    if (result.ok) throw new Error('expected the 403 to surface as an error')
+    expect(result.error.kind).toBe('Forbidden')
+    expect(result.error).toMatchObject({ code: 'system_permission_denied' })
   })
 })

@@ -2,42 +2,51 @@ import type { Result } from '@/shared/domain'
 import type { AppError } from '@/shared/domain/errors'
 
 /**
- * One audit record as the master audit endpoints serve it (`AuditLog` in the
- * API schema). Fields the backend serializes as optional stay nullable here —
+ * One audit record as the SYSTEM audit endpoint serves it
+ * (`SystemAuditEntryResponse`). The list item carries every displayable field —
+ * the contract has no separate detail endpoint, so expanding a row reads the
+ * item itself. Fields the backend serializes as optional stay nullable here —
  * the UI renders them as empty instead of inventing values.
  */
 export interface AuditLogEntry {
-  readonly uuid: string | null
+  readonly id: string
+  /** Monotonic position in the audit chain (`seq`). */
+  readonly seq: number
   /** RFC3339 timestamp. */
-  readonly occurredAt: string | null
-  readonly actorUserId: number | null
-  /** UUID of the acting user; null on legacy rows until the backend backfills. */
-  readonly actorUserUuid: string | null
-  readonly actorType: string | null
-  readonly orgId: number | null
-  /** UUID of the organization; null on legacy rows and rows without an org. */
-  readonly orgUuid: string | null
-  readonly action: string | null
+  readonly occurredAt: string
+  readonly action: string
+  readonly outcome: string
+  readonly actorUserId: string | null
+  readonly actorType: string
+  readonly authMethod: string | null
+  readonly certSerial: string | null
+  readonly resourceType: string | null
+  readonly resourceId: string | null
   /** Free-form JSON payload; rendered as text, never as HTML. */
   readonly details: unknown
   readonly ip: string | null
-  readonly userAgent: string | null
+  readonly requestId: string | null
 }
 
-/**
- * Stable row identity: rows carry a UUID, but a row without one (legacy data)
- * falls back to its index — there is no numeric `id` to key on anymore.
- */
-export const auditRowKey = (entry: Pick<AuditLogEntry, 'uuid'>, index: number): string =>
-  entry.uuid ?? `row-${index}`
+/** Stable row identity: every entry carries an `id`. */
+export const auditRowKey = (entry: Pick<AuditLogEntry, 'id'>): string => entry.id
 
 /**
- * RFC3339 window for the list endpoint. The backend requires `start` before
- * `end` and caps the range at 31 days; there are no other filters.
+ * Query for the audit list. The endpoint is cursor-paginated (`next_cursor` in
+ * the response feeds the next request) and filters by an RFC3339 `occurred`
+ * window plus action/actor/resource; the UI uses the window presets.
  */
-export interface AuditLogRange {
-  readonly start: string
-  readonly end: string
+export interface AuditLogQuery {
+  readonly limit: number
+  readonly cursor?: number
+  readonly occurredFrom?: string
+  readonly occurredTo?: string
+}
+
+/** One cursor-paged slice; `nextCursor` is `null` on the last slice. */
+export interface AuditLogPage {
+  readonly items: readonly AuditLogEntry[]
+  readonly nextCursor: number | null
 }
 
 /**
@@ -46,7 +55,6 @@ export interface AuditLogRange {
  * the infrastructure adapter.
  */
 export interface AuditLogRepository {
-  /** All entries in the window, newest first (the backend's fixed order). */
-  list(range: AuditLogRange): Promise<Result<readonly AuditLogEntry[], AppError>>
-  getByUuid(uuid: string): Promise<Result<AuditLogEntry, AppError>>
+  /** One page of entries, newest first (the backend's fixed order). */
+  list(query: AuditLogQuery): Promise<Result<AuditLogPage, AppError>>
 }

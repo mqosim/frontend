@@ -1,10 +1,10 @@
 import type { Result } from '@/shared/domain'
 
 import type { AdminIdentity } from '../domain/adminAccount'
-import type { AdminOrg } from '../domain/adminOrg'
+import type { AdminOrg, AdminOrgDetail } from '../domain/adminOrg'
 import type { AdminListQuery, AdminPage } from '../domain/adminQuery'
-import type { AdminRole } from '../domain/adminRole'
-import type { AdminSystemUser, AdminUser } from '../domain/adminUser'
+import type { AdminRoleOption } from '../domain/adminRole'
+import type { AdminMember, AdminSystemUser, AdminSystemUserPatch } from '../domain/adminUser'
 import type { AdminRepository } from '../domain/ports'
 
 export interface AdminUseCaseDeps {
@@ -12,46 +12,31 @@ export interface AdminUseCaseDeps {
 }
 
 export interface AdminUseCases {
-  /** The SYSTEM caller's own roles and permissions. */
+  /** The SYSTEM caller's own role and permissions. */
   getMe(): Promise<Result<AdminIdentity>>
 
   listOrgs(query: AdminListQuery): Promise<Result<AdminPage<AdminOrg>>>
-  getOrg(uuid: string): Promise<Result<AdminOrg>>
-  blockOrg(uuid: string): Promise<Result<AdminOrg>>
-  unblockOrg(uuid: string): Promise<Result<AdminOrg>>
-
-  listUsers(query: AdminListQuery): Promise<Result<AdminPage<AdminUser>>>
-  getUser(uuid: string): Promise<Result<AdminUser>>
-  blockUser(uuid: string): Promise<Result<AdminUser>>
-  unblockUser(uuid: string): Promise<Result<AdminUser>>
-  revokeUserSessions(uuid: string): Promise<Result<void>>
+  getOrg(id: string): Promise<Result<AdminOrgDetail>>
+  suspendOrg(id: string, reason: string): Promise<Result<AdminOrg>>
+  reactivateOrg(id: string, reason: string): Promise<Result<AdminOrg>>
+  listOrgMembers(id: string, query: AdminListQuery): Promise<Result<AdminPage<AdminMember>>>
 
   listSystemUsers(query: AdminListQuery): Promise<Result<AdminPage<AdminSystemUser>>>
-  getSystemUser(uuid: string): Promise<Result<AdminSystemUser>>
-  setSystemUserRoles(uuid: string, roles: readonly string[]): Promise<Result<AdminSystemUser>>
-  blockSystemUser(uuid: string): Promise<Result<AdminUser>>
-  unblockSystemUser(uuid: string): Promise<Result<AdminUser>>
-  revokeSystemUserSessions(uuid: string): Promise<Result<void>>
+  getSystemUser(id: string): Promise<Result<AdminSystemUser>>
+  updateSystemUser(id: string, patch: AdminSystemUserPatch): Promise<Result<AdminSystemUser>>
 
-  listRoles(): Promise<Result<readonly AdminRole[]>>
+  listRoles(): Promise<Result<readonly AdminRoleOption[]>>
 }
 
 export const createAdminUseCases = ({ repository }: AdminUseCaseDeps): AdminUseCases => ({
   getMe: () => repository.getMe(),
   listOrgs: (query) => repository.listOrgs(query),
-  getOrg: (uuid) => repository.getOrg(uuid),
-  blockOrg: (uuid) => repository.blockOrg(uuid),
-  unblockOrg: (uuid) => repository.unblockOrg(uuid),
-  listUsers: (query) => repository.listUsers(query),
-  getUser: (uuid) => repository.getUser(uuid),
-  blockUser: (uuid) => repository.blockUser(uuid),
-  unblockUser: (uuid) => repository.unblockUser(uuid),
-  revokeUserSessions: (uuid) => repository.revokeUserSessions(uuid),
+  getOrg: (id) => repository.getOrg(id),
+  suspendOrg: (id, reason) => repository.suspendOrg(id, reason),
+  reactivateOrg: (id, reason) => repository.reactivateOrg(id, reason),
+  listOrgMembers: (id, query) => repository.listOrgMembers(id, query),
   listSystemUsers: (query) => repository.listSystemUsers(query),
-  getSystemUser: (uuid) => repository.getSystemUser(uuid),
-  setSystemUserRoles: (uuid, roles) => repository.setSystemUserRoles(uuid, roles),
-  blockSystemUser: (uuid) => repository.blockSystemUser(uuid),
-  unblockSystemUser: (uuid) => repository.unblockSystemUser(uuid),
-  revokeSystemUserSessions: (uuid) => repository.revokeSystemUserSessions(uuid),
+  getSystemUser: (id) => repository.getSystemUser(id),
+  updateSystemUser: (id, patch) => repository.updateSystemUser(id, patch),
   listRoles: () => repository.listRoles(),
 })

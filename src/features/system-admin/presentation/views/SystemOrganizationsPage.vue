@@ -31,23 +31,36 @@ const {
   rangeStart,
   rangeEnd,
   search,
-  appliedSearch,
   status,
   error,
   load,
   refresh,
-  submitSearch,
   clearSearch,
   goToPage,
 } = useAdminList<AdminOrg>((query) => admin.listOrgs(query))
 
-const { pending, busy, errorKey, ask, cancel, confirm, dismiss } = useAdminAction(() => load())
+const { pending, busy, errorKey, reason, ask, cancel, confirm, dismiss } = useAdminAction(() =>
+  load(),
+)
 
-const canBlock = computed(() => can(ADMIN_PERMISSIONS.systemOrgBlock))
-const canUnblock = computed(() => can(ADMIN_PERMISSIONS.systemOrgUnblock))
+const canManage = computed(() => can(ADMIN_PERMISSIONS.tenantsManage))
 const loadErrorKey = computed(() =>
   error.value === null ? 'errors.generic' : adminLoadErrorKey(error.value),
 )
+
+// The backend has no text search: the filter applies to the loaded page only.
+const term = computed(() => search.value.trim().toLowerCase())
+const visibleItems = computed(() =>
+  term.value === ''
+    ? items.value
+    : items.value.filter(
+        (org) =>
+          org.name.toLowerCase().includes(term.value) ||
+          org.stir.toLowerCase().includes(term.value) ||
+          org.id.toLowerCase().includes(term.value),
+      ),
+)
+const isActive = (org: AdminOrg): boolean => org.status === 'active'
 
 onMounted(() => void load())
 
@@ -55,33 +68,33 @@ const formatDate = (value: string | null): string =>
   value === null ? '—' : formatSystemDateTime(value, locale.value)
 
 const view = (org: AdminOrg): void => {
-  void router.push({ name: 'system-organization-detail', params: { uuid: org.uuid } })
+  void router.push({ name: 'system-organization-detail', params: { tenantId: org.id } })
 }
 
-const askBlock = (org: AdminOrg): void => {
+const askSuspend = (org: AdminOrg): void => {
   ask({
-    kind: 'block-org',
+    kind: 'suspend-org',
     title: t('system.orgs_block_title'),
-    message: t('system.orgs_block_message', { name: org.name || org.uuid }),
+    message: t('system.orgs_block_message', { name: org.name || org.id }),
     confirmLabel: t('system.orgs_block'),
-    run: () => admin.blockOrg(org.uuid),
+    run: (reason) => admin.suspendOrg(org.id, reason),
   })
 }
 
-const askUnblock = (org: AdminOrg): void => {
+const askReactivate = (org: AdminOrg): void => {
   ask({
-    kind: 'unblock-org',
+    kind: 'reactivate-org',
     title: t('system.orgs_unblock_title'),
-    message: t('system.orgs_unblock_message', { name: org.name || org.uuid }),
+    message: t('system.orgs_unblock_message', { name: org.name || org.id }),
     confirmLabel: t('system.orgs_unblock'),
-    run: () => admin.unblockOrg(org.uuid),
+    run: (reason) => admin.reactivateOrg(org.id, reason),
   })
 }
 </script>
 
 <template>
   <AdminPage :title="t('system.orgs_title')" :subtitle="t('system.orgs_subtitle')">
-    <form class="admin-toolbar" role="search" @submit.prevent="submitSearch()">
+    <form class="admin-toolbar" role="search" @submit.prevent>
       <input
         v-model="search"
         class="admin-toolbar__input"
@@ -89,11 +102,14 @@ const askUnblock = (org: AdminOrg): void => {
         :placeholder="t('system.admin_search_orgs')"
         :aria-label="t('system.admin_search')"
       />
-      <AppButton type="submit" variant="ghost">{{ t('system.admin_search') }}</AppButton>
-      <AppButton v-if="appliedSearch !== ''" variant="ghost" @click="clearSearch()">
+      <AppButton v-if="search !== ''" variant="ghost" @click="clearSearch()">
         {{ t('system.admin_clear') }}
       </AppButton>
     </form>
+
+    <p v-if="search !== ''" class="admin-filter-notice" role="status">
+      {{ t('system.admin_filter_scope', { term: search }) }}
+    </p>
 
     <AppAlert v-if="errorKey !== null" variant="error">{{ t(errorKey) }}</AppAlert>
 
@@ -119,18 +135,18 @@ const askUnblock = (org: AdminOrg): void => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="org in items" :key="org.uuid">
+              <tr v-for="org in visibleItems" :key="org.id">
                 <td>
                   <span class="admin-table__desc">{{ org.name || '—' }}</span>
-                  <span class="admin-table__sub admin-table__mono">{{ org.uuid }}</span>
+                  <span class="admin-table__sub admin-table__mono">{{ org.id }}</span>
                 </td>
-                <td class="admin-table__mono">{{ org.tin || '—' }}</td>
+                <td class="admin-table__mono">{{ org.stir || '—' }}</td>
                 <td>
                   <span
                     class="admin-badge"
-                    :class="org.isActive ? 'admin-badge--active' : 'admin-badge--blocked'"
+                    :class="isActive(org) ? 'admin-badge--active' : 'admin-badge--blocked'"
                   >
-                    {{ t(org.isActive ? 'system.admin_active' : 'system.admin_blocked') }}
+                    {{ t(isActive(org) ? 'system.admin_active' : 'system.admin_blocked') }}
                   </span>
                 </td>
                 <td class="admin-table__muted">{{ formatDate(org.createdAt) }}</td>
@@ -140,18 +156,18 @@ const askUnblock = (org: AdminOrg): void => {
                       {{ t('system.admin_view') }}
                     </AppButton>
                     <AppButton
-                      v-if="canBlock && org.isActive"
+                      v-if="canManage && isActive(org)"
                       variant="ghost"
                       :disabled="busy"
-                      @click="askBlock(org)"
+                      @click="askSuspend(org)"
                     >
                       {{ t('system.orgs_block') }}
                     </AppButton>
                     <AppButton
-                      v-if="canUnblock && !org.isActive"
+                      v-if="canManage && !isActive(org)"
                       variant="ghost"
                       :disabled="busy"
-                      @click="askUnblock(org)"
+                      @click="askReactivate(org)"
                     >
                       {{ t('system.orgs_unblock') }}
                     </AppButton>
@@ -175,12 +191,15 @@ const askUnblock = (org: AdminOrg): void => {
     </template>
 
     <ConfirmDialog
+      v-model:reason="reason"
       :open="pending !== null"
       :title="pending?.title ?? ''"
       :message="pending?.message ?? ''"
       :confirm-label="pending?.confirmLabel ?? t('action.save')"
       :cancel-label="t('action.cancel')"
       :loading="busy"
+      :reason-label="t('system.orgs_reason_label')"
+      :reason-placeholder="t('system.orgs_reason_placeholder')"
       @confirm="confirm()"
       @cancel="cancel()"
       @dismiss="dismiss()"
@@ -189,3 +208,12 @@ const askUnblock = (org: AdminOrg): void => {
 </template>
 
 <style scoped src="../styles/admin.css"></style>
+
+<style scoped>
+/* Client-side filtering only covers the loaded page; the notice says so. */
+.admin-filter-notice {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+</style>

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onMounted, ref } from 'vue'
+import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { auditRowKey, type AuditLogEntry } from '../../domain/auditLog'
@@ -9,96 +9,73 @@ import {
   useAuditLogs,
   type AuditRangePresetId,
 } from '../composables/useAuditLogs'
-import { useAuditLogRepository } from '../composables/useAuditLogRepository'
 
 /**
- * The SYSTEM Audit Logs page, reading the real master audit endpoints through
- * the feature's repository. The period presets map to the backend's required
- * RFC3339 `start`/`end` pair — its only supported filter — and records arrive
- * newest-first in the backend's fixed order. An expanded row fetches the
- * single-event endpoint. The backend has no pagination, so the pager below
- * slices the actual response locally.
+ * The SYSTEM Audit Logs page, reading the FastAPI audit endpoint through the
+ * feature's repository. The period presets map to the `occurred_from`/
+ * `occurred_to` window, slices arrive newest-first, and `next_cursor` drives
+ * the Load-more control. There is no detail endpoint: expanding a row shows the
+ * fields the list item already carries.
  */
 const { t, locale } = useI18n()
 
-const { status, errorKind, preset, load, page, total, pageCount, pageEntries } = useAuditLogs()
-const repository = useAuditLogRepository()
+const {
+  status,
+  errorKind,
+  preset,
+  load,
+  loadMore,
+  loadingMore,
+  hasMore,
+  total,
+  entries,
+} = useAuditLogs()
 
 onMounted(() => {
   void load()
 })
 
-// ── Row expansion and the single-event detail fetch ──────────────────────────
-const expandedUuid = ref<string | null>(null)
-const detailStatus = ref<'loading' | 'ready' | 'error'>('loading')
-const detail = ref<AuditLogEntry | null>(null)
-
-const collapseDetails = (): void => {
-  expandedUuid.value = null
-  detail.value = null
-}
+// ── Row expansion: the list item is the single source of audit data ─────────
+const expandedId = ref<string | null>(null)
 
 // Toolbar actions collapse any open detail row before reloading the window.
 const selectPreset = (id: AuditRangePresetId): void => {
-  collapseDetails()
+  expandedId.value = null
   void load(id)
 }
 
 const refresh = (): void => {
-  collapseDetails()
+  expandedId.value = null
   void load()
 }
 
-const fetchDetail = async (uuid: string): Promise<void> => {
-  detailStatus.value = 'loading'
-  detail.value = null
-  const result = await repository.getByUuid(uuid)
-  // The row may have been collapsed (or another opened) while in flight.
-  if (expandedUuid.value !== uuid) return
-  if (!result.ok) {
-    detailStatus.value = 'error'
-    return
-  }
-  detail.value = result.value
-  detailStatus.value = 'ready'
+const loadNext = (): void => {
+  void loadMore()
 }
 
 const toggleDetails = (entry: AuditLogEntry): void => {
-  const uuid = entry.uuid
-  if (uuid === null) return
-  if (expandedUuid.value === uuid) {
-    collapseDetails()
-    return
-  }
-  expandedUuid.value = uuid
-  void fetchDetail(uuid)
-}
-
-const retryDetail = (): void => {
-  if (expandedUuid.value !== null) void fetchDetail(expandedUuid.value)
+  expandedId.value = expandedId.value === entry.id ? null : entry.id
 }
 
 // ── Safe presentation of nullable fields ─────────────────────────────────────
 const display = (value: string | number | null): string => (value === null ? '—' : String(value))
 
-// Prefer the stable UUIDs; the numeric ids remain as a fallback for legacy rows.
-const actorValue = (entry: AuditLogEntry): string | null => {
-  const value = entry.actorUserUuid ?? entry.actorUserId
-  return value === null ? null : String(value)
-}
-
-const orgValue = (entry: AuditLogEntry): string | null => {
-  const value = entry.orgUuid ?? entry.orgId
-  return value === null ? null : String(value)
-}
-
 const occurredAt = (entry: AuditLogEntry): string =>
   entry.occurredAt === null ? '—' : formatSystemDateTime(entry.occurredAt, locale.value)
+
+const resourceValue = (entry: AuditLogEntry): string | null => {
+  if (entry.resourceType === null && entry.resourceId === null) return null
+  return [entry.resourceType, entry.resourceId].filter((part) => part !== null).join(':')
+}
 
 const payloadText = (entry: AuditLogEntry): string | null =>
   entry.details === undefined || entry.details === null
     ? null
     : JSON.stringify(entry.details, null, 2)
+
+const expandedDetail = computed(
+  () => entries.value.find((entry) => entry.id === expandedId.value) ?? null,
+)
 </script>
 
 <template>
@@ -169,36 +146,35 @@ const payloadText = (entry: AuditLogEntry): string | null =>
                   <th scope="col">{{ t('system.audit_col_time') }}</th>
                   <th scope="col">{{ t('system.audit_col_action') }}</th>
                   <th scope="col">{{ t('system.audit_col_actor') }}</th>
-                  <th scope="col">{{ t('system.audit_col_org') }}</th>
+                  <th scope="col">{{ t('system.audit_col_resource') }}</th>
                   <th scope="col">{{ t('system.audit_col_ip') }}</th>
                   <th scope="col" class="audit-table__actions"></th>
                 </tr>
               </thead>
               <tbody>
-                <template v-for="(entry, index) in pageEntries" :key="auditRowKey(entry, index)">
+                <template v-for="entry in entries" :key="auditRowKey(entry)">
                   <tr>
                     <td class="audit-table__muted">{{ occurredAt(entry) }}</td>
                     <td>
                       <span class="audit-action-chip">{{ display(entry.action) }}</span>
                     </td>
-                    <td :title="actorValue(entry) ?? undefined">
+                    <td :title="entry.actorUserId ?? undefined">
                       <span class="audit-table__desc audit-table__mono">
-                        {{ display(actorValue(entry)) }}
+                        {{ display(entry.actorUserId) }}
                       </span>
                       <span v-if="entry.actorType !== null" class="audit-table__sub">
                         {{ entry.actorType }}
                       </span>
                     </td>
-                    <td class="audit-table__muted" :title="orgValue(entry) ?? undefined">
-                      <span class="audit-table__mono">{{ display(orgValue(entry)) }}</span>
+                    <td class="audit-table__muted" :title="resourceValue(entry) ?? undefined">
+                      <span class="audit-table__mono">{{ display(resourceValue(entry)) }}</span>
                     </td>
                     <td class="audit-table__muted">{{ display(entry.ip) }}</td>
                     <td class="audit-table__actions">
                       <button
-                        v-if="entry.uuid !== null"
                         type="button"
                         class="audit-toggle"
-                        :aria-expanded="expandedUuid === entry.uuid"
+                        :aria-expanded="expandedId === entry.id"
                         :aria-label="t('system.audit_row_details')"
                         @click="toggleDetails(entry)"
                       >
@@ -208,9 +184,9 @@ const payloadText = (entry: AuditLogEntry): string | null =>
                       </button>
                     </td>
                   </tr>
-                  <tr v-if="entry.uuid !== null && expandedUuid === entry.uuid">
+                  <tr v-if="expandedId === entry.id">
                     <td colspan="6">
-                      <div :id="`audit-detail-${auditRowKey(entry, index)}`" class="audit-detail">
+                      <div :id="`audit-detail-${auditRowKey(entry)}`" class="audit-detail">
                         <div class="audit-detail__head">
                           <h3 class="audit-detail__title">
                             {{ t('system.audit_details_title') }}
@@ -219,65 +195,69 @@ const payloadText = (entry: AuditLogEntry): string | null =>
                             type="button"
                             class="audit-period__btn"
                             :aria-label="t('system.audit_details_close')"
-                            @click="collapseDetails"
+                            @click="expandedId = null"
                           >
                             {{ t('system.audit_details_close') }}
                           </button>
                         </div>
 
-                        <p v-if="detailStatus === 'loading'" class="audit__status">
-                          {{ t('common.loading') }}
-                        </p>
-                        <div
-                          v-else-if="detailStatus === 'error'"
-                          class="audit-detail__error"
-                          role="alert"
-                        >
-                          <p class="audit__error-text">{{ t('system.audit_error_detail') }}</p>
-                          <button type="button" class="audit-period__btn" @click="retryDetail">
-                            {{ t('system.audit_retry') }}
-                          </button>
-                        </div>
-                        <dl v-else-if="detail !== null" class="audit-detail__grid">
+                        <dl v-if="expandedDetail !== null" class="audit-detail__grid">
                           <div class="audit-detail__item">
                             <dt>{{ t('system.audit_col_time') }}</dt>
-                            <dd>{{ occurredAt(detail) }}</dd>
+                            <dd>{{ occurredAt(expandedDetail) }}</dd>
                           </div>
                           <div class="audit-detail__item">
                             <dt>{{ t('system.audit_col_action') }}</dt>
-                            <dd>{{ display(detail.action) }}</dd>
+                            <dd>{{ display(expandedDetail.action) }}</dd>
                           </div>
                           <div class="audit-detail__item">
                             <dt>{{ t('system.audit_details_user') }}</dt>
-                            <dd class="audit-detail__wrap">{{ display(actorValue(detail)) }}</dd>
+                            <dd class="audit-detail__wrap">
+                              {{ display(expandedDetail.actorUserId) }}
+                            </dd>
                           </div>
                           <div class="audit-detail__item">
                             <dt>{{ t('system.principal') }}</dt>
-                            <dd>{{ display(detail.actorType) }}</dd>
+                            <dd>{{ display(expandedDetail.actorType) }}</dd>
                           </div>
                           <div class="audit-detail__item">
-                            <dt>{{ t('system.audit_details_org_id') }}</dt>
-                            <dd class="audit-detail__wrap">{{ display(orgValue(detail)) }}</dd>
+                            <dt>{{ t('system.audit_details_auth_method') }}</dt>
+                            <dd>{{ display(expandedDetail.authMethod) }}</dd>
+                          </div>
+                          <div class="audit-detail__item">
+                            <dt>{{ t('system.audit_details_cert_serial') }}</dt>
+                            <dd class="audit-detail__wrap">
+                              {{ display(expandedDetail.certSerial) }}
+                            </dd>
+                          </div>
+                          <div class="audit-detail__item">
+                            <dt>{{ t('system.audit_col_resource') }}</dt>
+                            <dd class="audit-detail__wrap">
+                              {{ display(resourceValue(expandedDetail)) }}
+                            </dd>
                           </div>
                           <div class="audit-detail__item">
                             <dt>{{ t('system.audit_col_ip') }}</dt>
-                            <dd class="audit-detail__wrap">{{ display(detail.ip) }}</dd>
+                            <dd class="audit-detail__wrap">{{ display(expandedDetail.ip) }}</dd>
                           </div>
                           <div class="audit-detail__item audit-detail__item--wide">
-                            <dt>{{ t('system.audit_details_agent') }}</dt>
-                            <dd class="audit-detail__wrap">{{ display(detail.userAgent) }}</dd>
+                            <dt>{{ t('system.audit_details_request_id') }}</dt>
+                            <dd class="audit-detail__wrap">
+                              {{ display(expandedDetail.requestId) }}
+                            </dd>
                           </div>
                           <div class="audit-detail__item audit-detail__item--wide">
                             <dt>{{ t('system.audit_details_uuid') }}</dt>
-                            <dd class="audit-detail__wrap">{{ display(detail.uuid) }}</dd>
+                            <dd class="audit-detail__wrap">{{ display(expandedDetail.id) }}</dd>
                           </div>
                           <div class="audit-detail__item audit-detail__item--wide">
                             <dt>{{ t('system.audit_details_payload') }}</dt>
                             <dd>
                               <pre
-                                v-if="payloadText(detail) !== null"
+                                v-if="payloadText(expandedDetail) !== null"
                                 class="audit-detail__payload"
-                                >{{ payloadText(detail) }}</pre>
+                                >{{ payloadText(expandedDetail) }}</pre
+                              >
                               <span v-else class="audit-detail__none">
                                 {{ t('system.audit_details_no_data') }}
                               </span>
@@ -293,23 +273,12 @@ const payloadText = (entry: AuditLogEntry): string | null =>
           </div>
         </article>
 
-        <nav class="audit-pagination" :aria-label="t('system.audit_title')">
+        <nav v-if="hasMore || loadingMore" class="audit-pagination" :aria-label="t('system.audit_title')">
           <button
             type="button"
             class="audit-period__btn"
-            :disabled="page <= 1"
-            @click="page = page - 1"
-          >
-            {{ t('system.audit_prev_page') }}
-          </button>
-          <p class="audit-pagination__status">
-            {{ t('system.audit_page_status', { page, pages: pageCount }) }}
-          </p>
-          <button
-            type="button"
-            class="audit-period__btn"
-            :disabled="page >= pageCount"
-            @click="page = page + 1"
+            :disabled="loadingMore"
+            @click="loadNext"
           >
             {{ t('system.audit_next_page') }}
           </button>
@@ -572,13 +541,6 @@ const payloadText = (entry: AuditLogEntry): string | null =>
   font-weight: 600;
 }
 
-.audit-detail__error {
-  display: flex;
-  flex-wrap: wrap;
-  gap: var(--space-3) var(--space-4);
-  align-items: center;
-}
-
 .audit-detail__grid {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -628,19 +590,12 @@ const payloadText = (entry: AuditLogEntry): string | null =>
   color: var(--color-text-muted);
 }
 
-/* ── Pagination ─────────────────────────────────────────────────────────── */
+/* ── Pagination (cursor: load more) ─────────────────────────────────────── */
 .audit-pagination {
   display: flex;
   gap: var(--space-3);
   align-items: center;
   justify-content: flex-end;
-}
-
-.audit-pagination__status {
-  margin: 0;
-  color: var(--color-text-muted);
-  font-size: var(--font-size-sm);
-  font-variant-numeric: tabular-nums;
 }
 
 /* ── Responsive ─────────────────────────────────────────────────────────── */

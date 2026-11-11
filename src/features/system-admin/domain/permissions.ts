@@ -1,42 +1,33 @@
 /**
- * The control-plane permission catalogue, mirrored from the backend
- * (`internal/master/domain/authorization.go`). These codes are opaque strings on
+ * The control-plane permission catalogue, mirrored from the FastAPI backend
+ * (`modules/system/domain/permissions.py`, ADR 0016 §7). The catalog is code,
+ * not database rows: adding a permission is a reviewed backend change first, so
+ * this list must never drift ahead of or behind it. Codes are opaque strings on
  * the wire; naming them here keeps the UI free of scattered literals and lets
  * the compiler catch a typo in a menu/button gate.
  *
- * A permission is a capability, not a role: the UI checks the resolved
- * permission set on the admin identity rather than granting features by role.
+ * A permission is a capability, not a role: the backend resolves the caller's
+ * grant set from their single role (`permissions_for`; unknown roles grant
+ * nothing), and the UI only checks that set to decide what to show — the
+ * server still enforces every call.
  */
 export const ADMIN_PERMISSIONS = {
-  // Control-plane reference data (languages, pages, phrases, countries).
-  systemReferenceRead: 'system.reference.read',
-  systemReferenceWrite: 'system.reference.write',
+  // Staff (system user) administration; role assignment is a write.
+  systemUsersRead: 'system.users.read',
+  systemUsersWrite: 'system.users.write',
 
-  // User administration.
-  systemUserRead: 'system.user.read',
-  systemUserBlock: 'system.user.block',
-  systemUserUnblock: 'system.user.unblock',
+  // Tenant (organization) administration and their platform users.
+  tenantsRead: 'tenants.read',
+  tenantsManage: 'tenants.manage',
+  tenantsUsersRead: 'tenants.users.read',
 
-  // Session administration.
-  systemSessionRevoke: 'system.session.revoke',
+  // Reference data (languages, pages, phrases).
+  i18nRead: 'i18n.read',
+  i18nManage: 'i18n.manage',
 
-  // Organization administration.
-  systemOrgRead: 'system.org.read',
-  systemOrgBlock: 'system.org.block',
-  systemOrgUnblock: 'system.org.unblock',
-
-  // Role administration.
-  systemRoleRead: 'system.role.read',
-  systemRoleManage: 'system.role.manage',
-
-  // Audit log.
-  systemAuditRead: 'system.audit.read',
-
-  // Reserved for the 2FA phase.
-  systemSecurityTwoFactorReset: 'system.security.two_factor.reset',
-
-  // Reserved for a future document-metadata surface; no endpoint uses it yet.
-  documentMetadataRead: 'document.metadata.read',
+  // Audit chain.
+  auditRead: 'audit.read',
+  auditVerify: 'audit.verify',
 } as const
 
 export type AdminPermissionCode = (typeof ADMIN_PERMISSIONS)[keyof typeof ADMIN_PERMISSIONS]

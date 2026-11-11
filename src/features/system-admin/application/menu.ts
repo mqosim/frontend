@@ -12,27 +12,24 @@ export const SYSTEM_MODULES: readonly SystemModuleDefinition[] = [
   {
     id: 'organizations',
     labelKey: 'system.nav_organizations',
-    permission: ADMIN_PERMISSIONS.systemOrgRead,
+    // Tenant (organization) rows: GET /system/tenants requires `tenants.read`.
+    // Their members live on the detail page (the contract has no global
+    // user directory).
+    permission: ADMIN_PERMISSIONS.tenantsRead,
     to: { name: 'system-organizations' },
-  },
-  {
-    id: 'users',
-    labelKey: 'system.nav_users',
-    permission: ADMIN_PERMISSIONS.systemUserRead,
-    to: { name: 'system-users' },
   },
   {
     id: 'system-users',
     labelKey: 'system.nav_system_users',
-    // Control-plane operators are a role-management surface: anyone who can read
-    // or manage roles may see it. Support staff lack both.
-    permissions: [ADMIN_PERMISSIONS.systemRoleRead, ADMIN_PERMISSIONS.systemRoleManage],
+    // Staff (system user) management: GET /system/users requires
+    // `system.users.read`; writes require `system.users.write`. Superadmin-only.
+    permission: ADMIN_PERMISSIONS.systemUsersRead,
     to: { name: 'system-system-users' },
   },
   { id: 'subscriptions', labelKey: 'system.nav_subscriptions' },
   { id: 'products', labelKey: 'system.nav_products' },
   { id: 'reports', labelKey: 'system.nav_reports' },
-  { id: 'audit', labelKey: 'system.nav_audit', permission: ADMIN_PERMISSIONS.systemAuditRead },
+  { id: 'audit', labelKey: 'system.nav_audit', permission: ADMIN_PERMISSIONS.auditRead },
 ]
 
 /** The sidebar, in display order: the Dashboard first, then the modules. */

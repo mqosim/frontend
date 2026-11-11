@@ -13,8 +13,8 @@ interface AdminPermissionsState {
 
 /**
  * The resolved admin identity/grants for the current SYSTEM session. Populated
- * once per session from `GET /api/v1/admin/me`; cleared when the session ends so
- * a later sign-in never inherits the previous account's permissions.
+ * once per session from `GET /api/v1/system/auth/me`; cleared when the session
+ * ends so a later sign-in never inherits the previous account's permissions.
  */
 export const useAdminPermissionsStore = defineStore('admin-permissions', {
   state: (): AdminPermissionsState => ({

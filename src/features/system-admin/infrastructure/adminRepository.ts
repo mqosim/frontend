@@ -1,18 +1,19 @@
 import { err, ok } from '@/shared/domain'
 import type { Result } from '@/shared/domain'
 import { toResult } from '@/shared/infrastructure/api/client'
-import type { ApiCall, ApiClient } from '@/shared/infrastructure/api/client'
-import { networkError, toAppError } from '@/shared/infrastructure/http/errors'
+import type { ApiClient } from '@/shared/infrastructure/api/client'
 
 import type { AdminListQuery, AdminPage } from '../domain/adminQuery'
+import type { AdminSystemUserPatch } from '../domain/adminUser'
 import type { AdminRepository } from '../domain/ports'
 import {
   toAdminIdentity,
+  toAdminMember,
   toAdminOrg,
-  toAdminRole,
+  toAdminOrgDetail,
+  toAdminRoleOptions,
   toAdminSystemUser,
-  toAdminUser,
-  type SetRolesRequestDto,
+  toSystemUserUpdateRequest,
 } from './mappers'
 
 export interface AdminRepositoryDeps {
@@ -24,157 +25,133 @@ export interface AdminRepositoryDeps {
 }
 
 /**
- * Normalises a list call into an `AdminPage`, reading `X-Total-Count` from the
- * response headers. `toResult` intentionally drops headers, so list endpoints
- * are handled here instead.
+ * Normalises a `{items, total}` list body into an `AdminPage`. The new
+ * contract puts the total in the body — the retired `X-Total-Count` header is
+ * no longer read.
  */
-const toPage = <Dto, Entity>(
-  call: ApiCall<Dto[] | undefined>,
+const toBodyPage = <Dto, Entity>(
+  result: Result<{ items: Dto[]; total: number } | undefined>,
   map: (dto: Dto) => Entity,
 ): Result<AdminPage<Entity>> => {
-  if (call.response === undefined) return err(networkError())
-  if (!call.response.ok) return err(toAppError(call.response, call.error))
-  const items = (call.data ?? []).map(map)
-  const header = call.response.headers.get('X-Total-Count')
-  const parsed = header === null ? Number.NaN : Number(header)
-  return ok({ items, total: Number.isFinite(parsed) ? parsed : items.length })
+  if (!result.ok) return result
+  const body = result.value
+  if (body === undefined) return err({ kind: 'Unknown', status: null })
+  return ok({ items: body.items.map(map), total: body.total })
 }
 
-const uuidPath = (uuid: string) => ({ params: { path: { uuid } } })
+const tenantPath = (id: string) => ({ params: { path: { tenant_id: id } } })
+const userPath = (id: string) => ({ params: { path: { user_id: id } } })
 
 export const createAdminRepository = ({ client }: AdminRepositoryDeps): AdminRepository => ({
   async getMe() {
-    const result = toResult(await client.GET('/api/v1/admin/me'))
+    // The SYSTEM identity surface is `/system/auth/me`: the staff profile with
+    // the permission set the backend resolves from the caller's single role.
+    const result = toResult(await client.GET('/api/v1/system/auth/me'))
     if (!result.ok) return result
     const identity = toAdminIdentity(result.value)
     if (identity === null) return err({ kind: 'Unknown', status: null })
     return ok(identity)
   },
 
-  // ── Organizations ─────────────────────────────────────────────────────────
+  // ── Tenants (organizations) ───────────────────────────────────────────────
   async listOrgs(query: AdminListQuery) {
-    return toPage(
-      await client.GET('/api/v1/admin/orgs', {
-        params: {
-          query: { search: query.search, limit: query.limit, offset: query.offset },
-        },
-      }),
+    return toBodyPage(
+      toResult(
+        await client.GET('/api/v1/system/tenants', {
+          params: { query: { limit: query.limit, offset: query.offset } },
+        }),
+      ),
       toAdminOrg,
     )
   },
 
-  async getOrg(uuid) {
-    const result = toResult(await client.GET('/api/v1/admin/orgs/{uuid}', uuidPath(uuid)))
+  async getOrg(id: string) {
+    const result = toResult(await client.GET('/api/v1/system/tenants/{tenant_id}', tenantPath(id)))
     if (!result.ok) return result
-    return ok(toAdminOrg(result.value))
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
+    return ok(toAdminOrgDetail(result.value))
   },
 
-  async blockOrg(uuid) {
-    const result = toResult(await client.POST('/api/v1/admin/orgs/{uuid}/block', uuidPath(uuid)))
-    if (!result.ok) return result
-    return ok(toAdminOrg(result.value))
-  },
-
-  async unblockOrg(uuid) {
-    const result = toResult(await client.POST('/api/v1/admin/orgs/{uuid}/unblock', uuidPath(uuid)))
-    if (!result.ok) return result
-    return ok(toAdminOrg(result.value))
-  },
-
-  // ── PERSON/ORG users ─────────────────────────────────────────────────────
-  async listUsers(query: AdminListQuery) {
-    return toPage(
-      await client.GET('/api/v1/admin/users', {
-        params: {
-          query: { search: query.search, limit: query.limit, offset: query.offset },
-        },
-      }),
-      toAdminUser,
-    )
-  },
-
-  async getUser(uuid) {
-    const result = toResult(await client.GET('/api/v1/admin/users/{uuid}', uuidPath(uuid)))
-    if (!result.ok) return result
-    return ok(toAdminUser(result.value))
-  },
-
-  async blockUser(uuid) {
-    const result = toResult(await client.POST('/api/v1/admin/users/{uuid}/block', uuidPath(uuid)))
-    if (!result.ok) return result
-    return ok(toAdminUser(result.value))
-  },
-
-  async unblockUser(uuid) {
-    const result = toResult(await client.POST('/api/v1/admin/users/{uuid}/unblock', uuidPath(uuid)))
-    if (!result.ok) return result
-    return ok(toAdminUser(result.value))
-  },
-
-  async revokeUserSessions(uuid) {
+  async suspendOrg(id: string, reason: string) {
+    // The lifecycle change is audited with the caller's reason (required,
+    // 1..200 chars — the confirm dialog enforces the non-empty part).
     const result = toResult(
-      await client.POST('/api/v1/admin/users/{uuid}/sessions/revoke', uuidPath(uuid)),
+      await client.POST('/api/v1/system/tenants/{tenant_id}/suspend', {
+        ...tenantPath(id),
+        body: { reason: reason.trim() },
+      }),
     )
-    return result.ok ? ok(undefined) : result
+    if (!result.ok) return result
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
+    return ok(toAdminOrg(result.value))
   },
 
-  // ── SYSTEM users ─────────────────────────────────────────────────────────
-  async listSystemUsers(query: AdminListQuery) {
-    return toPage(
-      await client.GET('/api/v1/admin/system-users', {
-        params: {
-          query: { search: query.search, limit: query.limit, offset: query.offset },
-        },
+  async reactivateOrg(id: string, reason: string) {
+    const result = toResult(
+      await client.POST('/api/v1/system/tenants/{tenant_id}/reactivate', {
+        ...tenantPath(id),
+        body: { reason: reason.trim() },
       }),
+    )
+    if (!result.ok) return result
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
+    return ok(toAdminOrg(result.value))
+  },
+
+  async listOrgMembers(id: string, query: AdminListQuery) {
+    return toBodyPage(
+      toResult(
+        await client.GET('/api/v1/system/tenants/{tenant_id}/users', {
+          params: {
+            path: { tenant_id: id },
+            query: { limit: query.limit, offset: query.offset },
+          },
+        }),
+      ),
+      toAdminMember,
+    )
+  },
+
+  // ── Staff (system users) ──────────────────────────────────────────────────
+  async listSystemUsers(query: AdminListQuery) {
+    return toBodyPage(
+      toResult(
+        await client.GET('/api/v1/system/users', {
+          params: { query: { limit: query.limit, offset: query.offset } },
+        }),
+      ),
       toAdminSystemUser,
     )
   },
 
-  async getSystemUser(uuid) {
-    const result = toResult(await client.GET('/api/v1/admin/system-users/{uuid}', uuidPath(uuid)))
+  async getSystemUser(id: string) {
+    const result = toResult(await client.GET('/api/v1/system/users/{user_id}', userPath(id)))
     if (!result.ok) return result
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
     return ok(toAdminSystemUser(result.value))
   },
 
-  async setSystemUserRoles(uuid, roles) {
-    const body: SetRolesRequestDto = { roles: [...roles] }
+  async updateSystemUser(id: string, patch: AdminSystemUserPatch) {
+    // Values outside the contract's fixed sets become a local validation error
+    // instead of a request the backend would answer 422.
+    const body = toSystemUserUpdateRequest(patch)
+    if (body === null) return err({ kind: 'Validation', status: 400, fields: {} })
     const result = toResult(
-      await client.PUT('/api/v1/admin/system-users/{uuid}/roles', {
-        ...uuidPath(uuid),
+      await client.PATCH('/api/v1/system/users/{user_id}', {
+        ...userPath(id),
         body,
       }),
     )
     if (!result.ok) return result
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
     return ok(toAdminSystemUser(result.value))
   },
 
-  async blockSystemUser(uuid) {
-    const result = toResult(
-      await client.POST('/api/v1/admin/system-users/{uuid}/block', uuidPath(uuid)),
-    )
-    if (!result.ok) return result
-    return ok(toAdminUser(result.value))
-  },
-
-  async unblockSystemUser(uuid) {
-    const result = toResult(
-      await client.POST('/api/v1/admin/system-users/{uuid}/unblock', uuidPath(uuid)),
-    )
-    if (!result.ok) return result
-    return ok(toAdminUser(result.value))
-  },
-
-  async revokeSystemUserSessions(uuid) {
-    const result = toResult(
-      await client.POST('/api/v1/admin/system-users/{uuid}/sessions/revoke', uuidPath(uuid)),
-    )
-    return result.ok ? ok(undefined) : result
-  },
-
-  // ── Role catalogue ───────────────────────────────────────────────────────
+  // ── Fixed permission catalogue ────────────────────────────────────────────
   async listRoles() {
-    const result = toResult(await client.GET('/api/v1/admin/roles'))
+    const result = toResult(await client.GET('/api/v1/system/permissions'))
     if (!result.ok) return result
-    return ok((result.value ?? []).map(toAdminRole))
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
+    return ok(toAdminRoleOptions(result.value))
   },
 })

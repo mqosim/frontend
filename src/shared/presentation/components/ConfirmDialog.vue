@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { onBeforeUnmount, ref, useId, watch } from 'vue'
+import { computed, onBeforeUnmount, ref, useId, watch } from 'vue'
 
 import AppButton from './AppButton.vue'
 
@@ -18,17 +18,38 @@ const props = withDefaults(
      * without reading the (frequently updating) visible message every time.
      */
     announcement?: string
+    /**
+     * When set, the dialog shows a single-line reason input (the backend stores
+     * it in the audit record) and keeps Confirm disabled until it is non-blank.
+     */
+    reasonLabel?: string
+    reasonPlaceholder?: string
+    reasonMaxLength?: number
   }>(),
-  { loading: false, initialFocus: 'cancel', announcement: '' },
+  {
+    loading: false,
+    initialFocus: 'cancel',
+    announcement: '',
+    reasonLabel: undefined,
+    reasonPlaceholder: undefined,
+    reasonMaxLength: 200,
+  },
 )
 
 const emit = defineEmits<{ confirm: []; cancel: []; dismiss: [] }>()
+
+/** The reason text; only meaningful when `reasonLabel` is set. */
+const reason = defineModel<string>('reason', { default: '' })
+
+const reasonRequired = computed(() => props.reasonLabel !== undefined)
+const confirmDisabled = computed(() => props.loading || (reasonRequired.value && reason.value.trim() === ''))
 
 // Unique ids: the dialog is mounted more than once at the app root (the idle
 // warning and the logout confirmation), so fixed ids would collide and
 // `aria-labelledby` would resolve to the wrong instance's title.
 const titleId = useId()
 const messageId = useId()
+const reasonId = useId()
 
 const dialogRef = ref<HTMLDialogElement | null>(null)
 // The element focused before opening, so focus can return there on close.
@@ -82,6 +103,18 @@ onBeforeUnmount(() => {
     <div class="confirm-dialog__panel">
       <h2 :id="titleId" class="confirm-dialog__title">{{ title }}</h2>
       <p :id="messageId" class="confirm-dialog__message">{{ message }}</p>
+      <div v-if="reasonLabel !== undefined" class="confirm-dialog__reason">
+        <label :for="reasonId" class="confirm-dialog__reason-label">{{ reasonLabel }}</label>
+        <input
+          :id="reasonId"
+          v-model="reason"
+          class="confirm-dialog__reason-input"
+          type="text"
+          :placeholder="reasonPlaceholder"
+          :maxlength="reasonMaxLength"
+          :disabled="loading"
+        />
+      </div>
       <p
         v-if="announcement !== ''"
         class="confirm-dialog__sr"
@@ -102,6 +135,7 @@ onBeforeUnmount(() => {
         <AppButton
           variant="primary"
           :loading="loading"
+          :disabled="confirmDisabled"
           :autofocus="initialFocus === 'confirm'"
           @click="emit('confirm')"
         >
@@ -146,6 +180,26 @@ onBeforeUnmount(() => {
 .confirm-dialog__message {
   margin: 0;
   color: var(--color-text-muted);
+}
+
+.confirm-dialog__reason {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-1);
+}
+
+.confirm-dialog__reason-label {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.confirm-dialog__reason-input {
+  padding: var(--space-2) var(--space-3);
+  border: 1px solid var(--color-border);
+  border-radius: var(--radius-sm);
+  background-color: var(--color-bg);
+  color: var(--color-text);
+  font: inherit;
 }
 
 /* Announcement target: present for assistive tech, not shown to sighted users. */

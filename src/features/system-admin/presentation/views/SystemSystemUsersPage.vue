@@ -31,70 +31,72 @@ const {
   rangeStart,
   rangeEnd,
   search,
-  appliedSearch,
   status,
   error,
   load,
   refresh,
-  submitSearch,
   clearSearch,
   goToPage,
 } = useAdminList<AdminSystemUser>((query) => admin.listSystemUsers(query))
 
 const { pending, busy, errorKey, ask, cancel, confirm, dismiss } = useAdminAction(() => load())
 
-// Blocking/revoking a control-plane account and replacing its roles are all
-// `system.role.manage` operations on the backend.
-const canManage = computed(() => can(ADMIN_PERMISSIONS.systemRoleManage))
+// Status changes and role assignment are both `system.users.write` operations
+// (`PATCH /system/users/{id}`); there is no session-revoke endpoint.
+const canManage = computed(() => can(ADMIN_PERMISSIONS.systemUsersWrite))
 const loadErrorKey = computed(() =>
   error.value === null ? 'errors.generic' : adminLoadErrorKey(error.value),
 )
+
+// The backend has no text search: the filter applies to the loaded page only.
+const term = computed(() => search.value.trim().toLowerCase())
+const visibleItems = computed(() =>
+  term.value === ''
+    ? items.value
+    : items.value.filter(
+        (user) =>
+          user.email.toLowerCase().includes(term.value) ||
+          user.displayName.toLowerCase().includes(term.value) ||
+          user.role.toLowerCase().includes(term.value) ||
+          user.id.toLowerCase().includes(term.value),
+      ),
+)
+
+const isActive = (user: AdminSystemUser): boolean => user.status === 'active'
 
 onMounted(() => void load())
 
 const formatDate = (value: string | null): string =>
   value === null ? '—' : formatSystemDateTime(value, locale.value)
 
-const displayName = (user: AdminSystemUser): string => user.email ?? user.phoneNumber ?? user.uuid
-
 const view = (user: AdminSystemUser): void => {
-  void router.push({ name: 'system-system-user-detail', params: { uuid: user.uuid } })
+  void router.push({ name: 'system-system-user-detail', params: { userId: user.id } })
 }
 
-const askBlock = (user: AdminSystemUser): void => {
+const askDisable = (user: AdminSystemUser): void => {
   ask({
-    kind: 'block-system-user',
+    kind: 'update-system-user',
     title: t('system.system_users_block_title'),
-    message: t('system.system_users_block_message', { name: displayName(user) }),
+    message: t('system.system_users_block_message', { name: user.displayName || user.email }),
     confirmLabel: t('system.system_users_block'),
-    run: () => admin.blockSystemUser(user.uuid),
+    run: () => admin.updateSystemUser(user.id, { status: 'disabled' }),
   })
 }
 
-const askUnblock = (user: AdminSystemUser): void => {
+const askEnable = (user: AdminSystemUser): void => {
   ask({
-    kind: 'unblock-system-user',
+    kind: 'update-system-user',
     title: t('system.system_users_unblock_title'),
-    message: t('system.system_users_unblock_message', { name: displayName(user) }),
+    message: t('system.system_users_unblock_message', { name: user.displayName || user.email }),
     confirmLabel: t('system.system_users_unblock'),
-    run: () => admin.unblockSystemUser(user.uuid),
-  })
-}
-
-const askRevoke = (user: AdminSystemUser): void => {
-  ask({
-    kind: 'revoke-system-user-sessions',
-    title: t('system.system_users_revoke_title'),
-    message: t('system.system_users_revoke_message', { name: displayName(user) }),
-    confirmLabel: t('system.system_users_revoke'),
-    run: () => admin.revokeSystemUserSessions(user.uuid),
+    run: () => admin.updateSystemUser(user.id, { status: 'active' }),
   })
 }
 </script>
 
 <template>
   <AdminPage :title="t('system.system_users_title')" :subtitle="t('system.system_users_subtitle')">
-    <form class="admin-toolbar" role="search" @submit.prevent="submitSearch()">
+    <form class="admin-toolbar" role="search" @submit.prevent>
       <input
         v-model="search"
         class="admin-toolbar__input"
@@ -102,11 +104,14 @@ const askRevoke = (user: AdminSystemUser): void => {
         :placeholder="t('system.admin_search_system_users')"
         :aria-label="t('system.admin_search_system_users')"
       />
-      <AppButton type="submit" variant="ghost">{{ t('system.admin_search') }}</AppButton>
-      <AppButton v-if="appliedSearch !== ''" variant="ghost" @click="clearSearch()">
+      <AppButton v-if="search !== ''" variant="ghost" @click="clearSearch()">
         {{ t('system.admin_clear') }}
       </AppButton>
     </form>
+
+    <p v-if="search !== ''" class="admin-filter-notice" role="status">
+      {{ t('system.admin_filter_scope', { term: search }) }}
+    </p>
 
     <AppAlert v-if="errorKey !== null" variant="error">{{ t(errorKey) }}</AppAlert>
 
@@ -136,23 +141,20 @@ const askRevoke = (user: AdminSystemUser): void => {
               </tr>
             </thead>
             <tbody>
-              <tr v-for="user in items" :key="user.uuid">
+              <tr v-for="user in visibleItems" :key="user.id">
                 <td>
-                  <span class="admin-table__desc">{{ displayName(user) }}</span>
-                  <span class="admin-table__sub admin-table__mono">{{ user.uuid }}</span>
+                  <span class="admin-table__desc">{{ user.displayName || user.email }}</span>
+                  <span class="admin-table__sub admin-table__mono">{{ user.id }}</span>
                 </td>
                 <td>
-                  <span v-if="user.roles.length === 0" class="admin-table__muted">
-                    {{ t('system.system_users_no_roles') }}
-                  </span>
-                  <span v-else>{{ user.roles.join(', ') }}</span>
+                  <span class="admin-table__mono">{{ user.role }}</span>
                 </td>
                 <td>
                   <span
                     class="admin-badge"
-                    :class="user.isActive ? 'admin-badge--active' : 'admin-badge--blocked'"
+                    :class="isActive(user) ? 'admin-badge--active' : 'admin-badge--blocked'"
                   >
-                    {{ t(user.isActive ? 'system.admin_active' : 'system.admin_blocked') }}
+                    {{ t(isActive(user) ? 'system.admin_active' : 'system.admin_blocked') }}
                   </span>
                 </td>
                 <td class="admin-table__muted">{{ formatDate(user.createdAt) }}</td>
@@ -162,10 +164,10 @@ const askRevoke = (user: AdminSystemUser): void => {
                       {{ t('system.admin_view') }}
                     </AppButton>
                     <AppButton
-                      v-if="user.isActive"
+                      v-if="isActive(user)"
                       variant="ghost"
                       :disabled="!canManage || busy"
-                      @click="askBlock(user)"
+                      @click="askDisable(user)"
                     >
                       {{ t('system.system_users_block') }}
                     </AppButton>
@@ -173,16 +175,9 @@ const askRevoke = (user: AdminSystemUser): void => {
                       v-else
                       variant="ghost"
                       :disabled="!canManage || busy"
-                      @click="askUnblock(user)"
+                      @click="askEnable(user)"
                     >
                       {{ t('system.system_users_unblock') }}
-                    </AppButton>
-                    <AppButton
-                      variant="ghost"
-                      :disabled="!canManage || busy"
-                      @click="askRevoke(user)"
-                    >
-                      {{ t('system.system_users_revoke') }}
                     </AppButton>
                   </div>
                 </td>
@@ -218,3 +213,12 @@ const askRevoke = (user: AdminSystemUser): void => {
 </template>
 
 <style scoped src="../styles/admin.css"></style>
+
+<style scoped>
+/* Client-side filtering only covers the loaded page; the notice says so. */
+.admin-filter-notice {
+  margin: 0;
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+</style>

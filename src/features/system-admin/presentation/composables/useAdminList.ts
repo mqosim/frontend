@@ -8,16 +8,19 @@ export type AdminListStatus = 'loading' | 'ready' | 'error'
 export type AdminPageLoader<T> = (query: AdminListQuery) => Promise<Result<AdminPage<T>>>
 
 /**
- * Search + offset paging shared by the admin list pages. The backend returns the
- * whole page plus `X-Total-Count`, so the pager is driven by the reported total,
- * not by a guessed "has more" flag.
+ * Offset paging shared by the admin list pages. The backend returns the page
+ * plus `total` in the body, so the pager is driven by the reported total, not
+ * by a guessed "has more" flag.
+ *
+ * The backend supports no text search, so `search` is a client-side filter over
+ * the currently loaded page: the views derive their visible rows from
+ * `filteredItems` and must show the filter-scope notice while it is active.
  */
 export const useAdminList = <T>(loadPage: AdminPageLoader<T>, pageSize = 20) => {
   const items = shallowRef<readonly T[]>([])
   const total = ref(0)
   const page = ref(1)
   const search = ref('')
-  const appliedSearch = ref('')
   const status = ref<AdminListStatus>('loading')
   const error = shallowRef<AppError | null>(null)
 
@@ -29,7 +32,6 @@ export const useAdminList = <T>(loadPage: AdminPageLoader<T>, pageSize = 20) => 
     status.value = 'loading'
     error.value = null
     const result = await loadPage({
-      search: appliedSearch.value === '' ? undefined : appliedSearch.value,
       limit: pageSize,
       offset: (page.value - 1) * pageSize,
     })
@@ -43,15 +45,8 @@ export const useAdminList = <T>(loadPage: AdminPageLoader<T>, pageSize = 20) => 
     status.value = 'ready'
   }
 
-  const submitSearch = (): void => {
-    appliedSearch.value = search.value.trim()
-    page.value = 1
-    void load()
-  }
-
   const clearSearch = (): void => {
     search.value = ''
-    submitSearch()
   }
 
   const goToPage = (next: number): void => {
@@ -73,12 +68,10 @@ export const useAdminList = <T>(loadPage: AdminPageLoader<T>, pageSize = 20) => 
     rangeStart,
     rangeEnd,
     search,
-    appliedSearch,
     status,
     error,
     load,
     refresh,
-    submitSearch,
     clearSearch,
     goToPage,
   }
