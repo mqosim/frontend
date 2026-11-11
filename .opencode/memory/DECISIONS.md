@@ -29,6 +29,16 @@
 - Resend is a second `register/start` with the same identifier after `resend_after`; success replaces `pending_id` and resets both timers. On 429 the cooldown uses `retryAfterMs` when present. All registration errors are mapped through `registerErrorMessageKey`.
 - Registration reuses login identifier normalization (`toLoginIdentifier`) and the login session-adoption/redirect path.
 
+## SYSTEM realm auth (2026-11-11)
+
+- SYSTEM sign-in is two steps: `POST /system/auth/login` only verifies the password and arms the second factor; the session is opened by `POST /system/auth/totp`. `beginLogin` returns just `{totpEnrolled}`, never a session or token.
+- The pre-authentication token lives entirely inside `systemAuthRepository`: kept in memory, sent only as `X-System-Pre-Auth`, never exposed to application/presentation code and never logged. It survives a wrong code (retry in place), and is dropped on a new login, on logout, on `system_pre_auth_invalid`, and once its `expires_in` elapses. A repository-only expiry timer is authoritative for "spent"; no extra request is sent to find out.
+- A session is accepted only when the token's `aud` is `system` (string or list). The pre-auth token's `aud: "system-preauth"` and regular PERSON/ORG tokens are rejected. Signature is never verified client-side; the server remains the authority.
+- `/system/auth/totp`, `/totp/enroll`, `/totp/activate`, `/login`, `/refresh`, `/logout` are in `NO_RETRY_ENDPOINTS`: the client's silent 401 refresh-and-retry never applies to them.
+- First login order is enforced in the UI: credentials → enroll → activate → recovery codes → totp → dashboard. A `totp_not_enrolled`/`totp_already_enrolled` code re-routes to the matching step instead of surfacing an error.
+- SYSTEM has no saved-language endpoint: the SYSTEM settings language section switches this browser only (`SystemSettingsPage.vue` `apply` prop), and the guard no longer adopts a SYSTEM account language.
+- SYSTEM error copy is chosen by backend machine code first (`system_invalid_credentials`, `system_account_locked`, `totp_invalid`, `recovery_code_invalid`, …) and falls back to the shared credential/kind mapping; backend `message` is never surfaced.
+
 ## Process and environment (2026-11-10)
 
 - Migration work stays on `main`. The AGENTS.md rule requiring an `api-migration` branch is obsolete for this work (explicit user decision).
