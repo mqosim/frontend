@@ -254,6 +254,8 @@ export const fallbackMessages: Record<string, string> = {
     'Add the secret below to your authenticator app, then confirm the code it generates.',
   'system.enroll_secret': 'Secret key',
   'system.enroll_uri': 'Setup link',
+  'system.enroll_qr_label': 'QR code with the two-factor setup link',
+  'system.enroll_qr_hint': 'Scan it with your authenticator app.',
   'system.enroll_continue': 'Continue',
 
   'system.activate_title': 'Confirm enrollment',

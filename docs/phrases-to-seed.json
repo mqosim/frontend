@@ -524,6 +524,18 @@
       "ru": "Ссылка для настройки",
       "en": "Setup link"
     },
+    "system.enroll_qr_label": {
+      "uz": "Ikki bosqichli sozlash havolasi bilan QR kod",
+      "uzc": "Икки босқичли созлаш ҳаволаси билан QR код",
+      "ru": "QR-код со ссылкой для настройки двухфакторной аутентификации",
+      "en": "QR code with the two-factor setup link"
+    },
+    "system.enroll_qr_hint": {
+      "uz": "Uni autentifikator ilovangiz bilan skanerlang.",
+      "uzc": "Уни аутентификатор иловангиз билан сканерланг.",
+      "ru": "Отсканируйте его в приложении-аутентификаторе.",
+      "en": "Scan it with your authenticator app."
+    },
     "system.enroll_continue": {
       "uz": "Davom etish",
       "uzc": "Давом этиш",

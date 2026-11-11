@@ -15,6 +15,7 @@ import { useFormField } from '@/shared/presentation/composables/useFormField'
 
 import type { SystemTotpEnrollment } from '../../domain/entities'
 import { useSystemAuthUseCases } from '../composables/useSystemAuthUseCases'
+import { buildEnrollmentQr, type EnrollmentQr } from '../enrollmentQr'
 import {
   systemLoginSchema,
   systemSecondFactorSchema,
@@ -47,6 +48,27 @@ const formErrorKey = ref('')
 const flowPending = ref(false)
 const enrollment = ref<SystemTotpEnrollment | null>(null)
 const recoveryCodes = ref<readonly string[]>([])
+const qr = ref<EnrollmentQr | null>(null)
+// Guards a late dynamic-import result from writing state after the step ended.
+let qrGeneration = 0
+
+/** Drops the rendered QR and invalidates any in-flight generation. */
+const resetQr = (): void => {
+  qrGeneration += 1
+  qr.value = null
+}
+
+/** Builds the QR for one enrollment payload; a late result is discarded. */
+const showEnrollmentQr = async (payload: SystemTotpEnrollment): Promise<void> => {
+  const generation = (qrGeneration += 1)
+  const built = await buildEnrollmentQr(payload.otpauthUri)
+  if (generation !== qrGeneration) return
+  qr.value = built
+  if (built === null && import.meta.env.DEV) {
+    // Generic on purpose: the URI and secret must never reach the console.
+    console.warn('[system-auth] QR generation failed; showing the text fallback.')
+  }
+}
 
 // The second-factor field is a single non-empty string, so it is validated here
 // instead of through a second vee-validate form: a component can only provide
@@ -71,6 +93,7 @@ const {
 const restart = (messageKey: string): void => {
   step.value = 'credentials'
   enrollment.value = null
+  resetQr()
   recoveryCodes.value = []
   code.value = ''
   codeErrorKey.value = ''
@@ -137,6 +160,7 @@ const startEnrollment = async (): Promise<void> => {
     return
   }
   enrollment.value = result.value
+  void showEnrollmentQr(result.value)
 }
 
 const onFactorSubmit = async (): Promise<void> => {
@@ -193,6 +217,7 @@ const onCodeBlur = (): void => {
 
 const onEnrollmentReady = (): void => {
   enrollment.value = null
+  resetQr()
   goTo('activate')
 }
 
@@ -210,6 +235,7 @@ const onCancel = (): void => {
 onBeforeUnmount(() => {
   // The one-time payloads must not outlive the screen.
   enrollment.value = null
+  resetQr()
   recoveryCodes.value = []
 })
 </script>
@@ -300,6 +326,19 @@ onBeforeUnmount(() => {
     <div v-else-if="step === 'enroll'" class="system-view__form">
       <p v-if="enrollment === null" class="system-view__hint">{{ t('common.loading') }}</p>
       <template v-else>
+        <div v-if="qr !== null" class="system-view__qr">
+          <svg
+            class="system-view__qr-svg"
+            :viewBox="`0 0 ${qr.size} ${qr.size}`"
+            role="img"
+            :aria-label="t('system.enroll_qr_label')"
+            shape-rendering="crispEdges"
+            focusable="false"
+          >
+            <path :d="qr.path" fill="#000000" />
+          </svg>
+          <p class="system-view__hint">{{ t('system.enroll_qr_hint') }}</p>
+        </div>
         <div class="system-view__secret">
           <p class="system-view__label">{{ t('system.enroll_secret') }}</p>
           <code class="system-view__code">{{ enrollment.secret }}</code>
@@ -374,6 +413,23 @@ onBeforeUnmount(() => {
   color: var(--color-text-muted);
 }
 
+/* The QR is one SVG path (no canvas, no data URL) on an explicit white box, so
+   the black modules keep their quiet zone and stay scannable in both themes. */
+.system-view__qr {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-2);
+}
+
+.system-view__qr-svg {
+  display: block;
+  width: 220px;
+  height: 220px;
+  max-width: 100%;
+  border-radius: var(--radius-sm);
+  background-color: #ffffff;
+}
+
 .system-view__secret {
   display: flex;
   flex-direction: column;
@@ -386,8 +442,8 @@ onBeforeUnmount(() => {
   color: var(--color-text-muted);
 }
 
-/* The one-time values are selectable as a whole: no QR library is installed, so
-   the secret and the otpauth URI are the only way to set the app up. */
+/* The one-time values are selectable as a whole: the QR above is the quick path
+   and these remain the manual fallback when scanning is not possible. */
 .system-view__code {
   padding: var(--space-2) var(--space-3);
   border: 1px solid var(--color-border);
