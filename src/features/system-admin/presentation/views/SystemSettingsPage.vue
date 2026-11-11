@@ -2,26 +2,43 @@
 import { inject } from 'vue'
 import { useI18n } from 'vue-i18n'
 
-import { I18nFeatureKey } from '@/features/i18n'
+import { I18nFeatureKey, toApiLanguageCode } from '@/features/i18n'
+import { useSystemAuthUseCases } from '@/features/system-auth'
 import { AppearanceSettingsSection, LanguageSettingsSection } from '@/features/settings'
+import type { AppError } from '@/shared/domain'
 
 /**
  * The Superadmin's own Settings page, following the regular Settings' section
  * order (Language, then Appearance). Both sections are the shared settings
  * feature components: Appearance applies through the shared theme store, and
- * Language only switches this browser's locale — the SYSTEM realm has no
- * saved-language endpoint, so the choice is not persisted to the account.
+ * Language persists through `PATCH /system/auth/me` — SYSTEM has no
+ * notification preferences, so that single write is the whole save. A failure
+ * (an unsupported language among them) propagates as the repository's
+ * `AppError`, which the section maps to copy by machine code; the locale only
+ * switches after the write succeeds.
  */
 const { t } = useI18n()
 const i18nFeature = inject(I18nFeatureKey)
 if (i18nFeature === undefined) {
   throw new Error('I18n feature was not provided by the composition root')
 }
+const system = useSystemAuthUseCases()
 
 const applyLanguage = async (languageCode: string): Promise<string> => {
-  // Local only: the SYSTEM contract exposes no language preference to write.
-  await i18nFeature.switchTo(languageCode, ['system.admin', 'common', 'settings'])
-  return languageCode
+  // Resolve the draft to a code the backend accepts; the switcher only offers
+  // active backend languages, so `null` means a stale draft — fail the save
+  // locally instead of a 422 round-trip. The section maps the machine code.
+  const code = toApiLanguageCode(languageCode)
+  if (code === null) {
+    const error: AppError = { kind: 'Validation', status: 400, fields: {} }
+    throw error
+  }
+  // Persist to the SYSTEM account first; the UI switches only after it succeeds.
+  const saved = await system.updateLanguage(code)
+  if (!saved.ok) throw saved.error
+  const applied = saved.value.languageCode ?? languageCode
+  await i18nFeature.switchTo(applied, ['system.admin', 'common', 'settings'])
+  return applied
 }
 </script>
 

@@ -117,6 +117,35 @@ describe('authRepository.registerStart', () => {
     expect(result.value).toEqual({ pendingId: 'p-1', expiresInSec: 300, resendAfterSec: 60 })
   })
 
+  test('sends the chosen UI language as language_code when provided', async () => {
+    const calls: RecordedCall[] = []
+    const client = {
+      async POST(path: string, init?: RecordedCall['init']): Promise<FakeCallResult> {
+        calls.push({ path, init })
+        return {
+          data: { pending_id: 'p-1', expires_in: 300, resend_after: 60 },
+          response: new Response(null, { status: 202 }),
+        }
+      },
+    }
+    const { repository } = makeRepository(client)
+
+    await repository.registerStart({
+      email: 'user@example.uz',
+      phone: '998901234567',
+      otpLocale: 'uz-Cyrl',
+      languageCode: 'uz-Cyrl',
+    })
+
+    // The body gains `language_code`; the OTP header is unchanged.
+    expect(calls[0]?.init?.body).toEqual({
+      email: 'user@example.uz',
+      phone: '998901234567',
+      language_code: 'uz-Cyrl',
+    })
+    expect(calls[0]?.init?.headers).toEqual({ 'Accept-Language': 'uz-Cyrl' })
+  })
+
   test('maps a 409 machine code to its copy key', async () => {
     const client = {
       async POST(): Promise<FakeCallResult> {

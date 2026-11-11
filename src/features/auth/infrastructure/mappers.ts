@@ -1,5 +1,6 @@
 import type { Principal, UserProfile } from '@/shared/domain'
 import type { components } from '@/shared/infrastructure/api/schema'
+import type { ApiLanguageCode } from '@/features/i18n'
 
 import type {
   AuthOutcome,
@@ -19,6 +20,27 @@ export type TenantMembershipDto = Schemas['TenantMembershipSchema']
 export type RegisterStartRequestDto = Schemas['RegisterStartRequest']
 export type RegisterStartResponseDto = Schemas['RegisterStartResponse']
 export type RegisterCompleteRequestDto = Schemas['RegisterCompleteRequest']
+export type MeLanguageUpdateRequestDto = Schemas['MeLanguageUpdateRequest']
+
+/**
+ * The generated schema's own language union, derived from the PATCH body's
+ * `language_code` (required, nullable — `null` clears the preference).
+ */
+export type ApiLanguageCodeDto = NonNullable<MeLanguageUpdateRequestDto['language_code']>
+
+/**
+ * Compile-time proof that the i18n domain union (`ApiLanguageCode`) is exactly
+ * the generated schema's union: if either side drifts, the `false` branch makes
+ * this line stop compiling instead of letting an unknown code reach the
+ * backend. The repositories assign `ApiLanguageCode` straight into the DTO
+ * bodies, so the same check guards the SYSTEM twin structurally.
+ */
+export const API_LANGUAGE_CODE_MATCHES_SCHEMA: ApiLanguageCodeDto extends ApiLanguageCode
+  ? ApiLanguageCode extends ApiLanguageCodeDto
+    ? true
+    : false
+  : false = true
+
 export type EimzoChallengeResponseDto = Schemas['EimzoChallengeResponse']
 export type EimzoLinkResponseDto = Schemas['EimzoLinkResponse']
 
@@ -119,8 +141,10 @@ export const toWorkspaceList = (dto: MeResponseDto | undefined): WorkspaceList |
 
 /**
  * Maps `/identity/me` to the UI profile. Contact details are the masked values
- * the contract returns; `languageCode` and `emailVerifiedAt` have no source in
- * this contract and stay `null` (see `UserProfile`).
+ * the contract returns; `language_code` is the account's saved language in
+ * canonical BCP 47 (absent or `null` when the account never chose one), and
+ * `emailVerifiedAt` has no source in this contract and stays `null` (see
+ * `UserProfile`).
  */
 export const toUserProfile = (dto: MeResponseDto | undefined): UserProfile | null => {
   if (dto === undefined) return null
@@ -129,7 +153,7 @@ export const toUserProfile = (dto: MeResponseDto | undefined): UserProfile | nul
     fullName: dto.full_name,
     email: dto.email_masked ?? null,
     phoneNumber: dto.phone_masked ?? null,
-    languageCode: null,
+    languageCode: dto.language_code ?? null,
     emailVerifiedAt: null,
   }
 }

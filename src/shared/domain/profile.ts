@@ -4,11 +4,11 @@
  * contact details there, so `email`/`phoneNumber` are display values, not
  * editable addresses.
  *
- * `languageCode` is `null` for the regular context: the new contract does not
- * return an account language from `/identity/me` (it lives in notification
- * preferences, which are not migrated yet), so the router guard's language
- * adoption is a no-op until then. `emailVerifiedAt` is likewise `null` — there
- * is no email-change flow in the current contract.
+ * `languageCode` is the account's saved interface language in canonical BCP 47
+ * (`uz-Cyrl` for Uzbek Cyrillic), or `null` when the account never chose one —
+ * the router guard adopts it once per session and leaves the browser's choice
+ * untouched otherwise. `emailVerifiedAt` is likewise `null` — there is no
+ * email-change flow in the current contract.
  */
 export interface UserProfile {
   readonly uuid: string

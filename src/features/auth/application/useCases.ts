@@ -1,4 +1,5 @@
 import type { Result, UserProfile } from '@/shared/domain'
+import type { ApiLanguageCode } from '@/features/i18n'
 
 import type {
   AuthOutcome,
@@ -31,6 +32,8 @@ export interface AuthUseCases {
   registerComplete(input: RegisterCompleteInput): Promise<Result<AuthOutcome>>
   /** The caller's masked profile; the source of the display name. */
   getProfile(): Promise<Result<UserProfile>>
+  /** Persists the account's UI language; the fresh profile echoes the code. */
+  updateLanguage(languageCode: ApiLanguageCode): Promise<Result<UserProfile>>
   /** The person's switchable tenants; the source for the account label and picker. */
   listWorkspaces(): Promise<Result<WorkspaceList>>
   /** Switches the session to one of the person's tenants. */
@@ -50,6 +53,7 @@ export const createAuthUseCases = ({ repository }: AuthUseCaseDeps): AuthUseCase
   registerStart: (input) => repository.registerStart(input),
   registerComplete: (input) => repository.registerComplete(input),
   getProfile: () => repository.getProfile(),
+  updateLanguage: (languageCode) => repository.updateLanguage(languageCode),
   listWorkspaces: () => repository.listWorkspaces(),
   switchTenant: (choice) => repository.switchTenant(choice),
   listEimzoKeys: () => repository.listEimzoKeys(),

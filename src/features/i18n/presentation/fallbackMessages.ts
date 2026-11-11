@@ -452,6 +452,8 @@ export const fallbackMessages: Record<string, string> = {
   'settings.language_hint': 'The interface language is saved to your account.',
   'settings.saved': 'Saved.',
   'settings.invalid_language': 'This language is not available.',
+  'settings.language_sync_failed':
+    'The language was saved, but notification preferences could not be updated.',
 
   'settings.page_subtitle': 'Manage your account settings and security preferences',
 
@@ -527,6 +529,7 @@ export const fallbackMessages: Record<string, string> = {
   'errors.conflict': 'This record already exists.',
   'errors.unprocessable': 'The request could not be processed.',
   'errors.service_unavailable': 'The service is temporarily unavailable. Try again shortly.',
+  'errors.language_unsupported': 'This language is not supported.',
   'errors.validation': 'Please check the highlighted fields.',
   'errors.not_found': 'Not found.',
   'errors.not_found_title': 'Page not found',

@@ -36,10 +36,10 @@ export interface GuardDeps {
  * Applies a loaded profile's saved language, so the app renders in the user's
  * language from the first authenticated page. Translations are loaded before the
  * locale switches (see `I18nFeature.switchTo`), and any failure keeps the
- * current language without blocking navigation.
- *
- * The regular context only: the SYSTEM realm exposes no saved language, so its
- * screen keeps the browser's current locale.
+ * current language without blocking navigation. Both contexts use it: the
+ * profile code is canonical BCP 47 (`uz-Cyrl`), which `switchTo` normalizes to
+ * the internal `uzc`, and `null` means the account never chose one, so the
+ * current (browser) language stands.
  */
 const applyAccountLanguage = async (
   profile: UserProfile,
@@ -55,6 +55,7 @@ const applyAccountLanguage = async (
 // later manual switch is not undone on every navigation. It resets when the
 // session ends, so a fresh sign-in always re-adopts the account language.
 let regularLanguageApplied = false
+let systemLanguageApplied = false
 // The person's switchable tenants are fetched at most once per authenticated
 // session (for the account label); the switch dialog re-fetches on open.
 let regularWorkspacesLoaded = false
@@ -124,6 +125,7 @@ export const createAuthGuard = ({
       if (!store.isAuthenticated) {
         systemMenuDefaulted = false
         systemAdminLoaded = false
+        systemLanguageApplied = false
         useAdminPermissionsStore().clear()
       }
 
@@ -160,6 +162,16 @@ export const createAuthGuard = ({
         const result = await admin.getMe()
         if (result.ok) permissions.setLoaded(result.value)
         else permissions.setError()
+      }
+
+      // Adopt the SYSTEM account's saved language once per session, reusing the
+      // same once-per-session rule as the regular context below. A null code
+      // (the account never chose one) or any failure keeps the current language
+      // without blocking navigation; a later manual switch is never undone.
+      if (store.isAuthenticated && !systemLanguageApplied) {
+        systemLanguageApplied = true
+        const profile = await system.getProfile()
+        if (profile.ok) await applyAccountLanguage(profile.value, i18n, pages())
       }
 
       // Expand the sidebar once per authenticated session, but only for a fresh

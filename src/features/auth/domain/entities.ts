@@ -1,4 +1,5 @@
 import type { Principal, Workspace } from '@/shared/domain'
+import type { ApiLanguageCode } from '@/features/i18n'
 
 /**
  * One tenant the person may switch into, as returned by
@@ -45,6 +46,13 @@ export interface RegisterStartInput {
   readonly phone: string
   /** Canonical API language code for the OTP delivery (`uz`, `uz-Cyrl`, `ru`, `en`). */
   readonly otpLocale: string
+  /**
+   * The account's initial interface language, stored with the registration
+   * (`register/start.language_code`), in the canonical backend form. Optional
+   * and nullable: the field is omitted when the UI has no supported language
+   * to send.
+   */
+  readonly languageCode?: ApiLanguageCode | null
 }
 
 /** The pending registration returned by `register/start`. */

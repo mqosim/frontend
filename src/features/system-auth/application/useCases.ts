@@ -1,4 +1,5 @@
 import type { Result, UserProfile } from '@/shared/domain'
+import type { ApiLanguageCode } from '@/features/i18n'
 
 import type {
   SystemLoginChallenge,
@@ -21,6 +22,8 @@ export interface SystemAuthUseCases {
   activateTotp(code: string): Promise<Result<SystemRecoveryCodes>>
   /** The SYSTEM caller's own account row (identity of the signed-in superadmin). */
   getProfile(): Promise<Result<UserProfile>>
+  /** Persists the SYSTEM account's UI language; the fresh profile echoes the code. */
+  updateLanguage(languageCode: ApiLanguageCode): Promise<Result<UserProfile>>
   refresh(): Promise<Result<SystemSession>>
   logout(): Promise<Result<void>>
 }
@@ -33,6 +36,7 @@ export const createSystemAuthUseCases = ({
   enrollTotp: () => repository.enrollTotp(),
   activateTotp: (code) => repository.activateTotp(code),
   getProfile: () => repository.getProfile(),
+  updateLanguage: (languageCode) => repository.updateLanguage(languageCode),
   refresh: () => repository.refresh(),
   logout: () => repository.logout(),
 })

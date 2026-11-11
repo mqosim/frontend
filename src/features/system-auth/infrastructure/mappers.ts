@@ -7,6 +7,7 @@ export type SystemLoginRequestDto = Schemas['SystemLoginRequest']
 export type SystemTotpRequestDto = Schemas['SystemTotpRequest']
 export type SystemActivateRequestDto = Schemas['SystemActivateRequest']
 export type SystemMeDto = Schemas['SystemMeResponse']
+export type SystemMeLanguageUpdateRequestDto = Schemas['SystemMeLanguageUpdateRequest']
 /** Response bodies the repository reads; call sites add `| undefined` for a bodyless 2xx. */
 export type SystemPreAuthResponseDto = Schemas['SystemPreAuthResponse']
 export type SystemTokenResponseDto = Schemas['SystemTokenResponse']
@@ -33,8 +34,9 @@ export const toSystemPrincipal = (accessToken: string): Principal | null => {
 
 /**
  * Maps `/system/auth/me` to the shared profile the chrome already understands.
- * The SYSTEM realm exposes no phone number and no saved language (it has no
- * language endpoint), so those stay `null`; the display name fills `fullName`.
+ * The SYSTEM realm exposes no phone number, so it stays `null`; `language_code`
+ * carries the saved interface language in canonical BCP 47 (`null` when the
+ * account never chose one). The display name fills `fullName`.
  */
 export const toSystemUserProfile = (dto: SystemMeDto | undefined): UserProfile | null => {
   if (dto === undefined) return null
@@ -43,7 +45,7 @@ export const toSystemUserProfile = (dto: SystemMeDto | undefined): UserProfile |
     fullName: dto.display_name,
     email: dto.email,
     phoneNumber: null,
-    languageCode: null,
+    languageCode: dto.language_code ?? null,
     emailVerifiedAt: null,
   }
 }

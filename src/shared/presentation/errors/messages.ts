@@ -15,6 +15,11 @@ const EIMZO_ERROR_KEYS: Readonly<Record<EimzoFailureCode, string>> = {
  * decides the copy, so backend messages cannot leak or be spoofed.
  */
 export const errorMessageKey = (error: AppError): string => {
+  // Application codes the kind-based mapping cannot tell apart. The language
+  // PATCH endpoints report an unsupported language with their own machine code.
+  if ('code' in error && error.code === 'system_language_unsupported') {
+    return 'errors.language_unsupported'
+  }
   switch (error.kind) {
     case 'Unauthorized':
       return 'errors.unauthorized'

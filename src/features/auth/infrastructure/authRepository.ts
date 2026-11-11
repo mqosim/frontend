@@ -17,6 +17,7 @@ import {
 import type {
   EimzoChallengeResponseDto,
   LoginRequestDto,
+  MeLanguageUpdateRequestDto,
   MeResponseDto,
   RegisterCompleteRequestDto,
   RegisterStartRequestDto,
@@ -157,6 +158,10 @@ export const createAuthRepository = ({
         return err({ kind: 'Validation', status: 400, fields: {} })
       }
       const body: RegisterStartRequestDto = { email: input.email, phone: input.phone }
+      // The contract also stores the account's initial interface language with
+      // the registration; the field is optional, so it travels only when the
+      // caller resolved a supported language (never as `null`).
+      if (input.languageCode) body.language_code = input.languageCode
       // `Accept-Language` is the contract's optional OTP-locale header; the
       // generated path declares no header parameter, so it travels through the
       // openapi-fetch `headers` option instead of `params.header`.
@@ -270,6 +275,17 @@ export const createAuthRepository = ({
 
     async getProfile() {
       const result = await fetchMe()
+      if (!result.ok) return result
+      const profile = toUserProfile(result.value)
+      if (profile === null) return err({ kind: 'Unknown', status: null })
+      return ok(profile)
+    },
+
+    async updateLanguage(languageCode) {
+      // The PATCH is a write, so it never joins the `fetchMe` single-flight
+      // cache; the response is the fresh profile and echoes the saved code.
+      const body: MeLanguageUpdateRequestDto = { language_code: languageCode }
+      const result = toResult(await client.PATCH('/api/v1/identity/me', { body }))
       if (!result.ok) return result
       const profile = toUserProfile(result.value)
       if (profile === null) return err({ kind: 'Unknown', status: null })

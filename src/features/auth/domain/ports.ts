@@ -1,4 +1,5 @@
 import type { Result, UserProfile } from '@/shared/domain'
+import type { ApiLanguageCode } from '@/features/i18n'
 
 import type {
   AuthOutcome,
@@ -51,6 +52,12 @@ export interface AuthRepository {
   logout(): Promise<Result<void>>
   /** The caller's masked profile and active tenants (`GET /identity/me`). */
   getProfile(): Promise<Result<UserProfile>>
+  /**
+   * Persists the caller's UI language (`PATCH /identity/me`) and returns the
+   * fresh profile. `languageCode` is the canonical backend code (`uz-Cyrl` for
+   * Uzbek Cyrillic); the response echoes the saved value.
+   */
+  updateLanguage(languageCode: ApiLanguageCode): Promise<Result<UserProfile>>
   /** The person's switchable tenants plus the current one (`GET /identity/me`). */
   listWorkspaces(): Promise<Result<WorkspaceList>>
   /** Switches the session to one of the person's tenants. */

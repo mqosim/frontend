@@ -115,6 +115,9 @@ const makeHarness = (): Harness => {
     async POST(path: string, init?: RecordedCall['init']): Promise<FakeCallResult> {
       return record(path, init)
     },
+    async PATCH(path: string, init?: RecordedCall['init']): Promise<FakeCallResult> {
+      return record(path, init)
+    },
   }
 
   const repository = createSystemAuthRepository({
@@ -194,6 +197,49 @@ describe('systemAuthRepository.beginLogin', () => {
     if (result.ok) throw new Error('expected the 423 to surface as an error')
     // The copy is chosen from `code`, never from the backend's `message`.
     expect(result.error).toEqual({ kind: 'Unknown', status: 423, code: 'system_account_locked' })
+  })
+})
+
+describe('systemAuthRepository.updateLanguage', () => {
+  const systemMeBody = {
+    id: 'sys-1',
+    email: 'admin@example.com',
+    display_name: 'SUPERADMIN',
+    role: 'superadmin',
+    language_code: 'uz-Cyrl',
+    permissions: ['*'],
+    totp_enrolled: true,
+  }
+
+  test('PATCHes the language and maps the fresh SYSTEM profile', async () => {
+    const harness = makeHarness()
+    harness.setRespond(() => jsonOk(systemMeBody))
+
+    const result = await harness.repository.updateLanguage('uz-Cyrl')
+
+    expect(harness.calls).toHaveLength(1)
+    expect(harness.calls[0]?.path).toBe('/api/v1/system/auth/me')
+    expect(harness.calls[0]?.init?.body).toEqual({ language_code: 'uz-Cyrl' })
+    if (!result.ok) throw new Error(`expected ok, got ${JSON.stringify(result.error)}`)
+    expect(result.value.languageCode).toBe('uz-Cyrl')
+    expect(result.value.uuid).toBe('sys-1')
+  })
+
+  test('surfaces an unsupported language by its machine code', async () => {
+    const harness = makeHarness()
+    // The client rejects regardless of input (the backend validates the code,
+    // not this client), so a supported code still exercises the 422 path.
+    harness.setRespond(() => apiError(422, 'system_language_unsupported'))
+
+    const result = await harness.repository.updateLanguage('uz-Cyrl')
+
+    if (result.ok) throw new Error('expected the 422 to surface as an error')
+    // The copy is chosen from `code`, never from the backend's `message`.
+    expect(result.error).toEqual({
+      kind: 'Unprocessable',
+      status: 422,
+      code: 'system_language_unsupported',
+    })
   })
 })
 

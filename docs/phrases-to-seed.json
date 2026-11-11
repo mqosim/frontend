@@ -2616,6 +2616,12 @@
       "ru": "Не удалось обработать запрос.",
       "en": "The request could not be processed."
     },
+    "errors.language_unsupported": {
+      "uz": "Bu til qo'llab-quvvatlanmaydi.",
+      "uzc": "Бу тил қўллаб-қувватланмайди.",
+      "ru": "Этот язык не поддерживается.",
+      "en": "This language is not supported."
+    },
     "errors.service_unavailable": {
       "uz": "Xizmat vaqtincha mavjud emas. Birozdan so'ng qayta urinib ko'ring.",
       "uzc": "Хизмат вақтинча мавжуд эмас. Бироздан сўнг қайта уриниб кўринг.",
@@ -2869,6 +2875,12 @@
       "uzc": "Бу тил мавжуд эмас.",
       "ru": "Этот язык недоступен.",
       "en": "This language is not available."
+    },
+    "settings.language_sync_failed": {
+      "uz": "Til saqlandi, lekin bildirishnoma sozlamalarini yangilab bo'lmadi.",
+      "uzc": "Тил сақланди, лекин билдиришнома созламаларини янгилаб бўлмади.",
+      "ru": "Язык сохранён, но не удалось обновить настройки уведомлений.",
+      "en": "The language was saved, but notification preferences could not be updated."
     },
     "settings.security_title": {
       "uz": "Hisob xavfsizligi",

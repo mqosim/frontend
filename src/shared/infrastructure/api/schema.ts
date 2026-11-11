@@ -141,7 +141,11 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Update My Language
+         * @description Change the caller's own UI language and return the fresh profile (idempotent).
+         */
+        patch: operations["update_my_language_api_v1_identity_me_patch"];
         trace?: never;
     };
     "/api/v1/identity/eimzo/challenge": {
@@ -729,7 +733,11 @@ export interface paths {
         delete?: never;
         options?: never;
         head?: never;
-        patch?: never;
+        /**
+         * Update My Language
+         * @description Change the caller's own interface language; a repeated value is a no-op.
+         */
+        patch: operations["update_my_language_api_v1_system_auth_me_patch"];
         trace?: never;
     };
     "/api/v1/system/users": {
@@ -1607,6 +1615,14 @@ export interface components {
             password: string;
         };
         /**
+         * MeLanguageUpdateRequest
+         * @description The caller's own UI language; ``null`` clears the preference.
+         */
+        MeLanguageUpdateRequest: {
+            /** Language Code */
+            language_code: ("uz" | "uz-Cyrl" | "ru" | "en") | null;
+        };
+        /**
          * MeResponse
          * @description Masked profile of the authenticated user plus their active tenants.
          */
@@ -1628,6 +1644,8 @@ export interface components {
             has_password: boolean;
             /** Auth Method */
             auth_method?: string | null;
+            /** Language Code */
+            language_code?: ("uz" | "uz-Cyrl" | "ru" | "en") | null;
             tenant: components["schemas"]["TenantSummarySchema"];
             /** Tenants */
             tenants: components["schemas"]["TenantMembershipSchema"][];
@@ -1737,6 +1755,8 @@ export interface components {
              * @example +998901234567
              */
             phone: string;
+            /** Language Code */
+            language_code?: ("uz" | "uz-Cyrl" | "ru" | "en") | null;
         };
         /**
          * RegisterStartResponse
@@ -2089,6 +2109,14 @@ export interface components {
             password: string;
         };
         /**
+         * SystemMeLanguageUpdateRequest
+         * @description The caller's own interface language; ``null`` clears the preference.
+         */
+        SystemMeLanguageUpdateRequest: {
+            /** Language Code */
+            language_code: ("uz" | "uz-Cyrl" | "ru" | "en") | null;
+        };
+        /**
          * SystemMeResponse
          * @description The authenticated system user with the effective permission set.
          */
@@ -2101,6 +2129,8 @@ export interface components {
             display_name: string;
             /** Role */
             role: string;
+            /** Language Code */
+            language_code: ("uz" | "uz-Cyrl" | "ru" | "en") | null;
             /** Permissions */
             permissions: string[];
             /** Totp Enrolled */
@@ -2489,6 +2519,8 @@ export interface components {
              */
             expires_in: number;
             tenant: components["schemas"]["TenantSummarySchema"];
+            /** Language Code */
+            language_code?: ("uz" | "uz-Cyrl" | "ru" | "en") | null;
         };
         /**
          * TranslationsResponse
@@ -2878,6 +2910,63 @@ export interface operations {
             };
             /** @description Unauthorized. Machine codes: unauthenticated. */
             401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_my_language_api_v1_identity_me_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["MeLanguageUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["MeResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: tenant_required. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). */
+            422: {
                 headers: {
                     /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
                     "X-Request-ID"?: string;
@@ -4963,6 +5052,63 @@ export interface operations {
             };
             /** @description Forbidden. Machine codes: system_account_disabled. */
             403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+        };
+    };
+    update_my_language_api_v1_system_auth_me_patch: {
+        parameters: {
+            query?: never;
+            header?: never;
+            path?: never;
+            cookie?: never;
+        };
+        requestBody: {
+            content: {
+                "application/json": components["schemas"]["SystemMeLanguageUpdateRequest"];
+            };
+        };
+        responses: {
+            /** @description Successful Response */
+            200: {
+                headers: {
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["SystemMeResponse"];
+                };
+            };
+            /** @description Unauthorized. Machine codes: system_unauthenticated. */
+            401: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Forbidden. Machine codes: system_account_disabled. */
+            403: {
+                headers: {
+                    /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
+                    "X-Request-ID"?: string;
+                    [name: string]: unknown;
+                };
+                content: {
+                    "application/json": components["schemas"]["ErrorResponse"];
+                };
+            };
+            /** @description Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: system_language_unsupported. */
+            422: {
                 headers: {
                     /** @description Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware). */
                     "X-Request-ID"?: string;

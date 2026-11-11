@@ -2,14 +2,17 @@
 import { computed, inject, onMounted, ref, useId, watch } from 'vue'
 import { useI18n } from 'vue-i18n'
 
+import { useAuthUseCases } from '@/features/auth'
 import {
   fromApiLang,
   I18nFeatureKey,
   LanguageSwitcher,
   toApiLang,
+  toApiLanguageCode,
   useLocaleStore,
 } from '@/features/i18n'
 import { useNotificationsUseCases } from '@/features/notifications'
+import type { AppError } from '@/shared/domain'
 import AppAlert from '@/shared/presentation/components/AppAlert.vue'
 import { errorMessageKey } from '@/shared/presentation/errors/messages'
 
@@ -19,28 +22,34 @@ import SettingsButton from '../components/SettingsButton.vue'
  * The Language settings section: the Settings-based language selection, restored
  * after the header selector was removed. The switcher (click-open, full labels,
  * flags) holds a draft until Save — Save persists the choice to the account
- * (`PUT /api/v1/notifications/preferences`, preserving the document-event
- * setting) before the locale flips, and Cancel discards it. The option list
- * comes from the active-languages API via the i18n feature; no language list is
- * duplicated here. Panel, typography, card chrome, and action buttons follow
- * the Account Security section's conventions so the two sections read as one
- * page.
+ * first (`PATCH /api/v1/identity/me`), then switches the locale, then keeps the
+ * notification language in step (`PUT /api/v1/notifications/preferences`, a full
+ * replacement, so the document-event setting is read first). A failed account
+ * write shows the error and changes nothing; a failed notification sync is
+ * soft — the language stays switched and a warning explains the gap. Cancel
+ * discards the draft. The option list comes from the active-languages API via
+ * the i18n feature; no language list is duplicated here. Panel, typography,
+ * card chrome, and action buttons follow the Account Security section's
+ * conventions so the two sections read as one page.
  *
  * An `apply` prop replaces the account write with a custom persistence step —
- * the SYSTEM settings page uses it to switch the locale only, because the SYSTEM
- * realm exposes no saved-language endpoint. Every other behaviour stays
- * identical.
+ * the SYSTEM settings page uses it to write `PATCH /system/auth/me` (SYSTEM has
+ * no notification preferences). The implementation throws the repository's
+ * `AppError` on failure, which this section maps to copy by machine code; every
+ * other behaviour stays identical.
  */
 const props = defineProps<{
   /**
    * Applies the drafted language and resolves with the code that was actually
-   * saved; a rejection surfaces the generic error. When omitted, the section
-   * persists to the regular account, as every PERSON/ORG Settings page does.
+   * saved; a rejection surfaces the error by its machine code. When omitted,
+   * the section persists to the regular account, as every PERSON/ORG Settings
+   * page does.
    */
   apply?: (languageCode: string) => Promise<string>
 }>()
 
 const { t } = useI18n()
+const auth = useAuthUseCases()
 const notifications = useNotificationsUseCases()
 const localeStore = useLocaleStore()
 const i18nFeature = inject(I18nFeatureKey)
@@ -53,6 +62,9 @@ const languagesReady = computed(() => localeStore.languages.length > 0)
 
 const loading = ref(true)
 const errorKey = ref<string | null>(null)
+// A soft, non-blocking notice: the language WAS saved, only the notification
+// sync afterwards failed, so the UI must not read as a failed save.
+const warningKey = ref<string | null>(null)
 
 // The chosen language is a draft until Save: the selector shows `draft` while
 // `savedLanguage` tracks the last persisted value, so nothing is written to the
@@ -65,24 +77,25 @@ onMounted(async () => {
   await i18nFeature?.loadLanguages()
 
   if (props.apply === undefined) {
-    // The account language lives in the notification preferences, not in
-    // `/identity/me`. The contract speaks `uz-Cyrl`; `fromApiLang` restores the
-    // app's internal `uzc` before the switcher sees it.
-    const preferences = await notifications.loadPreferences()
+    // The saved language lives on `/identity/me` (`language_code`) and the
+    // router guard already adopted it into the locale store; this read
+    // refreshes the displayed value from the account (adoption may have kept
+    // the browser's choice when the profile read failed). A failure or a null
+    // code — the account never chose one — keeps that current choice as the
+    // displayed value.
+    const profile = await auth.getProfile()
     loading.value = false
 
-    if (!preferences.ok) {
-      errorKey.value = errorMessageKey(preferences.error)
-      return
+    if (profile.ok && profile.value.languageCode !== null) {
+      // The contract speaks `uz-Cyrl`; `fromApiLang` restores the app's
+      // internal `uzc` before the switcher sees it.
+      const saved = fromApiLang(profile.value.languageCode)
+      savedLanguage.value = saved
+      draft.value = saved
     }
-
-    const saved =
-      preferences.value.locale === null ? localeStore.locale : fromApiLang(preferences.value.locale)
-    savedLanguage.value = saved
-    draft.value = saved
   } else {
-    // A custom `apply` has no profile to read: the locale store already holds
-    // the language the router guard adopted at sign-in.
+    // A custom `apply` has no regular profile to read: the locale store already
+    // holds the language the SYSTEM guard adopted at sign-in.
     loading.value = false
   }
 
@@ -109,42 +122,67 @@ watch(
 const onSelect = (code: string): void => {
   draft.value = code
   errorKey.value = null
+  warningKey.value = null
 }
 
 const onCancel = (): void => {
   draft.value = savedLanguage.value
   errorKey.value = null
+  warningKey.value = null
 }
 
-// Apply and persist the pending choice only on Save, then load the phrases for
-// the new locale. A failed write keeps the draft so the user can retry.
+// Apply and persist the pending choice only on Save. The account write goes
+// first (`PATCH /identity/me`); the UI switches only after it succeeds, and the
+// notification sync afterwards is best-effort. A failed account write keeps the
+// draft so the user can retry.
 const onSave = async (): Promise<void> => {
   errorKey.value = null
+  warningKey.value = null
 
   if (props.apply !== undefined) {
     try {
       const applied = await props.apply(draft.value)
       savedLanguage.value = applied
       draft.value = applied
-    } catch {
-      errorKey.value = 'errors.generic'
+    } catch (error) {
+      // `apply` implementations throw the repository's `AppError`; anything
+      // else (an unexpected crash) falls back to the generic copy.
+      errorKey.value = errorMessageKey(error as AppError)
     }
     return
   }
 
-  const result = await notifications.saveLocale(toApiLang(draft.value))
-  if (!result.ok) {
+  // 1) Resolve the draft to a code the backend accepts and persist it first;
+  //    nothing else happens when this fails, so the UI never shows a language
+  //    the account does not know about. A stale draft (a later-deactivated
+  //    language restored from storage) fails here without a request.
+  const languageCode = toApiLanguageCode(draft.value)
+  if (languageCode === null) {
+    errorKey.value = 'settings.invalid_language'
+    return
+  }
+  const saved = await auth.updateLanguage(languageCode)
+  if (!saved.ok) {
     errorKey.value =
-      result.error.kind === 'Validation'
-        ? 'settings.invalid_language'
-        : errorMessageKey(result.error)
+      saved.error.kind === 'Validation' ? 'settings.invalid_language' : errorMessageKey(saved.error)
     return
   }
 
-  const applied = result.value.locale === null ? draft.value : fromApiLang(result.value.locale)
+  // 2) Switch the UI — translations load before the locale flips — and remember
+  //    the code the account actually reports. `fromApiLang` restores the
+  //    internal `uzc` from the contract's `uz-Cyrl`.
+  const applied =
+    saved.value.languageCode === null ? draft.value : fromApiLang(saved.value.languageCode)
+  await i18nFeature?.switchTo(applied, ['settings', 'org', 'common'])
   savedLanguage.value = applied
   draft.value = applied
-  await i18nFeature?.switchTo(applied, ['settings', 'org', 'common'])
+
+  // 3) Keep the notification language in step (the product treats them as the
+  //    same choice). The PUT is a full replacement, so the use case reads the
+  //    current document-event level first. A failure here is soft: the language
+  //    stays switched and a warning explains the gap instead of a failed save.
+  const synced = await notifications.saveLocale(toApiLang(applied))
+  if (!synced.ok) warningKey.value = 'settings.language_sync_failed'
 }
 </script>
 
@@ -157,6 +195,7 @@ const onSave = async (): Promise<void> => {
 
     <template v-else>
       <AppAlert v-if="errorKey" variant="error">{{ t(errorKey) }}</AppAlert>
+      <AppAlert v-else-if="warningKey" variant="warning">{{ t(warningKey) }}</AppAlert>
 
       <div v-if="languagesReady" class="language-section__card">
         <div class="language-section__selector">

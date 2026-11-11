@@ -17,6 +17,7 @@ import type {
   SystemActivateResponseDto,
   SystemEnrollResponseDto,
   SystemLoginRequestDto,
+  SystemMeLanguageUpdateRequestDto,
   SystemPreAuthResponseDto,
   SystemTokenResponseDto,
   SystemTotpRequestDto,
@@ -224,6 +225,17 @@ export const createSystemAuthRepository = ({
       // and the effective permission set, and is reachable only with a SYSTEM
       // access token, so a regular token can never read a SYSTEM profile.
       const result = toResult(await client.GET('/api/v1/system/auth/me'))
+      if (!result.ok) return result
+      const profile = toSystemUserProfile(result.value)
+      if (profile === null) return err({ kind: 'Unknown', status: null })
+      return ok(profile)
+    },
+
+    async updateLanguage(languageCode) {
+      // SYSTEM has no notification preferences: this PATCH is the whole save,
+      // and the response is the fresh profile echoing the saved code.
+      const body: SystemMeLanguageUpdateRequestDto = { language_code: languageCode }
+      const result = toResult(await client.PATCH('/api/v1/system/auth/me', { body }))
       if (!result.ok) return result
       const profile = toSystemUserProfile(result.value)
       if (profile === null) return err({ kind: 'Unknown', status: null })

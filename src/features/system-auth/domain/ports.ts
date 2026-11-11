@@ -1,4 +1,5 @@
 import type { Result, UserProfile } from '@/shared/domain'
+import type { ApiLanguageCode } from '@/features/i18n'
 
 import type {
   SystemLoginChallenge,
@@ -28,6 +29,13 @@ export interface SystemAuthRepository {
   activateTotp(code: string): Promise<Result<SystemRecoveryCodes>>
   /** The SYSTEM caller's own account row (`GET /system/auth/me`). */
   getProfile(): Promise<Result<UserProfile>>
+  /**
+   * Persists the SYSTEM account's interface language (`PATCH /system/auth/me`)
+   * and returns the fresh profile. `languageCode` is the canonical backend
+   * code; the response echoes the saved value. SYSTEM has no notification
+   * preferences, so this write is the whole persistence step.
+   */
+  updateLanguage(languageCode: ApiLanguageCode): Promise<Result<UserProfile>>
   /** Rotates the session from the `system_refresh_token` cookie. Single-flight. */
   refresh(): Promise<Result<SystemSession>>
   /** Revokes the session server-side and always clears the in-memory token. */

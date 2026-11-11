@@ -52,27 +52,6 @@
               }
             }
           },
-          "422": {
-            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
-            "headers": {
-              "X-Request-ID": {
-                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
-                "schema": {
-                  "type": "string",
-                  "examples": [
-                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
-                  ]
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "429": {
             "description": "Too Many Requests. Machine codes: rate_limited.",
             "headers": {
@@ -89,7 +68,7 @@
                 "description": "Seconds to wait before retrying (set by RateLimited, 429 only).",
                 "schema": {
                   "type": "integer",
-                  "minimum": 0,
+                  "minimum": 0.0,
                   "examples": [
                     60
                   ]
@@ -106,6 +85,27 @@
           },
           "502": {
             "description": "Bad Gateway. Machine codes: otp_delivery_failed.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
             "headers": {
               "X-Request-ID": {
                 "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
@@ -233,7 +233,7 @@
                 "description": "Seconds to wait before retrying (set by RateLimited, 429 only).",
                 "schema": {
                   "type": "integer",
-                  "minimum": 0,
+                  "minimum": 0.0,
                   "examples": [
                     60
                   ]
@@ -319,27 +319,6 @@
               }
             }
           },
-          "422": {
-            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
-            "headers": {
-              "X-Request-ID": {
-                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
-                "schema": {
-                  "type": "string",
-                  "examples": [
-                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
-                  ]
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "429": {
             "description": "Too Many Requests. Machine codes: rate_limited.",
             "headers": {
@@ -356,9 +335,30 @@
                 "description": "Seconds to wait before retrying (set by RateLimited, 429 only).",
                 "schema": {
                   "type": "integer",
-                  "minimum": 0,
+                  "minimum": 0.0,
                   "examples": [
                     60
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
                   ]
                 }
               }
@@ -573,6 +573,101 @@
             "HTTPBearer": []
           }
         ]
+      },
+      "patch": {
+        "summary": "Update My Language",
+        "description": "Change the caller's own UI language and return the fresh profile (idempotent).",
+        "operationId": "update_my_language_api_v1_identity_me_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MeLanguageUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Machine codes: unauthenticated.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Machine codes: tenant_required.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
       }
     },
     "/api/v1/identity/eimzo/challenge": {
@@ -607,7 +702,7 @@
                 "description": "Seconds to wait before retrying (set by RateLimited, 429 only).",
                 "schema": {
                   "type": "integer",
-                  "minimum": 0,
+                  "minimum": 0.0,
                   "examples": [
                     60
                   ]
@@ -726,27 +821,6 @@
               }
             }
           },
-          "422": {
-            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
-            "headers": {
-              "X-Request-ID": {
-                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
-                "schema": {
-                  "type": "string",
-                  "examples": [
-                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
-                  ]
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "502": {
             "description": "Bad Gateway. Machine codes: eimzo_error.",
             "headers": {
@@ -790,6 +864,27 @@
                 "description": "Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity.",
                 "schema": {
                   "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
+                  ]
                 }
               }
             },
@@ -851,27 +946,6 @@
               }
             }
           },
-          "422": {
-            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
-            "headers": {
-              "X-Request-ID": {
-                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
-                "schema": {
-                  "type": "string",
-                  "examples": [
-                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
-                  ]
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "502": {
             "description": "Bad Gateway. Machine codes: eimzo_error.",
             "headers": {
@@ -895,6 +969,27 @@
           },
           "503": {
             "description": "Service Unavailable. Machine codes: eimzo_unavailable.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
             "headers": {
               "X-Request-ID": {
                 "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
@@ -1206,7 +1301,7 @@
                 "description": "Seconds to wait before retrying (set by RateLimited, 429 only).",
                 "schema": {
                   "type": "integer",
-                  "minimum": 0,
+                  "minimum": 0.0,
                   "examples": [
                     60
                   ]
@@ -3459,6 +3554,37 @@
               }
             }
           },
+          "429": {
+            "description": "Too Many Requests. Machine codes: rate_limited.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
+                  ]
+                }
+              },
+              "Retry-After": {
+                "description": "Seconds to wait before retrying (set by RateLimited, 429 only).",
+                "schema": {
+                  "type": "integer",
+                  "minimum": 0.0,
+                  "examples": [
+                    60
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
           "304": {
             "description": "Not modified: the If-None-Match header matched the current ETag (no body).",
             "headers": {
@@ -3478,37 +3604,6 @@
                   "examples": [
                     "public, max-age=60, stale-while-revalidate=300"
                   ]
-                }
-              }
-            }
-          },
-          "429": {
-            "description": "Too Many Requests. Machine codes: rate_limited.",
-            "headers": {
-              "X-Request-ID": {
-                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
-                "schema": {
-                  "type": "string",
-                  "examples": [
-                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
-                  ]
-                }
-              },
-              "Retry-After": {
-                "description": "Seconds to wait before retrying (set by RateLimited, 429 only).",
-                "schema": {
-                  "type": "integer",
-                  "minimum": 0,
-                  "examples": [
-                    60
-                  ]
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
                 }
               }
             }
@@ -3614,29 +3709,6 @@
               }
             }
           },
-          "304": {
-            "description": "Not modified: the If-None-Match header matched the current ETag (no body).",
-            "headers": {
-              "ETag": {
-                "description": "Strong entity tag of the representation (catalog revision + language + page set). Send it back as If-None-Match to receive 304.",
-                "schema": {
-                  "type": "string",
-                  "examples": [
-                    "\"12-uz-9f2e1c2d3e4f5a6b\""
-                  ]
-                }
-              },
-              "Cache-Control": {
-                "description": "Public caching directive: max-age plus stale-while-revalidate (seconds).",
-                "schema": {
-                  "type": "string",
-                  "examples": [
-                    "public, max-age=60, stale-while-revalidate=300"
-                  ]
-                }
-              }
-            }
-          },
           "404": {
             "description": "Not Found. Machine codes: language_not_found, page_not_found.",
             "headers": {
@@ -3706,6 +3778,29 @@
               "application/json": {
                 "schema": {
                   "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "304": {
+            "description": "Not modified: the If-None-Match header matched the current ETag (no body).",
+            "headers": {
+              "ETag": {
+                "description": "Strong entity tag of the representation (catalog revision + language + page set). Send it back as If-None-Match to receive 304.",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "\"12-uz-9f2e1c2d3e4f5a6b\""
+                  ]
+                }
+              },
+              "Cache-Control": {
+                "description": "Public caching directive: max-age plus stale-while-revalidate (seconds).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "public, max-age=60, stale-while-revalidate=300"
+                  ]
                 }
               }
             }
@@ -3781,27 +3876,6 @@
               }
             }
           },
-          "422": {
-            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
-            "headers": {
-              "X-Request-ID": {
-                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
-                "schema": {
-                  "type": "string",
-                  "examples": [
-                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
-                  ]
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "423": {
             "description": "Error. Machine codes: system_account_locked.",
             "headers": {
@@ -3839,9 +3913,30 @@
                 "description": "Seconds to wait before retrying (set by RateLimited, 429 only).",
                 "schema": {
                   "type": "integer",
-                  "minimum": 0,
+                  "minimum": 0.0,
                   "examples": [
                     60
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
                   ]
                 }
               }
@@ -3964,27 +4059,6 @@
               }
             }
           },
-          "422": {
-            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
-            "headers": {
-              "X-Request-ID": {
-                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
-                "schema": {
-                  "type": "string",
-                  "examples": [
-                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
-                  ]
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "429": {
             "description": "Too Many Requests. Machine codes: rate_limited.",
             "headers": {
@@ -4001,7 +4075,7 @@
                 "description": "Seconds to wait before retrying (set by RateLimited, 429 only).",
                 "schema": {
                   "type": "integer",
-                  "minimum": 0,
+                  "minimum": 0.0,
                   "examples": [
                     60
                   ]
@@ -4011,6 +4085,27 @@
                 "description": "Refresh cookie set/rotated on success or cleared on error; HttpOnly, path /api/v1/identity.",
                 "schema": {
                   "type": "string"
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
+                  ]
                 }
               }
             },
@@ -4243,27 +4338,6 @@
               }
             }
           },
-          "422": {
-            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
-            "headers": {
-              "X-Request-ID": {
-                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
-                "schema": {
-                  "type": "string",
-                  "examples": [
-                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
-                  ]
-                }
-              }
-            },
-            "content": {
-              "application/json": {
-                "schema": {
-                  "$ref": "#/components/schemas/ErrorResponse"
-                }
-              }
-            }
-          },
           "429": {
             "description": "Too Many Requests. Machine codes: rate_limited.",
             "headers": {
@@ -4280,9 +4354,30 @@
                 "description": "Seconds to wait before retrying (set by RateLimited, 429 only).",
                 "schema": {
                   "type": "integer",
-                  "minimum": 0,
+                  "minimum": 0.0,
                   "examples": [
                     60
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}).",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
                   ]
                 }
               }
@@ -4454,6 +4549,101 @@
           },
           "403": {
             "description": "Forbidden. Machine codes: system_account_disabled.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          }
+        },
+        "security": [
+          {
+            "HTTPBearer": []
+          }
+        ]
+      },
+      "patch": {
+        "summary": "Update My Language",
+        "description": "Change the caller's own interface language; a repeated value is a no-op.",
+        "operationId": "update_my_language_api_v1_system_auth_me_patch",
+        "requestBody": {
+          "content": {
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SystemMeLanguageUpdateRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "Successful Response",
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/SystemMeResponse"
+                }
+              }
+            }
+          },
+          "401": {
+            "description": "Unauthorized. Machine codes: system_unauthenticated.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "403": {
+            "description": "Forbidden. Machine codes: system_account_disabled.",
+            "headers": {
+              "X-Request-ID": {
+                "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
+                "schema": {
+                  "type": "string",
+                  "examples": [
+                    "018f6b2c1a4b7cc09f2e5d3b1a2c4d5e"
+                  ]
+                }
+              }
+            },
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ErrorResponse"
+                }
+              }
+            }
+          },
+          "422": {
+            "description": "Request validation failed (code ``validation_error``, problems[] = {path, code}). Application codes: system_language_unsupported.",
             "headers": {
               "X-Request-ID": {
                 "description": "Correlation id accepted from the client or generated per request (echoed by ObservabilityMiddleware).",
@@ -7689,7 +7879,7 @@
         "properties": {
           "expected_revision": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Expected Revision",
             "examples": [
               1
@@ -8445,6 +8635,34 @@
         "title": "LoginRequest",
         "description": "Password login with an email or phone identifier."
       },
+      "MeLanguageUpdateRequest": {
+        "properties": {
+          "language_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "uz",
+                  "uz-Cyrl",
+                  "ru",
+                  "en"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "language_code"
+        ],
+        "title": "MeLanguageUpdateRequest",
+        "description": "The caller's own UI language; ``null`` clears the preference."
+      },
       "MeResponse": {
         "properties": {
           "id": {
@@ -8503,6 +8721,23 @@
               }
             ],
             "title": "Auth Method"
+          },
+          "language_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "uz",
+                  "uz-Cyrl",
+                  "ru",
+                  "en"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Code"
           },
           "tenant": {
             "$ref": "#/components/schemas/TenantSummarySchema"
@@ -8735,6 +8970,23 @@
             "examples": [
               "+998901234567"
             ]
+          },
+          "language_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "uz",
+                  "uz-Cyrl",
+                  "ru",
+                  "en"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Code"
           }
         },
         "additionalProperties": false,
@@ -8790,7 +9042,7 @@
           },
           "expected_revision": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Expected Revision",
             "examples": [
               1
@@ -9512,6 +9764,34 @@
         "title": "SystemLoginRequest",
         "description": "Step 1: email + password (the response carries the pre-auth token)."
       },
+      "SystemMeLanguageUpdateRequest": {
+        "properties": {
+          "language_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "uz",
+                  "uz-Cyrl",
+                  "ru",
+                  "en"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Code"
+          }
+        },
+        "additionalProperties": false,
+        "type": "object",
+        "required": [
+          "language_code"
+        ],
+        "title": "SystemMeLanguageUpdateRequest",
+        "description": "The caller's own interface language; ``null`` clears the preference."
+      },
       "SystemMeResponse": {
         "properties": {
           "id": {
@@ -9529,6 +9809,23 @@
           "role": {
             "type": "string",
             "title": "Role"
+          },
+          "language_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "uz",
+                  "uz-Cyrl",
+                  "ru",
+                  "en"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Code"
           },
           "permissions": {
             "items": {
@@ -9548,6 +9845,7 @@
           "email",
           "display_name",
           "role",
+          "language_code",
           "permissions",
           "totp_enrolled"
         ],
@@ -10392,6 +10690,23 @@
           },
           "tenant": {
             "$ref": "#/components/schemas/TenantSummarySchema"
+          },
+          "language_code": {
+            "anyOf": [
+              {
+                "type": "string",
+                "enum": [
+                  "uz",
+                  "uz-Cyrl",
+                  "ru",
+                  "en"
+                ]
+              },
+              {
+                "type": "null"
+              }
+            ],
+            "title": "Language Code"
           }
         },
         "type": "object",
@@ -10442,7 +10757,7 @@
         "properties": {
           "expected_revision": {
             "type": "integer",
-            "minimum": 1,
+            "minimum": 1.0,
             "title": "Expected Revision",
             "examples": [
               1

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { computed, onUnmounted, ref, watch } from 'vue'
 
-import { getCurrentLocale, toApiLang } from '@/features/i18n'
+import { getCurrentLocale, toApiLang, toApiLanguageCode } from '@/features/i18n'
 import { registerErrorMessageKey } from '@/shared/presentation/errors/messages'
 
 import type { RegisterPending } from '../../domain/entities'
@@ -73,7 +73,11 @@ const canResend = computed(
   () => step.value === 'verify' && resendInSeconds.value === 0 && !isResending.value,
 )
 
-/** The contract's optional OTP-locale header, in canonical BCP 47 form. */
+/**
+ * The currently selected UI language in canonical BCP 47: it drives the
+ * contract's optional OTP-locale header and the account's initial
+ * `language_code` stored at `register/start`.
+ */
 const otpLocale = (): string => toApiLang(getCurrentLocale())
 
 const applyPending = (value: RegisterPending): void => {
@@ -91,6 +95,9 @@ const submitIdentifier = async (values: RegisterStartFormValues): Promise<void> 
     email: values.email,
     phone: values.phone,
     otpLocale: otpLocale(),
+    // The same UI language also becomes the account's initial preference; an
+    // unsupported code resolves to `null` and the field stays unset.
+    languageCode: toApiLanguageCode(getCurrentLocale()),
   })
   if (!result.ok) {
     const fieldErrorKeys = toRegisterStartFieldErrors(result.error)
@@ -115,6 +122,9 @@ const resend = async (): Promise<void> => {
     email: email.value,
     phone: phone.value,
     otpLocale: otpLocale(),
+    // The same UI language also becomes the account's initial preference; an
+    // unsupported code resolves to `null` and the field stays unset.
+    languageCode: toApiLanguageCode(getCurrentLocale()),
   })
   isResending.value = false
   if (!result.ok) {
