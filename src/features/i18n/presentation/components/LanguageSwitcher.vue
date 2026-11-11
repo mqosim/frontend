@@ -6,7 +6,7 @@ import { useRoute } from 'vue-router'
 import { I18nFeatureKey } from '../di'
 import { useLocaleStore } from '../stores/localeStore'
 import FlagIcon from './FlagIcon.vue'
-import { languageLabelFor } from './languageLabels'
+import { languageLabelFor, nativeNameFor } from './languageLabels'
 
 const { t } = useI18n()
 const store = useLocaleStore()
@@ -55,12 +55,16 @@ const languages = computed(() => store.languages)
 const selectedCode = computed(() => props.selected ?? store.locale)
 const currentLabel = computed(() => languageLabelFor(selectedCode.value))
 
-// The authenticated Settings page shows the full language names (e.g. "English")
-// instead of the short labels used in the compact header control. The name comes
-// from the active-languages API, so no language list is duplicated here.
+// The authenticated Settings page shows the full language names — always in the
+// language's own script (`Ўзбекча`, `Русский`, …), never translated into the
+// active UI language. The name comes from the active-languages API's
+// `nativeName`, with the built-in native table as the fallback, so no language
+// list is duplicated here.
 const fullNameFor = (code: string): string | null => {
-  const name = languages.value.find((language) => language.code === code)?.name
-  return name !== undefined && name.trim().length > 0 ? name : null
+  const language = languages.value.find((language) => language.code === code)
+  const native = language?.nativeName.trim()
+  if (native !== undefined && native.length > 0) return native
+  return nativeNameFor(code)
 }
 
 const currentText = computed(() =>
@@ -92,14 +96,16 @@ const orderedLanguages = computed(() => {
 })
 
 // Neither a label nor the language names are visible, so the control and every
-// option get an accessible name from the phrase plus the API name. The visible
-// short label is kept in the name too (WCAG 2.5.3 Label in Name).
+// option get an accessible name from the phrase plus the native name. The
+// visible short label is kept in the name too (WCAG 2.5.3 Label in Name).
 const labelFor = (code: string): string => {
-  const name = store.languages.find((language) => language.code === code)?.name
+  const native =
+    store.languages.find((language) => language.code === code)?.nativeName.trim() ||
+    nativeNameFor(code)
   const short = languageLabelFor(code).label
-  return name === undefined
+  return native === null
     ? `${t('common.language')}: ${short}`
-    : `${t('common.language')}: ${name} (${short})`
+    : `${t('common.language')}: ${native} (${short})`
 }
 const triggerLabel = computed(() => labelFor(selectedCode.value))
 

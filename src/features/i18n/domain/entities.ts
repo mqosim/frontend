@@ -1,6 +1,12 @@
 export interface Language {
   readonly code: string
+  /** The backend's reference name (English); display uses `nativeName`. */
   readonly name: string
+  /**
+   * The language's own name for itself (`native_name`), e.g. `Ўзбекча` for
+   * Uzbek Cyrillic — independent of the active UI language.
+   */
+  readonly nativeName: string
   readonly isDefault: boolean
 }
 

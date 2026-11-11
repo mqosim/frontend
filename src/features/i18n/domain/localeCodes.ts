@@ -12,6 +12,9 @@ const API_BY_INTERNAL: Readonly<Record<string, string>> = {
 const INTERNAL_BY_API: Readonly<Record<string, string>> = {
   'uz-cyrl': 'uzc',
   'uz-cyrl-uz': 'uzc',
+  // Underscore variant seen in stored/exported data; never emitted by the API
+  // (it always uses the hyphenated BCP 47 form) but tolerated for display.
+  uz_cyrl: 'uzc',
   uzc: 'uzc',
 }
 

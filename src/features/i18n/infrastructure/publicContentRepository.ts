@@ -63,6 +63,7 @@ export const createLanguageRepository = (client: ApiClient): LanguageRepository 
         // API's `uz-Cyrl`.
         code: fromApiLang(item.code),
         name: item.name,
+        nativeName: item.native_name ?? '',
         isDefault: item.is_default,
       })),
     )

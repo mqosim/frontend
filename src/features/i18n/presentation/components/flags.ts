@@ -9,9 +9,14 @@
  * corners, so keep the important shapes near the centre. Keep those rules when
  * adding a flag.
  *
- * To add a language, add ONE entry to `FLAGS` keyed by its lower-case code;
- * anything not listed falls back to a neutral circle in `FlagIcon.vue`.
+ * To add a language, add ONE entry to `FLAGS` keyed by its lower-case internal
+ * code; anything not listed falls back to a neutral circle in `FlagIcon.vue`.
+ * Lookups normalise the code first (`uz-Cyrl`/`uz_Cyrl` → `uzc`), so every
+ * Uzbek form — including Uzbek Cyrillic — resolves to the Uzbekistan flag.
  */
+
+import { fromApiLang } from '../../domain/localeCodes'
+
 export interface FlagRect {
   readonly x: number
   readonly y: number
@@ -62,6 +67,6 @@ export const FLAGS: Record<string, readonly FlagRect[]> = {
   ],
 }
 
-/** Case-insensitive lookup; `null` means "no flag, use the neutral fallback". */
+/** Case-insensitive lookup after code normalisation; `null` means "no flag, use the neutral fallback". */
 export const flagFor = (code: string): readonly FlagRect[] | null =>
-  FLAGS[code.trim().toLowerCase()] ?? null
+  FLAGS[fromApiLang(code.trim()).toLowerCase()] ?? null
