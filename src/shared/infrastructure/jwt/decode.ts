@@ -12,6 +12,18 @@ export interface AccessTokenClaims {
   /** Expiry, seconds since epoch. */
   readonly exp?: number
   readonly jti?: string
+  /**
+   * Audience. The SYSTEM realm mints `aud: "system"` for a session and
+   * `aud: "system-preauth"` for the pre-authentication token; JWT allows either
+   * a single string or an array.
+   */
+  readonly aud?: string | readonly string[]
+  /** Issuer (`mfin:system` in the SYSTEM realm). */
+  readonly iss?: string
+  /** SYSTEM realm role (`superadmin` | `operator` | `i18n_editor`). */
+  readonly role?: string
+  /** Authentication method the token was minted for (`password+totp`, `recovery_code`). */
+  readonly amr?: string
 }
 
 const base64UrlDecode = (segment: string): string | null => {
@@ -24,6 +36,23 @@ const base64UrlDecode = (segment: string): string | null => {
   } catch {
     return null
   }
+}
+
+/**
+ * True when the claims belong to a SYSTEM-realm access token. The SYSTEM realm
+ * identifies its tokens by audience alone (`aud: "system"`) — unlike the
+ * previous contract it carries no `ptype`/`uid` — so this is the single check
+ * that keeps a regular PERSON/ORG token from ever satisfying a SYSTEM session.
+ *
+ * The claims are read without verifying the signature: this decides which store
+ * a token is filed under, never whether the server will accept it.
+ */
+export const isSystemAccessToken = (claims: AccessTokenClaims): boolean => {
+  const aud: unknown = claims.aud
+  if (typeof aud === 'string') return aud === 'system'
+  // JWT also allows a list of audiences; a malformed value grants nothing.
+  if (!Array.isArray(aud)) return false
+  return aud.some((entry) => entry === 'system')
 }
 
 /**

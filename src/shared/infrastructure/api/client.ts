@@ -89,6 +89,11 @@ const NO_RETRY_ENDPOINTS = [
   '/system/auth/login',
   '/system/auth/refresh',
   '/system/auth/logout',
+  // The TOTP steps must not rotate the session: a wrong code is `totp_invalid`,
+  // not an expired access token, and there is no session to renew yet.
+  '/system/auth/totp',
+  '/system/auth/totp/enroll',
+  '/system/auth/totp/activate',
   // Previous contract — removed together with its slices.
   '/auth/login',
   '/auth/login_with_signature',

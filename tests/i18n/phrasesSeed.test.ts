@@ -73,6 +73,7 @@ const LABEL_KEY = /labelKey:\s*['"]([a-z0-9_.]+)['"]/g
 /** Files that return i18n keys from mappings instead of calling `t()` directly. */
 const KEY_MAP_FILES = [
   'src/features/system-admin/presentation/adminErrors.ts',
+  'src/features/system-auth/presentation/systemAuthErrors.ts',
   'src/shared/presentation/errors/messages.ts',
 ]
 

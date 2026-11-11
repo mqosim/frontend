@@ -457,6 +457,174 @@
       "uzc": "Иловага қайтиш",
       "ru": "Вернуться в приложение",
       "en": "Back to the app"
+    },
+    "system.totp_title": {
+      "uz": "Ikki bosqichli tasdiqlash",
+      "uzc": "Икки босқичли тасдиқлаш",
+      "ru": "Двухфакторная аутентификация",
+      "en": "Two-factor authentication"
+    },
+    "system.totp_subtitle": {
+      "uz": "Autentifikator ilovangizdagi 6 xonali kodni kiriting.",
+      "uzc": "Аутентификатор иловангиздаги 6 хонали кодни киритинг.",
+      "ru": "Введите 6-значный код из приложения-аутентификатора.",
+      "en": "Enter the 6-digit code from your authenticator app."
+    },
+    "system.totp_code": {
+      "uz": "Tasdiqlash kodi",
+      "uzc": "Тасдиқлаш коди",
+      "ru": "Код подтверждения",
+      "en": "Authentication code"
+    },
+    "system.totp_submit": {
+      "uz": "Tasdiqlash",
+      "uzc": "Тасдиқлаш",
+      "ru": "Подтвердить",
+      "en": "Verify"
+    },
+    "system.totp_recovery_hint": {
+      "uz": "Zaxira kodlaringizdan birini ham kiritishingiz mumkin.",
+      "uzc": "Захира кодларингиздан бирини ҳам киритишингиз мумкин.",
+      "ru": "Можно также ввести один из резервных кодов.",
+      "en": "You can also enter one of your recovery codes."
+    },
+    "system.totp_back": {
+      "uz": "Tizimga kirishga qaytish",
+      "uzc": "Тизимга киришга қайтиш",
+      "ru": "Вернуться ко входу",
+      "en": "Back to sign in"
+    },
+    "system.totp_next_code": {
+      "uz": "Ilovadagi keyingi kodni kuting va uni kiriting.",
+      "uzc": "Иловадаги кейинги кодни кутинг ва уни киритинг.",
+      "ru": "Дождитесь следующего кода в приложении и введите его.",
+      "en": "Wait for the next code in your app, then enter it."
+    },
+    "system.enroll_title": {
+      "uz": "Ikki bosqichli tasdiqlashni sozlash",
+      "uzc": "Икки босқичли тасдиқлашни созлаш",
+      "ru": "Настройка двухфакторной аутентификации",
+      "en": "Set up two-factor authentication"
+    },
+    "system.enroll_subtitle": {
+      "uz": "Quyidagi maxfiy kalitni autentifikator ilovangizga qo'shing, so'ng u yaratgan kodni tasdiqlang.",
+      "uzc": "Қуйидаги махфий калитни аутентификатор иловангизга қўшинг, сўнг у яратган кодни тасдиқланг.",
+      "ru": "Добавьте секретный ключ ниже в приложение-аутентификатор, затем подтвердите сгенерированный им код.",
+      "en": "Add the secret below to your authenticator app, then confirm the code it generates."
+    },
+    "system.enroll_secret": {
+      "uz": "Maxfiy kalit",
+      "uzc": "Махфий калит",
+      "ru": "Секретный ключ",
+      "en": "Secret key"
+    },
+    "system.enroll_uri": {
+      "uz": "Sozlash havolasi",
+      "uzc": "Созлаш ҳаволаси",
+      "ru": "Ссылка для настройки",
+      "en": "Setup link"
+    },
+    "system.enroll_continue": {
+      "uz": "Davom etish",
+      "uzc": "Давом этиш",
+      "ru": "Продолжить",
+      "en": "Continue"
+    },
+    "system.activate_title": {
+      "uz": "Sozlashni tasdiqlang",
+      "uzc": "Созлашни тасдиқланг",
+      "ru": "Подтвердите настройку",
+      "en": "Confirm enrollment"
+    },
+    "system.activate_subtitle": {
+      "uz": "Sozlashni yakunlash uchun autentifikator ilovangizdagi kodni kiriting.",
+      "uzc": "Созлашни якунлаш учун аутентификатор иловангиздаги кодни киритинг.",
+      "ru": "Введите код из приложения-аутентификатора, чтобы завершить настройку.",
+      "en": "Enter the code from your authenticator app to finish setting it up."
+    },
+    "system.activate_code": {
+      "uz": "Ilovadagi kod",
+      "uzc": "Иловадаги код",
+      "ru": "Код из приложения",
+      "en": "Code from the app"
+    },
+    "system.activate_submit": {
+      "uz": "Yoqish",
+      "uzc": "Ёқиш",
+      "ru": "Включить",
+      "en": "Turn on"
+    },
+    "system.recovery_title": {
+      "uz": "Zaxira kodlar",
+      "uzc": "Захира кодлар",
+      "ru": "Резервные коды",
+      "en": "Recovery codes"
+    },
+    "system.recovery_subtitle": {
+      "uz": "Bu kodlarni xavfsiz joyda saqlang. Har biri bir marta ishlaydi.",
+      "uzc": "Бу кодларни хавфсиз жойда сақланг. Ҳар бири бир марта ишлайди.",
+      "ru": "Сохраните эти коды в надёжном месте. Каждый работает один раз.",
+      "en": "Store these codes somewhere safe. Each one works once."
+    },
+    "system.recovery_notice": {
+      "uz": "Ular faqat bir marta ko'rsatiladi va keyin tiklanishi mumkin emas.",
+      "uzc": "Улар фақат бир марта кўрсатилади ва кейин тикланиши мумкин эмас.",
+      "ru": "Они показываются только один раз, восстановить их будет нельзя.",
+      "en": "They are shown only once and cannot be recovered later."
+    },
+    "system.recovery_continue": {
+      "uz": "Kodlarni saqlab oldim",
+      "uzc": "Кодларни сақлаб олдим",
+      "ru": "Я сохранил коды",
+      "en": "I saved the codes"
+    },
+    "system.error_invalid_credentials": {
+      "uz": "Elektron pochta yoki parol noto'g'ri.",
+      "uzc": "Электрон почта ёки парол нотўғри.",
+      "ru": "Неверная почта или пароль.",
+      "en": "Incorrect email or password."
+    },
+    "system.error_account_disabled": {
+      "uz": "Bu tizim hisobi o'chirilgan. Superadmin bilan bog'laning.",
+      "uzc": "Бу тизим ҳисоби ўчирилган. Суперадмин билан боғланинг.",
+      "ru": "Эта системная учётная запись отключена. Обратитесь к суперадминистратору.",
+      "en": "This system account is disabled. Contact a superadmin."
+    },
+    "system.error_account_locked": {
+      "uz": "Juda ko'p muvaffaqiyatsiz urinish. Keyinroq qayta urinib ko'ring.",
+      "uzc": "Жуда кўп муваффақиятсиз уриниш. Кейинроқ қайта уриниб кўринг.",
+      "ru": "Слишком много неудачных попыток. Попробуйте позже.",
+      "en": "Too many failed attempts. Try again later."
+    },
+    "system.error_pre_auth_invalid": {
+      "uz": "Kirish sessiyasi tugadi. Qaytadan boshlang.",
+      "uzc": "Кириш сессияси тугади. Қайтадан бошланг.",
+      "ru": "Сессия входа истекла. Начните заново.",
+      "en": "The sign-in session expired. Start again."
+    },
+    "system.error_totp_invalid": {
+      "uz": "Bu kod yaroqsiz. Ilovani tekshirib, qayta urinib ko'ring.",
+      "uzc": "Бу код яроқсиз. Иловани текшириб, қайта уриниб кўринг.",
+      "ru": "Неверный код. Проверьте приложение и попробуйте снова.",
+      "en": "That code is not valid. Check your app and try again."
+    },
+    "system.error_recovery_code_invalid": {
+      "uz": "Bu zaxira kod yaroqsiz.",
+      "uzc": "Бу захира код яроқсиз.",
+      "ru": "Этот резервный код недействителен.",
+      "en": "That recovery code is not valid."
+    },
+    "system.error_totp_not_enrolled": {
+      "uz": "Ikki bosqichli tasdiqlash hali sozlanmagan.",
+      "uzc": "Икки босқичли тасдиқлаш ҳали созланмаган.",
+      "ru": "Двухфакторная аутентификация ещё не настроена.",
+      "en": "Two-factor authentication is not set up yet."
+    },
+    "system.error_totp_already_enrolled": {
+      "uz": "Ikki bosqichli tasdiqlash allaqachon sozlangan. Kodni kiriting.",
+      "uzc": "Икки босқичли тасдиқлаш аллақачон созланган. Кодни киритинг.",
+      "ru": "Двухфакторная аутентификация уже настроена. Введите код.",
+      "en": "Two-factor authentication is already set up. Enter a code."
     }
   },
   "system.admin": {
@@ -2423,6 +2591,12 @@
       "uzc": "Тўлиқ исмда нотўғри белгилар бор.",
       "ru": "Полное имя содержит недопустимые символы.",
       "en": "The full name contains invalid characters."
+    },
+    "validation.max_chars": {
+      "uz": "Bu maydon juda uzun.",
+      "uzc": "Бу майдон жуда узун.",
+      "ru": "Это поле слишком длинное.",
+      "en": "This value is too long."
     },
     "errors.unprocessable": {
       "uz": "So'rovni qayta ishlab bo'lmadi.",

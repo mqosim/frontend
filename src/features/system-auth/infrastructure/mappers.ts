@@ -1,42 +1,49 @@
 import type { Principal, UserProfile } from '@/shared/domain'
 import type { components } from '@/shared/infrastructure/api/schema'
-import { decodeAccessToken } from '@/shared/infrastructure/jwt/decode'
+import { decodeAccessToken, isSystemAccessToken } from '@/shared/infrastructure/jwt/decode'
 
 type Schemas = components['schemas']
-export type SystemAuthResultDto = Schemas['AuthResult']
-export type SystemTokenPairDto = Schemas['TokenPair']
 export type SystemLoginRequestDto = Schemas['SystemLoginRequest']
-export type SystemLogoutRequestDto = Schemas['SystemLogoutRequest']
-export type SystemUserMeDto = Schemas['UserMe']
-export type SystemUpdateUserLanguageRequestDto = Schemas['UpdateUserLanguageRequest']
+export type SystemTotpRequestDto = Schemas['SystemTotpRequest']
+export type SystemActivateRequestDto = Schemas['SystemActivateRequest']
+export type SystemMeDto = Schemas['SystemMeResponse']
+/** Response bodies the repository reads; call sites add `| undefined` for a bodyless 2xx. */
+export type SystemPreAuthResponseDto = Schemas['SystemPreAuthResponse']
+export type SystemTokenResponseDto = Schemas['SystemTokenResponse']
+export type SystemEnrollResponseDto = Schemas['SystemEnrollResponse']
+export type SystemActivateResponseDto = Schemas['SystemActivateResponse']
 
 /**
- * Builds the SYSTEM principal from the (unverified) access token. A token whose
- * `ptype` is not SYSTEM is rejected, so a regular token can never satisfy a
- * SYSTEM session.
+ * Builds the SYSTEM principal from the (unverified) access token. The SYSTEM
+ * realm identifies its tokens by audience (`aud: "system"`) and carries no
+ * `ptype`/`uid`; a token minted for the regular realm therefore never satisfies
+ * the SYSTEM session. `sub` is the system user id and `exp` the expiry.
  */
 export const toSystemPrincipal = (accessToken: string): Principal | null => {
   const claims = decodeAccessToken(accessToken)
-  if (claims === null || claims.ptype !== 'SYSTEM') return null
+  if (claims === null || !isSystemAccessToken(claims)) return null
 
   return {
     type: 'SYSTEM',
-    userId: claims.uid ?? claims.sub ?? null,
+    userId: claims.sub ?? null,
     orgId: null,
     expiresAt: typeof claims.exp === 'number' ? claims.exp * 1000 : null,
   }
 }
 
-/** Maps the `/auth/me` body to the UI profile. `null` when the body is absent. */
-export const toSystemUserProfile = (dto: SystemUserMeDto | undefined): UserProfile | null => {
+/**
+ * Maps `/system/auth/me` to the shared profile the chrome already understands.
+ * The SYSTEM realm exposes no phone number and no saved language (it has no
+ * language endpoint), so those stay `null`; the display name fills `fullName`.
+ */
+export const toSystemUserProfile = (dto: SystemMeDto | undefined): UserProfile | null => {
   if (dto === undefined) return null
   return {
-    uuid: dto.uuid ?? '',
-    email: dto.email ?? null,
-    phoneNumber: dto.phone_number ?? null,
-    languageCode: dto.language_code ?? null,
-    // SYSTEM accounts cannot run the email-change flow (PERSON/ORG only), so a
-    // SYSTEM profile never reports a verified address.
+    uuid: dto.id,
+    fullName: dto.display_name,
+    email: dto.email,
+    phoneNumber: null,
+    languageCode: null,
     emailVerifiedAt: null,
   }
 }

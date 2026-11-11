@@ -27,9 +27,9 @@ import SettingsButton from '../components/SettingsButton.vue'
  * page.
  *
  * An `apply` prop replaces the account write with a custom persistence step —
- * the SYSTEM settings page saves to the SYSTEM account
- * (PUT /api/v1/system/users/me) and then switches the locale itself. Every
- * other behaviour stays identical.
+ * the SYSTEM settings page uses it to switch the locale only, because the SYSTEM
+ * realm exposes no saved-language endpoint. Every other behaviour stays
+ * identical.
  */
 const props = defineProps<{
   /**

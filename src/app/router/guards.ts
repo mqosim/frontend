@@ -8,7 +8,7 @@ import { useAdminPermissionsStore } from '@/features/system-admin'
 import type { AdminUseCases } from '@/features/system-admin'
 import { useSystemSessionStore } from '@/features/system-auth'
 import type { SystemAuthUseCases } from '@/features/system-auth'
-import type { Principal, Result, UserProfile } from '@/shared/domain'
+import type { Principal, UserProfile } from '@/shared/domain'
 import { regularDashboardRoute, workspaceOf } from '@/shared/presentation/navigation/dashboardRoute'
 import type { RegularDashboardRoute } from '@/shared/presentation/navigation/dashboardRoute'
 
@@ -33,8 +33,13 @@ export interface GuardDeps {
 }
 
 /**
- * Applies a loaded profile's saved language. Shared by the regular and SYSTEM
- * paths so the switch logic lives in one place.
+ * Applies a loaded profile's saved language, so the app renders in the user's
+ * language from the first authenticated page. Translations are loaded before the
+ * locale switches (see `I18nFeature.switchTo`), and any failure keeps the
+ * current language without blocking navigation.
+ *
+ * The regular context only: the SYSTEM realm exposes no saved language, so its
+ * screen keeps the browser's current locale.
  */
 const applyAccountLanguage = async (
   profile: UserProfile,
@@ -46,31 +51,10 @@ const applyAccountLanguage = async (
   await i18n.switchTo(code, pages)
 }
 
-/**
- * Adopts the account's saved language once a session is established, so the app
- * renders in the user's language from the first authenticated page. Translations
- * are loaded before the locale switches (see `I18nFeature.switchTo`), and any
- * failure keeps the current language without blocking navigation.
- *
- * Returns the loaded profile (or `null` on failure) so the regular bootstrap can
- * reuse it for the user id instead of issuing a second `/identity/me`.
- */
-const adoptAccountLanguage = async (
-  loadProfile: () => Promise<Result<UserProfile>>,
-  i18n: I18nFeature,
-  pages: readonly string[],
-): Promise<UserProfile | null> => {
-  const profile = await loadProfile()
-  if (!profile.ok) return null
-  await applyAccountLanguage(profile.value, i18n, pages)
-  return profile.value
-}
-
 // The saved language is adopted at most once per authenticated session, so a
 // later manual switch is not undone on every navigation. It resets when the
 // session ends, so a fresh sign-in always re-adopts the account language.
 let regularLanguageApplied = false
-let systemLanguageApplied = false
 // The person's switchable tenants are fetched at most once per authenticated
 // session (for the account label); the switch dialog re-fetches on open.
 let regularWorkspacesLoaded = false
@@ -138,7 +122,6 @@ export const createAuthGuard = ({
       }
 
       if (!store.isAuthenticated) {
-        systemLanguageApplied = false
         systemMenuDefaulted = false
         systemAdminLoaded = false
         useAdminPermissionsStore().clear()
@@ -165,12 +148,6 @@ export const createAuthGuard = ({
         return { name: 'system-login' }
       }
       if (meta.guestOnly && store.isAuthenticated) return { name: 'system-dashboard' }
-
-      // Adopt the SYSTEM account's saved language once per session.
-      if (store.isAuthenticated && !systemLanguageApplied) {
-        systemLanguageApplied = true
-        await adoptAccountLanguage(() => system.getProfile(), i18n, pages())
-      }
 
       // Resolve the caller's roles/permissions once per session, before the first
       // SYSTEM page renders, so permission-gated menu items and actions never

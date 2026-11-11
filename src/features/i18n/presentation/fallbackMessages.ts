@@ -241,6 +241,42 @@ export const fallbackMessages: Record<string, string> = {
   'system.login_submit': 'Sign in',
   'system.back_to_app': 'Back to the app',
 
+  'system.totp_title': 'Two-factor authentication',
+  'system.totp_subtitle': 'Enter the 6-digit code from your authenticator app.',
+  'system.totp_code': 'Authentication code',
+  'system.totp_submit': 'Verify',
+  'system.totp_recovery_hint': 'You can also enter one of your recovery codes.',
+  'system.totp_back': 'Back to sign in',
+  'system.totp_next_code': 'Wait for the next code in your app, then enter it.',
+
+  'system.enroll_title': 'Set up two-factor authentication',
+  'system.enroll_subtitle':
+    'Add the secret below to your authenticator app, then confirm the code it generates.',
+  'system.enroll_secret': 'Secret key',
+  'system.enroll_uri': 'Setup link',
+  'system.enroll_continue': 'Continue',
+
+  'system.activate_title': 'Confirm enrollment',
+  'system.activate_subtitle':
+    'Enter the code from your authenticator app to finish setting it up.',
+  'system.activate_code': 'Code from the app',
+  'system.activate_submit': 'Turn on',
+
+  'system.recovery_title': 'Recovery codes',
+  'system.recovery_subtitle': 'Store these codes somewhere safe. Each one works once.',
+  'system.recovery_notice': 'They are shown only once and cannot be recovered later.',
+  'system.recovery_continue': 'I saved the codes',
+
+  'system.error_invalid_credentials': 'Incorrect email or password.',
+  'system.error_account_disabled': 'This system account is disabled. Contact a superadmin.',
+  'system.error_account_locked': 'Too many failed attempts. Try again later.',
+  'system.error_pre_auth_invalid': 'The sign-in session expired. Start again.',
+  'system.error_totp_invalid': 'That code is not valid. Check your app and try again.',
+  'system.error_recovery_code_invalid': 'That recovery code is not valid.',
+  'system.error_totp_not_enrolled': 'Two-factor authentication is not set up yet.',
+  'system.error_totp_already_enrolled':
+    'Two-factor authentication is already set up. Enter a code.',
+
   'system.menu_label': 'Administration',
   'system.open_menu': 'Open menu',
   'system.close_menu': 'Close menu',

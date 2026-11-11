@@ -1,23 +1,33 @@
 import type { Result, UserProfile } from '@/shared/domain'
 
-import type { SystemLoginInput, SystemSession } from './entities'
+import type {
+  SystemLoginChallenge,
+  SystemLoginInput,
+  SystemRecoveryCodes,
+  SystemSession,
+  SystemTotpEnrollment,
+} from './entities'
 
 /**
  * Outbound port for the SYSTEM auth API. Kept entirely separate from the
- * regular repository: a SYSTEM session never calls `/auth/refresh`, and a
+ * regular repository: a SYSTEM session never calls `/identity/refresh`, and a
  * regular session never calls `/system/auth/refresh`.
+ *
+ * The contract is a two-step sign-in: `beginLogin` verifies the password and
+ * only *arms* the second factor, so it returns no session. The pre-authenticated
+ * state stays inside the implementation; the caller never handles its token.
  */
 export interface SystemAuthRepository {
-  login(input: SystemLoginInput): Promise<Result<SystemSession>>
-  /** The SYSTEM caller's own account row (`GET /auth/me`); source of the saved language. */
+  /** Step 1: verify the password. Never opens a session and never stores a token. */
+  beginLogin(input: SystemLoginInput): Promise<Result<SystemLoginChallenge>>
+  /** Step 2: verify a TOTP (or recovery) code and open the session. */
+  verifyTotp(code: string): Promise<Result<SystemSession>>
+  /** Start TOTP enrollment for the account the password step authenticated. */
+  enrollTotp(): Promise<Result<SystemTotpEnrollment>>
+  /** Confirm the enrollment; the recovery codes are returned exactly once. */
+  activateTotp(code: string): Promise<Result<SystemRecoveryCodes>>
+  /** The SYSTEM caller's own account row (`GET /system/auth/me`). */
   getProfile(): Promise<Result<UserProfile>>
-  /**
-   * Persists the SYSTEM account's UI language (`PUT /system/users/me`) and
-   * returns the refreshed profile. The settings page saves through this before
-   * switching the locale, so the choice survives sign-out and the router guard
-   * re-adopts it at the next sign-in.
-   */
-  updateLanguage(languageCode: string): Promise<Result<UserProfile>>
   /** Rotates the session from the `system_refresh_token` cookie. Single-flight. */
   refresh(): Promise<Result<SystemSession>>
   /** Revokes the session server-side and always clears the in-memory token. */
