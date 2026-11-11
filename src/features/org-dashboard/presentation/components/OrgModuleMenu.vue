@@ -246,9 +246,13 @@ const brandTo = computed<RouteLocationRaw>(() => {
 }
 
 .module-menu__label {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+  /* Long translations wrap onto a second line instead of being clipped: the
+     item's min-height keeps single-line rows unchanged and lets wrapped rows
+     grow; the icon stays centred next to the label. */
+  min-width: 0;
+  overflow-wrap: break-word;
+  white-space: normal;
+  line-height: 1.25;
 }
 
 .module-menu__footer {
