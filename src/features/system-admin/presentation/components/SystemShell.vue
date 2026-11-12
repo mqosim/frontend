@@ -17,7 +17,7 @@ const systemSession = useSystemSessionStore()
 const { collapsed, toggle } = useModuleMenu()
 const { status: adminStatus, load: reloadAdmin, loading: adminLoading } = useAdminIdentity()
 
-// A failed `/admin/me` never ends the session: the shell still renders, gated
+// A failed `/system/auth/me` never ends the session: the shell still renders, gated
 // menu items stay hidden (empty grants), and this notice offers a retry.
 const adminLoadFailed = computed(() => adminStatus.value === 'error')
 

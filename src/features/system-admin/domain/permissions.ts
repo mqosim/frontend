@@ -32,6 +32,13 @@ export const ADMIN_PERMISSIONS = {
 
 export type AdminPermissionCode = (typeof ADMIN_PERMISSIONS)[keyof typeof ADMIN_PERMISSIONS]
 
+/**
+ * Every catalogue code, for the few UI decisions that are "any admin
+ * capability at all" (the Dashboard entry) rather than one named grant.
+ */
+export const ALL_ADMIN_PERMISSIONS: readonly AdminPermissionCode[] =
+  Object.values(ADMIN_PERMISSIONS)
+
 /** True when the resolved grant set contains `permission` (exact match). */
 export const grantsPermission = (
   granted: readonly string[],

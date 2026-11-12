@@ -117,3 +117,56 @@ describe('auditLogRepository.list', () => {
     expect(result.error).toMatchObject({ code: 'system_permission_denied' })
   })
 })
+
+describe('auditLogRepository.verify', () => {
+  test('GETs the bounded verification endpoint and maps the result', async () => {
+    const calls: string[] = []
+    const client = {
+      async GET(path: string): Promise<FakeCallResult> {
+        calls.push(path)
+        return {
+          data: {
+            ok: true,
+            rows_checked: 1000,
+            verified_from_seq: 11,
+            truncated: true,
+            head_seq: 1010,
+          },
+          response: new Response(null, { status: 200 }),
+        }
+      },
+    }
+    const repository = makeRepository(client)
+
+    const result = await repository.verify()
+
+    expect(calls).toEqual(['/api/v1/system/audit/verify'])
+    if (!result.ok) throw new Error(`expected ok, got ${JSON.stringify(result.error)}`)
+    expect(result.value).toEqual({
+      ok: true,
+      rowsChecked: 1000,
+      verifiedFromSeq: 11,
+      truncated: true,
+      firstBadSeq: null,
+      headSeq: 1010,
+    })
+  })
+
+  test('surfaces a 403 when the caller lacks audit.verify', async () => {
+    const client = {
+      async GET(): Promise<FakeCallResult> {
+        return {
+          error: { error: { code: 'system_permission_denied', message: 'not allowed' } },
+          response: new Response(null, { status: 403 }),
+        }
+      },
+    }
+    const repository = makeRepository(client)
+
+    const result = await repository.verify()
+
+    if (result.ok) throw new Error('expected a forbidden error')
+    expect(result.error.kind).toBe('Forbidden')
+    expect(result.error).toMatchObject({ code: 'system_permission_denied' })
+  })
+})

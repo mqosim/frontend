@@ -67,7 +67,7 @@ let regularWorkspacesLoaded = false
 // when the session ends, so the next login always starts expanded.
 let regularMenuDefaulted = false
 let systemMenuDefaulted = false
-// The SYSTEM caller's permissions are resolved from `/admin/me` at most once per
+// The SYSTEM caller's permissions are resolved from `/system/auth/me` at most once per
 // authenticated session, before the first SYSTEM page renders, so the sidebar and
 // action buttons never flash items the caller cannot use. Resets with the session.
 let systemAdminLoaded = false
@@ -162,6 +162,17 @@ export const createAuthGuard = ({
         const result = await admin.getMe()
         if (result.ok) permissions.setLoaded(result.value)
         else permissions.setError()
+      }
+
+      // Route-level permission gate. `/system/auth/me` has already resolved in
+      // this navigation (or failed), so an unauthorized page never renders —
+      // including on a direct URL visit. A failed load denies gated routes
+      // rather than assuming access; the access-denied view offers a retry.
+      if (store.isAuthenticated && meta.systemPermission !== undefined) {
+        const permissions = useAdminPermissionsStore()
+        if (permissions.status !== 'ready' || !permissions.can(meta.systemPermission)) {
+          return { name: 'system-access-denied' }
+        }
       }
 
       // Adopt the SYSTEM account's saved language once per session, reusing the

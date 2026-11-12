@@ -1,6 +1,18 @@
 import type { Result } from '@/shared/domain'
 
 import type { AdminIdentity } from './adminAccount'
+import type {
+  AdminImportReport,
+  AdminImportRequest,
+  AdminLanguage,
+  AdminLanguagePatch,
+  AdminMissingLanguage,
+  AdminPageCreateInput,
+  AdminPagePatch,
+  AdminPhrase,
+  AdminPhrasePage,
+  AdminTranslationPage,
+} from './adminI18n'
 import type { AdminOrg, AdminOrgDetail } from './adminOrg'
 import type { AdminListQuery, AdminPage } from './adminQuery'
 import type { AdminRoleOption } from './adminRole'
@@ -35,4 +47,27 @@ export interface AdminRepository {
 
   // Fixed permission catalogue (role → permission grants)
   listRoles(): Promise<Result<readonly AdminRoleOption[]>>
+
+  // ── i18n catalog management (i18n.read / i18n.manage) ────────────────────
+  listI18nLanguages(): Promise<Result<readonly AdminLanguage[]>>
+  updateI18nLanguage(code: string, patch: AdminLanguagePatch): Promise<Result<AdminLanguage>>
+
+  listI18nPages(): Promise<Result<readonly AdminTranslationPage[]>>
+  createI18nPage(input: AdminPageCreateInput): Promise<Result<AdminTranslationPage>>
+  updateI18nPage(key: string, patch: AdminPagePatch): Promise<Result<AdminTranslationPage>>
+  deleteI18nPage(key: string): Promise<Result<void>>
+
+  listI18nPhrases(
+    page: string,
+    query: { limit: number; cursor?: string },
+  ): Promise<Result<AdminPhrasePage>>
+  upsertI18nPhrase(
+    pageKey: string,
+    phraseKey: string,
+    values: Readonly<Record<string, string>>,
+  ): Promise<Result<AdminPhrase>>
+  deleteI18nPhrase(pageKey: string, phraseKey: string): Promise<Result<void>>
+
+  getI18nMissing(): Promise<Result<readonly AdminMissingLanguage[]>>
+  importI18n(body: AdminImportRequest): Promise<Result<AdminImportReport>>
 }

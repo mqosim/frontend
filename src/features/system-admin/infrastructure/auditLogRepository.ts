@@ -3,7 +3,7 @@ import { toResult } from '@/shared/infrastructure/api/client'
 import type { ApiClient } from '@/shared/infrastructure/api/client'
 
 import type { AuditLogQuery, AuditLogRepository } from '../domain/auditLog'
-import { toAuditEntry } from './mappers'
+import { toAuditEntry, toAuditVerifyResult } from './mappers'
 
 export interface AuditLogRepositoryDeps {
   /**
@@ -35,5 +35,14 @@ export const createAuditLogRepository = ({
     const body = result.value
     if (body === undefined) return err({ kind: 'Unknown', status: null })
     return ok({ items: body.items.map(toAuditEntry), nextCursor: body.next_cursor ?? null })
+  },
+
+  async verify() {
+    // Bounded suffix verification: the backend caps the checked rows and says
+    // so via `truncated`; the UI reports the result as-is.
+    const result = toResult(await client.GET('/api/v1/system/audit/verify'))
+    if (!result.ok) return result
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
+    return ok(toAuditVerifyResult(result.value))
   },
 })

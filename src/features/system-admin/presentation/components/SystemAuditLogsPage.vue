@@ -3,12 +3,15 @@ import { computed, onMounted, ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 
 import { auditRowKey, type AuditLogEntry } from '../../domain/auditLog'
-import { formatSystemDateTime } from '../../domain/format'
+import { formatSystemCount, formatSystemDateTime } from '../../domain/format'
+import { ADMIN_PERMISSIONS } from '../../domain/permissions'
+import { adminLoadErrorKey } from '../adminErrors'
 import {
   AUDIT_RANGE_PRESETS,
   useAuditLogs,
   type AuditRangePresetId,
 } from '../composables/useAuditLogs'
+import { usePermissions } from '../composables/usePermissions'
 
 /**
  * The SYSTEM Audit Logs page, reading the FastAPI audit endpoint through the
@@ -18,6 +21,7 @@ import {
  * fields the list item already carries.
  */
 const { t, locale } = useI18n()
+const { can } = usePermissions()
 
 const {
   status,
@@ -29,7 +33,19 @@ const {
   hasMore,
   total,
   entries,
+  verifying,
+  verifyResult,
+  verifyError,
+  verify,
 } = useAuditLogs()
+
+const canVerify = computed(() => can(ADMIN_PERMISSIONS.auditVerify))
+const verifyErrorKey = computed(() =>
+  verifyError.value === null ? null : adminLoadErrorKey(verifyError.value),
+)
+
+const formatCount = (value: number): string => formatSystemCount(value, locale.value)
+const formatSeq = (value: number | null): string => (value === null ? '—' : String(value))
 
 onMounted(() => {
   void load()
@@ -104,6 +120,15 @@ const expandedDetail = computed(
           {{ t('system.audit_count', { count: total }) }}
         </p>
         <button
+          v-if="canVerify"
+          type="button"
+          class="audit-period__btn"
+          :disabled="verifying"
+          @click="verify"
+        >
+          {{ verifying ? t('system.audit_verify_running') : t('system.audit_verify') }}
+        </button>
+        <button
           type="button"
           class="audit-period__btn"
           :disabled="status === 'loading'"
@@ -112,6 +137,47 @@ const expandedDetail = computed(
           {{ t('system.audit_refresh') }}
         </button>
       </div>
+    </div>
+
+    <div v-if="verifyErrorKey !== null" class="audit-card audit__error" role="alert">
+      <p class="audit__error-text">{{ t(verifyErrorKey) }}</p>
+    </div>
+
+    <div v-else-if="verifyResult !== null" class="audit-card audit-verify">
+      <p
+        class="audit-verify__headline"
+        :class="{ 'audit-verify__headline--bad': !verifyResult.ok }"
+      >
+        {{
+          verifyResult.ok
+            ? t('system.audit_verify_ok', { count: formatCount(verifyResult.rowsChecked) })
+            : t('system.audit_verify_failed', { seq: formatSeq(verifyResult.firstBadSeq) })
+        }}
+      </p>
+      <dl class="audit-verify__grid">
+        <div class="audit-verify__item">
+          <dt>{{ t('system.audit_verify_rows') }}</dt>
+          <dd>{{ formatCount(verifyResult.rowsChecked) }}</dd>
+        </div>
+        <div class="audit-verify__item">
+          <dt>{{ t('system.audit_verify_from') }}</dt>
+          <dd>{{ formatSeq(verifyResult.verifiedFromSeq) }}</dd>
+        </div>
+        <div class="audit-verify__item">
+          <dt>{{ t('system.audit_verify_head') }}</dt>
+          <dd>{{ formatSeq(verifyResult.headSeq) }}</dd>
+        </div>
+        <div class="audit-verify__item">
+          <dt>{{ t('system.audit_verify_scope') }}</dt>
+          <dd>
+            {{
+              verifyResult.truncated
+                ? t('system.audit_verify_truncated')
+                : t('system.audit_verify_complete')
+            }}
+          </dd>
+        </div>
+      </dl>
     </div>
 
     <p v-if="status === 'loading'" class="audit__status">{{ t('common.loading') }}</p>
@@ -256,8 +322,7 @@ const expandedDetail = computed(
                               <pre
                                 v-if="payloadText(expandedDetail) !== null"
                                 class="audit-detail__payload"
-                                >{{ payloadText(expandedDetail) }}</pre
-                              >
+                                >{{ payloadText(expandedDetail) }}</pre>
                               <span v-else class="audit-detail__none">
                                 {{ t('system.audit_details_no_data') }}
                               </span>
@@ -273,13 +338,12 @@ const expandedDetail = computed(
           </div>
         </article>
 
-        <nav v-if="hasMore || loadingMore" class="audit-pagination" :aria-label="t('system.audit_title')">
-          <button
-            type="button"
-            class="audit-period__btn"
-            :disabled="loadingMore"
-            @click="loadNext"
-          >
+        <nav
+          v-if="hasMore || loadingMore"
+          class="audit-pagination"
+          :aria-label="t('system.audit_title')"
+        >
+          <button type="button" class="audit-period__btn" :disabled="loadingMore" @click="loadNext">
             {{ t('system.audit_next_page') }}
           </button>
         </nav>
@@ -399,6 +463,54 @@ const expandedDetail = computed(
 
 .audit__error-text {
   margin: 0;
+}
+
+/* ── Chain verification result ──────────────────────────────────────────── */
+.audit-verify {
+  display: flex;
+  flex-direction: column;
+  gap: var(--space-3);
+}
+
+.audit-verify__headline {
+  margin: 0;
+  color: var(--color-success, var(--color-info));
+  font-weight: 600;
+}
+
+.audit-verify__headline--bad {
+  color: var(--color-danger);
+}
+
+.audit-verify__grid {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--space-3);
+  margin: 0;
+}
+
+.audit-verify__item {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.audit-verify__item dt {
+  color: var(--color-text-muted);
+  font-size: var(--font-size-sm);
+}
+
+.audit-verify__item dd {
+  margin: 0;
+  font-variant-numeric: tabular-nums;
+  overflow-wrap: anywhere;
+}
+
+@media (max-width: 48rem) {
+  .audit-verify__grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
 }
 
 /* ── Table ──────────────────────────────────────────────────────────────── */

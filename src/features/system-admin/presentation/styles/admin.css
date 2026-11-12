@@ -94,6 +94,15 @@
   justify-content: flex-end;
 }
 
+/* Paired row controls ("Edit"/"Delete") belong on one line: stacked buttons
+   read as two unrelated actions. The table wrapper already scrolls
+   horizontally on narrow screens, so keeping them inline never clips. */
+.admin-table__actions--nowrap {
+  flex-wrap: nowrap;
+  gap: var(--space-2);
+  white-space: nowrap;
+}
+
 .admin-badge {
   display: inline-flex;
   padding: 0.125rem var(--space-2);

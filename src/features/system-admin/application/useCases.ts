@@ -1,6 +1,18 @@
 import type { Result } from '@/shared/domain'
 
 import type { AdminIdentity } from '../domain/adminAccount'
+import type {
+  AdminImportReport,
+  AdminImportRequest,
+  AdminLanguage,
+  AdminLanguagePatch,
+  AdminMissingLanguage,
+  AdminPageCreateInput,
+  AdminPagePatch,
+  AdminPhrase,
+  AdminPhrasePage,
+  AdminTranslationPage,
+} from '../domain/adminI18n'
 import type { AdminOrg, AdminOrgDetail } from '../domain/adminOrg'
 import type { AdminListQuery, AdminPage } from '../domain/adminQuery'
 import type { AdminRoleOption } from '../domain/adminRole'
@@ -26,6 +38,25 @@ export interface AdminUseCases {
   updateSystemUser(id: string, patch: AdminSystemUserPatch): Promise<Result<AdminSystemUser>>
 
   listRoles(): Promise<Result<readonly AdminRoleOption[]>>
+
+  listI18nLanguages(): Promise<Result<readonly AdminLanguage[]>>
+  updateI18nLanguage(code: string, patch: AdminLanguagePatch): Promise<Result<AdminLanguage>>
+  listI18nPages(): Promise<Result<readonly AdminTranslationPage[]>>
+  createI18nPage(input: AdminPageCreateInput): Promise<Result<AdminTranslationPage>>
+  updateI18nPage(key: string, patch: AdminPagePatch): Promise<Result<AdminTranslationPage>>
+  deleteI18nPage(key: string): Promise<Result<void>>
+  listI18nPhrases(
+    page: string,
+    query: { limit: number; cursor?: string },
+  ): Promise<Result<AdminPhrasePage>>
+  upsertI18nPhrase(
+    pageKey: string,
+    phraseKey: string,
+    values: Readonly<Record<string, string>>,
+  ): Promise<Result<AdminPhrase>>
+  deleteI18nPhrase(pageKey: string, phraseKey: string): Promise<Result<void>>
+  getI18nMissing(): Promise<Result<readonly AdminMissingLanguage[]>>
+  importI18n(body: AdminImportRequest): Promise<Result<AdminImportReport>>
 }
 
 export const createAdminUseCases = ({ repository }: AdminUseCaseDeps): AdminUseCases => ({
@@ -39,4 +70,17 @@ export const createAdminUseCases = ({ repository }: AdminUseCaseDeps): AdminUseC
   getSystemUser: (id) => repository.getSystemUser(id),
   updateSystemUser: (id, patch) => repository.updateSystemUser(id, patch),
   listRoles: () => repository.listRoles(),
+
+  listI18nLanguages: () => repository.listI18nLanguages(),
+  updateI18nLanguage: (code, patch) => repository.updateI18nLanguage(code, patch),
+  listI18nPages: () => repository.listI18nPages(),
+  createI18nPage: (input) => repository.createI18nPage(input),
+  updateI18nPage: (key, patch) => repository.updateI18nPage(key, patch),
+  deleteI18nPage: (key) => repository.deleteI18nPage(key),
+  listI18nPhrases: (page, query) => repository.listI18nPhrases(page, query),
+  upsertI18nPhrase: (pageKey, phraseKey, values) =>
+    repository.upsertI18nPhrase(pageKey, phraseKey, values),
+  deleteI18nPhrase: (pageKey, phraseKey) => repository.deleteI18nPhrase(pageKey, phraseKey),
+  getI18nMissing: () => repository.getI18nMissing(),
+  importI18n: (body) => repository.importI18n(body),
 })

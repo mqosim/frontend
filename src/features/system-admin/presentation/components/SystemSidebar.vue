@@ -8,6 +8,7 @@ import BrandLogo from '@/shared/presentation/components/BrandLogo.vue'
 import ModuleIcon from '@/shared/presentation/components/ModuleIcon.vue'
 
 import { SYSTEM_MENU } from '../../application/menu'
+import { adminRoleLabelKey } from '../../domain/adminRole'
 import type { SystemNavDefinition } from '../../domain/menu'
 import { usePermissions } from '../composables/usePermissions'
 
@@ -21,10 +22,11 @@ const emit = defineEmits<{ 'toggle-collapse': []; close: [] }>()
 
 const { t } = useI18n()
 const route = useRoute()
-const { can, canAny } = usePermissions()
+const { can, canAny, role } = usePermissions()
 
 // UX-only gating: entries whose permission the caller lacks are hidden (an entry
-// without a permission is always shown). The server remains the authority.
+// without a permission is shown to any admin grant). The server remains the
+// authority.
 const menuItems = computed(() =>
   SYSTEM_MENU.filter(
     (item) =>
@@ -33,9 +35,15 @@ const menuItems = computed(() =>
   ),
 )
 
-/** Modules live on the module route; the Dashboard names its own route. */
+/** The translated role label; an unknown value renders as its raw code. */
+const roleLabel = computed(() => {
+  const key = adminRoleLabelKey(role.value)
+  return key === null ? (role.value ?? '—') : t(key)
+})
+
+/** Every entry names its own route (no generic module page remains). */
 const itemTarget = (item: SystemNavDefinition): RouteLocationRaw =>
-  item.to ?? { name: 'system-module', params: { module: item.id } }
+  item.to ?? { name: 'system-dashboard' }
 </script>
 
 <template>
@@ -103,6 +111,8 @@ const itemTarget = (item: SystemNavDefinition): RouteLocationRaw =>
       <dl class="system-menu__account">
         <dt>{{ t('system.principal') }}</dt>
         <dd>{{ principalType }}</dd>
+        <dt>{{ t('system.role_label') }}</dt>
+        <dd>{{ roleLabel }}</dd>
       </dl>
 
       <span class="system-menu__badge">{{ t('system.badge') }}</span>

@@ -10,17 +10,20 @@ export interface Permissions {
   readonly can: (permission: AdminPermissionCode) => boolean
   /** True when the current grants contain at least one of `permissions`. */
   readonly canAny: (permissions: readonly AdminPermissionCode[]) => boolean
-  /** The caller's resolved roles. */
-  readonly roles: ComputedRef<readonly string[]>
-  /** True once `/admin/me` has been loaded for this session. */
+  /** The caller's single backend role, or `null` before `/system/auth/me` resolves. */
+  readonly role: ComputedRef<string | null>
+  /** The raw resolved grant set (for menu/route gates that need the list). */
+  readonly grants: ComputedRef<readonly string[]>
+  /** True once `/system/auth/me` has been loaded for this session. */
   readonly isLoaded: ComputedRef<boolean>
   readonly identity: ComputedRef<AdminIdentity | null>
 }
 
 /**
  * Reads the current SYSTEM caller's permissions. `can(...)` is reactive: a call
- * inside a `computed` re-evaluates when `/admin/me` resolves or the session
- * clears. Missing permissions simply mean "hide" — the server still enforces.
+ * inside a `computed` re-evaluates when `/system/auth/me` resolves or the
+ * session clears. Missing permissions simply mean "hide" — the server still
+ * enforces.
  */
 export const usePermissions = (): Permissions => {
   const store = useAdminPermissionsStore()
@@ -32,7 +35,8 @@ export const usePermissions = (): Permissions => {
   return {
     can,
     canAny,
-    roles: computed(() => store.roles),
+    role: computed(() => store.role),
+    grants: computed(() => store.permissions),
     isLoaded: computed(() => store.isLoaded),
     identity: computed(() => store.identity),
   }

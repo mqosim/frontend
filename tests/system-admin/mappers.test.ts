@@ -21,6 +21,7 @@ import {
   toAdminRoleOptions,
   toAdminSystemUser,
   toAuditEntry,
+  toAuditVerifyResult,
   toSystemUserUpdateRequest,
 } from '../../src/features/system-admin/infrastructure/mappers'
 
@@ -67,8 +68,20 @@ describe('toAdminIdentity', () => {
     })
     expect(profile?.uuid).toBe('018f0000-0000-7000-8000-000000000003')
     expect(profile?.email).toBe('admin@example.com')
-    expect(profile?.roles).toEqual(['superadmin'])
+    expect(profile?.role).toBe('superadmin')
     expect(profile?.permissions).toEqual(['system.users.read', 'audit.read'])
+  })
+
+  test('keeps a missing role null instead of inventing one', () => {
+    const profile = toAdminIdentity({
+      id: '018f0000-0000-7000-8000-000000000003',
+      email: 'admin@example.com',
+      display_name: 'ADMIN',
+      permissions: [],
+      totp_enrolled: false,
+    })
+    expect(profile?.role).toBeNull()
+    expect(profile?.permissions).toEqual([])
   })
 
   test('returns null when the body is missing', () => {
@@ -190,7 +203,9 @@ describe('toAdminRoleOptions', () => {
       },
     })
     expect(options.map((option) => option.role)).toEqual(['i18n_editor', 'operator', 'superadmin'])
-    expect(options.find((option) => option.role === 'operator')?.permissions).toEqual(['audit.read'])
+    expect(options.find((option) => option.role === 'operator')?.permissions).toEqual([
+      'audit.read',
+    ])
   })
 })
 
@@ -246,5 +261,41 @@ describe('toAuditEntry', () => {
     expect(entry.resourceId).toBeNull()
     expect(entry.ip).toBeNull()
     expect(entry.requestId).toBeNull()
+  })
+})
+
+describe('toAuditVerifyResult', () => {
+  test('maps the bounded verification result', () => {
+    expect(
+      toAuditVerifyResult({
+        ok: true,
+        rows_checked: 500,
+        verified_from_seq: 42,
+        truncated: true,
+        head_seq: 541,
+      }),
+    ).toEqual({
+      ok: true,
+      rowsChecked: 500,
+      verifiedFromSeq: 42,
+      truncated: true,
+      firstBadSeq: null,
+      headSeq: 541,
+    })
+  })
+
+  test('keeps the first bad position and a null head on failure', () => {
+    const result = toAuditVerifyResult({
+      ok: false,
+      rows_checked: 10,
+      verified_from_seq: null,
+      truncated: false,
+      first_bad_seq: 7,
+      head_seq: null,
+    })
+    expect(result.ok).toBe(false)
+    expect(result.firstBadSeq).toBe(7)
+    expect(result.headSeq).toBeNull()
+    expect(result.verifiedFromSeq).toBeNull()
   })
 })

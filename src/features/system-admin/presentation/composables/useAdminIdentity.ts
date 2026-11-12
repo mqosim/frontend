@@ -3,7 +3,7 @@ import { computed, ref } from 'vue'
 import { useAdminPermissionsStore } from '../stores/adminPermissionsStore'
 import { useAdminUseCases } from './useAdminUseCases'
 
-/** Loads/retries `/admin/me` without touching the session — a failure never logs out. */
+/** Loads/retries `/system/auth/me` without touching the session — a failure never logs out. */
 export const useAdminIdentity = () => {
   const admin = useAdminUseCases()
   const store = useAdminPermissionsStore()
@@ -24,6 +24,6 @@ export const useAdminIdentity = () => {
     loading,
     status: computed(() => store.status),
     identity: computed(() => store.identity),
-    roles: computed(() => store.roles),
+    role: computed(() => store.role),
   }
 }

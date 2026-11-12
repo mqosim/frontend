@@ -35,3 +35,31 @@ export const adminActionErrorKey = (error: AppError, kind: AdminActionKind): str
 /** List/detail load failures: a 403 means the caller lacks the page permission. */
 export const adminLoadErrorKey = (error: AppError): string =>
   error.kind === 'Forbidden' ? 'system.admin_error_forbidden' : errorMessageKey(error)
+
+/**
+ * Mutation failures of the i18n catalog endpoints. The backend reports its
+ * invariants with dedicated machine codes (a default language cannot be
+ * cleared, the last active language cannot be deactivated, a page must be empty
+ * before deletion, keys are unique), so copy is chosen from the code first.
+ */
+const I18N_CODE_KEYS: Readonly<Record<string, string>> = {
+  language_default_required: 'system.i18n_error_default_required',
+  language_last_active: 'system.i18n_error_last_active',
+  language_not_found: 'system.i18n_error_language_not_found',
+  page_key_taken: 'system.i18n_error_page_key_taken',
+  page_not_empty: 'system.i18n_error_page_not_empty',
+  phrase_key_taken: 'system.i18n_error_phrase_key_taken',
+  phrase_not_found: 'system.i18n_error_phrase_not_found',
+  import_too_large: 'system.i18n_error_import_too_large',
+  invalid_translation_key: 'system.i18n_error_invalid_key',
+  invalid_translation_value: 'system.i18n_error_invalid_value',
+  translation_value_too_long: 'system.i18n_error_value_too_long',
+}
+
+export const i18nActionErrorKey = (error: AppError): string => {
+  if ('code' in error && error.code !== undefined) {
+    const key = I18N_CODE_KEYS[error.code]
+    if (key !== undefined) return key
+  }
+  return adminActionErrorKey(error, 'update-system-user')
+}

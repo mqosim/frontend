@@ -182,6 +182,11 @@ export const MODULE_ICONS: Record<string, ModuleIconShape> = {
   reports: {
     paths: ['M3 3v16a2 2 0 0 0 2 2h16', 'M18 17V9', 'M13 17V5', 'M8 17v-3'],
   },
+  // i18n: a globe, the interface-language catalog.
+  i18n: {
+    circles: [{ cx: 12, cy: 12, r: 9 }],
+    paths: ['M3 12h18', 'M12 3a14 14 0 0 1 0 18', 'M12 3a14 14 0 0 0 0 18'],
+  },
   // Audit: a shield with a check, the verified activity log.
   audit: {
     paths: [

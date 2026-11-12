@@ -9,6 +9,7 @@ import AppButton from '@/shared/presentation/components/AppButton.vue'
 import ConfirmDialog from '@/shared/presentation/components/ConfirmDialog.vue'
 
 import type { AdminRoleOption } from '../../domain/adminRole'
+import { adminRoleLabelKey } from '../../domain/adminRole'
 import type { AdminSystemUser } from '../../domain/adminUser'
 import { formatSystemDateTime } from '../../domain/format'
 import { ADMIN_PERMISSIONS } from '../../domain/permissions'
@@ -96,6 +97,12 @@ const formatDate = (value: string | null): string =>
 
 const isActive = (user: AdminSystemUser): boolean => user.status === 'active'
 
+/** Translated role label; unknown values render as their raw code. */
+const roleLabel = (role: string): string => {
+  const key = adminRoleLabelKey(role)
+  return key === null ? role : t(key)
+}
+
 const selectRole = (role: string): void => {
   if (!canManage.value || rolesSaving.value) return
   rolesSaved.value = false
@@ -147,10 +154,7 @@ const askEnable = (user: AdminSystemUser): void => {
 </script>
 
 <template>
-  <AdminPage
-    :title="t('system.system_users_detail_title')"
-    :subtitle="detail?.email ?? detail?.id"
-  >
+  <AdminPage :title="t('system.system_users_detail_title')" :subtitle="detail?.email ?? detail?.id">
     <div class="admin-actions">
       <AppButton variant="ghost" @click="back()">{{ t('system.admin_back') }}</AppButton>
     </div>
@@ -178,12 +182,7 @@ const askEnable = (user: AdminSystemUser): void => {
         >
           {{ t('system.system_users_block') }}
         </AppButton>
-        <AppButton
-          v-else
-          variant="ghost"
-          :disabled="!canManage || busy"
-          @click="askEnable(detail)"
-        >
+        <AppButton v-else variant="ghost" :disabled="!canManage || busy" @click="askEnable(detail)">
           {{ t('system.system_users_unblock') }}
         </AppButton>
       </div>
@@ -214,7 +213,7 @@ const askEnable = (user: AdminSystemUser): void => {
         </div>
         <div class="admin-detail__item">
           <dt>{{ t('system.system_users_col_roles') }}</dt>
-          <dd class="admin-table__mono">{{ detail.role }}</dd>
+          <dd>{{ roleLabel(detail.role) }}</dd>
         </div>
         <div class="admin-detail__item">
           <dt>{{ t('system.admin_created') }}</dt>
@@ -249,7 +248,11 @@ const askEnable = (user: AdminSystemUser): void => {
         <template v-else>
           <!-- Exactly one role per staff account (a backend CHECK enforces it),
                so the former checkbox list becomes a single-choice radio group. -->
-          <ul class="admin-checkbox-list" role="radiogroup" :aria-label="t('system.system_users_col_roles')">
+          <ul
+            class="admin-checkbox-list"
+            role="radiogroup"
+            :aria-label="t('system.system_users_col_roles')"
+          >
             <li v-for="role in roles" :key="role.role" class="admin-checkbox">
               <input
                 :id="`role-${role.role}`"
@@ -260,7 +263,8 @@ const askEnable = (user: AdminSystemUser): void => {
                 @change="selectRole(role.role)"
               />
               <label :for="`role-${role.role}`">
-                <span class="admin-table__mono">{{ role.role }}</span>
+                <span>{{ roleLabel(role.role) }}</span>
+                <span class="admin-table__sub admin-table__mono">{{ role.role }}</span>
                 <span class="admin-table__sub">
                   {{
                     t('system.system_users_role_permissions', { count: role.permissions.length })

@@ -4,6 +4,12 @@ import { toResult } from '@/shared/infrastructure/api/client'
 import type { ApiClient } from '@/shared/infrastructure/api/client'
 
 import type { AdminListQuery, AdminPage } from '../domain/adminQuery'
+import type {
+  AdminImportRequest,
+  AdminLanguagePatch,
+  AdminPageCreateInput,
+  AdminPagePatch,
+} from '../domain/adminI18n'
 import type { AdminSystemUserPatch } from '../domain/adminUser'
 import type { AdminRepository } from '../domain/ports'
 import {
@@ -15,6 +21,18 @@ import {
   toAdminSystemUser,
   toSystemUserUpdateRequest,
 } from './mappers'
+import {
+  toAdminImportReport,
+  toAdminLanguage,
+  toAdminMissingLanguage,
+  toAdminPhrase,
+  toAdminTranslationPage,
+  toImportRequest,
+  toLanguageUpdateRequest,
+  toPageCreateRequest,
+  toPageUpdateRequest,
+  toPhraseUpsertRequest,
+} from './i18nMappers'
 
 export interface AdminRepositoryDeps {
   /**
@@ -153,5 +171,125 @@ export const createAdminRepository = ({ client }: AdminRepositoryDeps): AdminRep
     if (!result.ok) return result
     if (result.value === undefined) return err({ kind: 'Unknown', status: null })
     return ok(toAdminRoleOptions(result.value))
+  },
+
+  // ── i18n catalog management ───────────────────────────────────────────────
+  async listI18nLanguages() {
+    const result = toResult(await client.GET('/api/v1/system/i18n/languages'))
+    if (!result.ok) return result
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
+    return ok(result.value.items.map(toAdminLanguage))
+  },
+
+  async updateI18nLanguage(code: string, patch: AdminLanguagePatch) {
+    const result = toResult(
+      await client.PATCH('/api/v1/system/i18n/languages/{code}', {
+        params: { path: { code } },
+        body: toLanguageUpdateRequest(patch),
+      }),
+    )
+    if (!result.ok) return result
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
+    return ok(toAdminLanguage(result.value))
+  },
+
+  async listI18nPages() {
+    const result = toResult(await client.GET('/api/v1/system/i18n/pages'))
+    if (!result.ok) return result
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
+    return ok(result.value.items.map(toAdminTranslationPage))
+  },
+
+  async createI18nPage(input: AdminPageCreateInput) {
+    const result = toResult(
+      await client.POST('/api/v1/system/i18n/pages', { body: toPageCreateRequest(input) }),
+    )
+    if (!result.ok) return result
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
+    return ok(toAdminTranslationPage(result.value))
+  },
+
+  async updateI18nPage(key: string, patch: AdminPagePatch) {
+    const result = toResult(
+      await client.PATCH('/api/v1/system/i18n/pages/{page_key}', {
+        params: { path: { page_key: key } },
+        body: toPageUpdateRequest(patch),
+      }),
+    )
+    if (!result.ok) return result
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
+    return ok(toAdminTranslationPage(result.value))
+  },
+
+  async deleteI18nPage(key: string) {
+    const result = toResult(
+      await client.DELETE('/api/v1/system/i18n/pages/{page_key}', {
+        params: { path: { page_key: key } },
+      }),
+    )
+    if (!result.ok) return result
+    return ok(undefined)
+  },
+
+  async listI18nPhrases(page: string, query: { limit: number; cursor?: string }) {
+    const result = toResult(
+      await client.GET('/api/v1/system/i18n/phrases', {
+        params: {
+          query: {
+            page,
+            limit: query.limit,
+            ...(query.cursor === undefined ? {} : { cursor: query.cursor }),
+          },
+        },
+      }),
+    )
+    if (!result.ok) return result
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
+    return ok({
+      items: result.value.items.map(toAdminPhrase),
+      nextCursor: result.value.next_cursor ?? null,
+    })
+  },
+
+  async upsertI18nPhrase(
+    pageKey: string,
+    phraseKey: string,
+    values: Readonly<Record<string, string>>,
+  ) {
+    const result = toResult(
+      await client.PUT('/api/v1/system/i18n/phrases/{page_key}/{phrase_key}', {
+        params: { path: { page_key: pageKey, phrase_key: phraseKey } },
+        body: toPhraseUpsertRequest(values),
+      }),
+    )
+    if (!result.ok) return result
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
+    return ok(toAdminPhrase(result.value))
+  },
+
+  async deleteI18nPhrase(pageKey: string, phraseKey: string) {
+    const result = toResult(
+      await client.DELETE('/api/v1/system/i18n/phrases/{page_key}/{phrase_key}', {
+        params: { path: { page_key: pageKey, phrase_key: phraseKey } },
+      }),
+    )
+    if (!result.ok) return result
+    return ok(undefined)
+  },
+
+  async getI18nMissing() {
+    const result = toResult(await client.GET('/api/v1/system/i18n/missing'))
+    if (!result.ok) return result
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
+    return ok(result.value.items.map(toAdminMissingLanguage))
+  },
+
+  async importI18n(body: AdminImportRequest) {
+    const result = toResult(
+      await client.POST('/api/v1/system/i18n/import', { body: toImportRequest(body) }),
+    )
+    if (!result.ok) return result
+    if (result.value === undefined) return err({ kind: 'Unknown', status: null })
+    return ok(toAdminImportReport(result.value))
   },
 })

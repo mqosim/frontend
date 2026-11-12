@@ -8,6 +8,7 @@ import AppButton from '@/shared/presentation/components/AppButton.vue'
 import ConfirmDialog from '@/shared/presentation/components/ConfirmDialog.vue'
 
 import type { AdminSystemUser } from '../../domain/adminUser'
+import { adminRoleLabelKey } from '../../domain/adminRole'
 import { formatSystemDateTime } from '../../domain/format'
 import { ADMIN_PERMISSIONS } from '../../domain/permissions'
 import { adminLoadErrorKey } from '../adminErrors'
@@ -63,6 +64,12 @@ const visibleItems = computed(() =>
 )
 
 const isActive = (user: AdminSystemUser): boolean => user.status === 'active'
+
+/** Translated role label; unknown values render as their raw code. */
+const roleLabel = (role: string): string => {
+  const key = adminRoleLabelKey(role)
+  return key === null ? role : t(key)
+}
 
 onMounted(() => void load())
 
@@ -147,7 +154,7 @@ const askEnable = (user: AdminSystemUser): void => {
                   <span class="admin-table__sub admin-table__mono">{{ user.id }}</span>
                 </td>
                 <td>
-                  <span class="admin-table__mono">{{ user.role }}</span>
+                  <span>{{ roleLabel(user.role) }}</span>
                 </td>
                 <td>
                   <span

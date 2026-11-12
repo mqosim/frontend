@@ -725,16 +725,16 @@
       "en": "This section is a placeholder — its management service has not been connected yet."
     },
     "system.dash_title": {
-      "uz": "Platforma bir qarashda",
-      "uzc": "Платформа бир қарашда",
-      "ru": "Платформа одним взглядом",
-      "en": "Platform at a glance"
+      "uz": "Boshqaruv",
+      "uzc": "Бошқарув",
+      "ru": "Администрирование",
+      "en": "Administration"
     },
     "system.dash_subtitle": {
-      "uz": "Tashkilotlar, foydalanuvchilar va platforma faoliyatining qisqacha xulosasi.",
-      "uzc": "Ташкилотлар, фойдаланувчилар ва платформа фаолиятининг қисқача хулосаси.",
-      "ru": "Краткий обзор организаций, пользователей и активности платформы.",
-      "en": "A summary of organizations, users and platform activity."
+      "uz": "Hisobingiz uchun mavjud boshqaruv bo'limlari.",
+      "uzc": "Ҳисобингиз учун мавжуд бошқарув бўлимлари.",
+      "ru": "Разделы администрирования, доступные вашей учётной записи.",
+      "en": "Administration areas available to your account."
     },
     "system.dash_sample_notice": {
       "uz": "Namuna ma'lumotlar — quyidagi raqamlar va nomlar haqiqiy platforma statistikasi emas.",
@@ -1623,6 +1623,582 @@
       "uzc": "Роллар янгиланди.",
       "ru": "Роли обновлены.",
       "en": "Roles updated."
+    },
+    "system.access_denied_title": {
+      "uz": "Kirish taqiqlangan",
+      "uzc": "Кириш тақиқланган",
+      "ru": "Доступ запрещён",
+      "en": "Access denied"
+    },
+    "system.access_denied_text": {
+      "uz": "Hisobingizda bu bo'limni ochish uchun ruxsat yo'q. Rolingiz bergan bo'limlardan foydalaning yoki administratorga murojaat qiling.",
+      "uzc": "Ҳисобингизда бу бўлимни очиш учун рухсат йўқ. Ролингиз берган бўлимлардан фойдаланинг ёки администраторга мурожаат қилинг.",
+      "ru": "У вашей учётной записи нет прав для открытия этого раздела. Используйте доступные вашей роли разделы или обратитесь к администратору.",
+      "en": "Your account does not have permission to open this section. Use the areas your role grants, or contact an administrator."
+    },
+    "system.access_denied_back": {
+      "uz": "Mavjud bo'limga o'tish",
+      "uzc": "Мавжуд бўлимга ўтиш",
+      "ru": "Перейти в доступный раздел",
+      "en": "Go to an available section"
+    },
+    "system.access_denied_retry": {
+      "uz": "Qayta urinish",
+      "uzc": "Қайта уриниш",
+      "ru": "Повторить",
+      "en": "Try again"
+    },
+    "system.access_denied_none": {
+      "uz": "Hisobingizda hech qanday boshqaruv ruxsati yo'q.",
+      "uzc": "Ҳисобингизда ҳеч қандай бошқарув рухсати йўқ.",
+      "ru": "У вашей учётной записи нет прав администрирования.",
+      "en": "Your account has no administration permissions."
+    },
+    "system.admin_edit": {
+      "uz": "Tahrirlash",
+      "uzc": "Таҳрирлаш",
+      "ru": "Изменить",
+      "en": "Edit"
+    },
+    "system.dash_hint_organizations": {
+      "uz": "Tashkilotlar va ularning a'zolarini ko'rish.",
+      "uzc": "Ташкилотлар ва уларнинг аъзоларини кўриш.",
+      "ru": "Просмотр организаций и их участников.",
+      "en": "Browse organizations and their membership."
+    },
+    "system.dash_hint_system_users": {
+      "uz": "Boshqaruv paneli xodimlari hisoblarini boshqarish.",
+      "uzc": "Бошқарув панели ходимлари ҳисобларини бошқариш.",
+      "ru": "Управление учётными записями сотрудников панели управления.",
+      "en": "Manage control-plane staff accounts."
+    },
+    "system.dash_hint_i18n": {
+      "uz": "Interfeys tillari, sahifalari va iboralarini boshqarish.",
+      "uzc": "Интерфейс тиллари, саҳифалари ва ибораларини бошқариш.",
+      "ru": "Управление языками интерфейса, страницами и фразами.",
+      "en": "Manage interface languages, pages and phrases."
+    },
+    "system.dash_hint_audit": {
+      "uz": "Xavfsizlikka oid harakatlarni ko'rib chiqish.",
+      "uzc": "Хавфсизликка оид ҳаракатларни кўриб чиқиш.",
+      "ru": "Просмотр событий, связанных с безопасностью.",
+      "en": "Review security-relevant activity."
+    },
+    "system.dash_i18n_welcome": {
+      "uz": "Hisobingiz interfeys tarjimalarini boshqaradi. Davom etish uchun katalogni oching.",
+      "uzc": "Ҳисобингиз интерфейс таржималарини бошқаради. Давом этиш учун каталогни очинг.",
+      "ru": "Ваша учётная запись управляет переводами интерфейса. Откройте каталог, чтобы продолжить.",
+      "en": "Your account manages interface translations. Open the catalog to continue."
+    },
+    "system.audit_verify": {
+      "uz": "Zanjirni tekshirish",
+      "uzc": "Занжирни текшириш",
+      "ru": "Проверить цепочку",
+      "en": "Verify chain"
+    },
+    "system.audit_verify_running": {
+      "uz": "Tekshirilmoqda…",
+      "uzc": "Текширилмоқда…",
+      "ru": "Проверка…",
+      "en": "Verifying…"
+    },
+    "system.audit_verify_ok": {
+      "uz": "Zanjir tekshirildi — {count} yozuv tekshirildi.",
+      "uzc": "Занжир текширилди — {count} ёзув текширилди.",
+      "ru": "Цепочка проверена — проверено записей: {count}.",
+      "en": "Chain verified — {count} entries checked."
+    },
+    "system.audit_verify_failed": {
+      "uz": "Zanjir tekshiruvi {seq} ketma-ketlikda muvaffaqiyatsiz bo'ldi.",
+      "uzc": "Занжир текшируви {seq} кетма-кетликда муваффақиятсиз бўлди.",
+      "ru": "Проверка цепочки не удалась на последовательности {seq}.",
+      "en": "Chain verification failed at sequence {seq}."
+    },
+    "system.audit_verify_rows": {
+      "uz": "Tekshirilgan yozuvlar",
+      "uzc": "Текширилган ёзувлар",
+      "ru": "Проверено записей",
+      "en": "Entries checked"
+    },
+    "system.audit_verify_from": {
+      "uz": "Tekshirish boshlangan",
+      "uzc": "Текшириш бошланган",
+      "ru": "Проверено начиная с",
+      "en": "Verified from"
+    },
+    "system.audit_verify_head": {
+      "uz": "Zanjir boshi",
+      "uzc": "Занжир боши",
+      "ru": "Начало цепочки",
+      "en": "Chain head"
+    },
+    "system.audit_verify_scope": {
+      "uz": "Qamrov",
+      "uzc": "Қамров",
+      "ru": "Охват",
+      "en": "Scope"
+    },
+    "system.audit_verify_complete": {
+      "uz": "Barcha mavjud yozuvlar",
+      "uzc": "Барча мавжуд ёзувлар",
+      "ru": "Все доступные записи",
+      "en": "All available entries"
+    },
+    "system.audit_verify_truncated": {
+      "uz": "Faqat eng yangi yozuvlar",
+      "uzc": "Фақат энг янги ёзувлар",
+      "ru": "Только последние записи",
+      "en": "Newest entries only"
+    },
+    "system.i18n_title": {
+      "uz": "Interfeys tarjimalari",
+      "uzc": "Интерфейс таржималари",
+      "ru": "Переводы интерфейса",
+      "en": "Interface translations"
+    },
+    "system.i18n_subtitle": {
+      "uz": "Interfeys tillari, sahifalari va iboralarini boshqaring.",
+      "uzc": "Интерфейс тиллари, саҳифалари ва ибораларини бошқаринг.",
+      "ru": "Управляйте языками интерфейса, страницами и фразами.",
+      "en": "Manage interface languages, pages and phrases."
+    },
+    "system.i18n_read_only": {
+      "uz": "Katalogni ko'rishingiz mumkin; o'zgartirish uchun i18n boshqaruv ruxsati kerak.",
+      "uzc": "Каталогни кўришингиз мумкин; ўзгартириш учун i18n бошқарув рухсати керак.",
+      "ru": "Вы можете просматривать каталог; для изменений нужно право управления i18n.",
+      "en": "You can view the catalog; changes require the i18n manage permission."
+    },
+    "system.i18n_tab_languages": {
+      "uz": "Tillar",
+      "uzc": "Тиллар",
+      "ru": "Языки",
+      "en": "Languages"
+    },
+    "system.i18n_tab_pages": {
+      "uz": "Sahifalar",
+      "uzc": "Саҳифалар",
+      "ru": "Страницы",
+      "en": "Pages"
+    },
+    "system.i18n_tab_phrases": {
+      "uz": "Iboralar",
+      "uzc": "Иборалар",
+      "ru": "Фразы",
+      "en": "Phrases"
+    },
+    "system.i18n_tab_missing": {
+      "uz": "Yetishmayotgan",
+      "uzc": "Етишмаётган",
+      "ru": "Отсутствующие",
+      "en": "Missing"
+    },
+    "system.i18n_tab_import": {
+      "uz": "Import",
+      "uzc": "Импорт",
+      "ru": "Импорт",
+      "en": "Import"
+    },
+    "system.i18n_col_language": {
+      "uz": "Til",
+      "uzc": "Тил",
+      "ru": "Язык",
+      "en": "Language"
+    },
+    "system.i18n_col_code": {
+      "uz": "Kod",
+      "uzc": "Код",
+      "ru": "Код",
+      "en": "Code"
+    },
+    "system.i18n_col_script": {
+      "uz": "Yozuv",
+      "uzc": "Ёзув",
+      "ru": "Письменность",
+      "en": "Script"
+    },
+    "system.i18n_col_default": {
+      "uz": "Asosiy",
+      "uzc": "Асосий",
+      "ru": "По умолчанию",
+      "en": "Default"
+    },
+    "system.i18n_col_phrases": {
+      "uz": "Iboralar",
+      "uzc": "Иборалар",
+      "ru": "Фразы",
+      "en": "Phrases"
+    },
+    "system.i18n_col_missing": {
+      "uz": "Yetishmayotgan",
+      "uzc": "Етишмаётган",
+      "ru": "Отсутствует",
+      "en": "Missing"
+    },
+    "system.i18n_col_pages": {
+      "uz": "Sahifalar",
+      "uzc": "Саҳифалар",
+      "ru": "Страницы",
+      "en": "Pages"
+    },
+    "system.i18n_active": {
+      "uz": "Faol",
+      "uzc": "Фаол",
+      "ru": "Активен",
+      "en": "Active"
+    },
+    "system.i18n_inactive": {
+      "uz": "Faol emas",
+      "uzc": "Фаол эмас",
+      "ru": "Неактивен",
+      "en": "Inactive"
+    },
+    "system.i18n_default": {
+      "uz": "Asosiy",
+      "uzc": "Асосий",
+      "ru": "По умолчанию",
+      "en": "Default"
+    },
+    "system.i18n_activate": {
+      "uz": "Faollashtirish",
+      "uzc": "Фаоллаштириш",
+      "ru": "Активировать",
+      "en": "Activate"
+    },
+    "system.i18n_deactivate": {
+      "uz": "O'chirib qo'yish",
+      "uzc": "Ўчириб қўйиш",
+      "ru": "Деактивировать",
+      "en": "Deactivate"
+    },
+    "system.i18n_make_default": {
+      "uz": "Asosiy qilish",
+      "uzc": "Асосий қилиш",
+      "ru": "Сделать основным",
+      "en": "Make default"
+    },
+    "system.i18n_page_key": {
+      "uz": "Sahifa kaliti",
+      "uzc": "Саҳифа калити",
+      "ru": "Ключ страницы",
+      "en": "Page key"
+    },
+    "system.i18n_page_description": {
+      "uz": "Tavsif",
+      "uzc": "Тавсиф",
+      "ru": "Описание",
+      "en": "Description"
+    },
+    "system.i18n_page_active": {
+      "uz": "Faol",
+      "uzc": "Фаол",
+      "ru": "Активна",
+      "en": "Active"
+    },
+    "system.i18n_page_create": {
+      "uz": "Sahifa yaratish",
+      "uzc": "Саҳифа яратиш",
+      "ru": "Создать страницу",
+      "en": "Create page"
+    },
+    "system.i18n_page_delete_title": {
+      "uz": "Sahifa o'chirilsinmi?",
+      "uzc": "Саҳифа ўчирилсинми?",
+      "ru": "Удалить страницу?",
+      "en": "Delete page?"
+    },
+    "system.i18n_page_delete_message": {
+      "uz": "Bo'sh “{key}” sahifasi o'chirilsinmi?",
+      "uzc": "Бўш “{key}” саҳифаси ўчирилсинми?",
+      "ru": "Удалить пустую страницу «{key}»?",
+      "en": "Delete the empty page “{key}”?"
+    },
+    "system.i18n_delete": {
+      "uz": "O'chirish",
+      "uzc": "Ўчириш",
+      "ru": "Удалить",
+      "en": "Delete"
+    },
+    "system.i18n_delete_needs_empty": {
+      "uz": "Faqat bo'sh sahifalarni o'chirish mumkin.",
+      "uzc": "Фақат бўш саҳифаларни ўчириш мумкин.",
+      "ru": "Удалять можно только пустые страницы.",
+      "en": "Only empty pages can be deleted."
+    },
+    "system.i18n_select_page": {
+      "uz": "Sahifa",
+      "uzc": "Саҳифа",
+      "ru": "Страница",
+      "en": "Page"
+    },
+    "system.i18n_no_pages": {
+      "uz": "Hozircha katalog sahifalari yo'q.",
+      "uzc": "Ҳозирча каталог саҳифалари йўқ.",
+      "ru": "Страниц каталога пока нет.",
+      "en": "No catalog pages exist yet."
+    },
+    "system.i18n_phrase_new": {
+      "uz": "Yangi ibora",
+      "uzc": "Янги ибора",
+      "ru": "Новая фраза",
+      "en": "New phrase"
+    },
+    "system.i18n_phrase_edit": {
+      "uz": "Iborani tahrirlash",
+      "uzc": "Иборани таҳрирлаш",
+      "ru": "Изменить фразу",
+      "en": "Edit phrase"
+    },
+    "system.i18n_phrase_key": {
+      "uz": "Ibora kaliti",
+      "uzc": "Ибора калити",
+      "ru": "Ключ фразы",
+      "en": "Phrase key"
+    },
+    "system.i18n_phrase_delete_title": {
+      "uz": "Ibora o'chirilsinmi?",
+      "uzc": "Ибора ўчирилсинми?",
+      "ru": "Удалить фразу?",
+      "en": "Delete phrase?"
+    },
+    "system.i18n_phrase_delete_message": {
+      "uz": "“{key}” iborasi barcha tillardan o'chirilsinmi?",
+      "uzc": "“{key}” ибораси барча тиллардан ўчирилсинми?",
+      "ru": "Удалить фразу «{key}» из всех языков?",
+      "en": "Delete the phrase “{key}” from every language?"
+    },
+    "system.i18n_load_more": {
+      "uz": "Ko'proq yuklash",
+      "uzc": "Кўпроқ юклаш",
+      "ru": "Загрузить ещё",
+      "en": "Load more"
+    },
+    "system.i18n_missing_hint": {
+      "uz": "Har bir faol tilda qiymati yo'q iboralar, sahifalar bo'yicha.",
+      "uzc": "Ҳар бир фаол тилда қиймати йўқ иборалар, саҳифалар бўйича.",
+      "ru": "Фразы без значения для каждого активного языка, сгруппированные по страницам.",
+      "en": "Phrases without a value in each active language, grouped by page."
+    },
+    "system.i18n_import_hint": {
+      "uz": "`pages` va/yoki `phrases` maydonlari bilan seed shaklidagi JSON joylashtiring. Avval sinov rejimida ishga tushiring.",
+      "uzc": "`pages` ва/ёки `phrases` майдонлари билан seed шаклидаги JSON жойлаштиринг. Аввал синов режимида ишга туширинг.",
+      "ru": "Вставьте JSON с полями `pages` и/или `phrases` в формате seed. Сначала выполните пробный запуск.",
+      "en": "Paste a JSON payload with `pages` and/or `phrases` in the seed shape. Run a dry run first."
+    },
+    "system.i18n_import_payload": {
+      "uz": "Import ma'lumoti (JSON)",
+      "uzc": "Импорт маълумоти (JSON)",
+      "ru": "Данные импорта (JSON)",
+      "en": "Import payload (JSON)"
+    },
+    "system.i18n_import_placeholder": {
+      "uz": "{'{'} \"phrases\": {'{'} \"page.key\": {'{'} \"phrase.key\": {'{'} \"uz\": \"…\", \"uzc\": \"…\", \"ru\": \"…\", \"en\": \"…\" {'}'} {'}'} {'}'} {'}'}",
+      "uzc": "{'{'} \"phrases\": {'{'} \"page.key\": {'{'} \"phrase.key\": {'{'} \"uz\": \"…\", \"uzc\": \"…\", \"ru\": \"…\", \"en\": \"…\" {'}'} {'}'} {'}'} {'}'}",
+      "ru": "{'{'} \"phrases\": {'{'} \"page.key\": {'{'} \"phrase.key\": {'{'} \"uz\": \"…\", \"uzc\": \"…\", \"ru\": \"…\", \"en\": \"…\" {'}'} {'}'} {'}'} {'}'}",
+      "en": "{'{'} \"phrases\": {'{'} \"page.key\": {'{'} \"phrase.key\": {'{'} \"uz\": \"…\", \"uzc\": \"…\", \"ru\": \"…\", \"en\": \"…\" {'}'} {'}'} {'}'} {'}'}"
+    },
+    "system.i18n_import_dry_run": {
+      "uz": "Sinov rejimi (saqlamaydi)",
+      "uzc": "Синов режими (сақламайди)",
+      "ru": "Пробный запуск (без сохранения)",
+      "en": "Dry run (do not save)"
+    },
+    "system.i18n_import_overwrite": {
+      "uz": "Mavjud qiymatlarni almashtirish",
+      "uzc": "Мавжуд қийматларни алмаштириш",
+      "ru": "Перезаписать существующие значения",
+      "en": "Overwrite existing values"
+    },
+    "system.i18n_import_run": {
+      "uz": "Importni ishga tushirish",
+      "uzc": "Импортни ишга тушириш",
+      "ru": "Выполнить импорт",
+      "en": "Run import"
+    },
+    "system.i18n_import_invalid_json": {
+      "uz": "Ma'lumot haqiqiy JSON emas.",
+      "uzc": "Маълумот ҳақиқий JSON эмас.",
+      "ru": "Данные не являются корректным JSON.",
+      "en": "The payload is not valid JSON."
+    },
+    "system.i18n_import_invalid_shape": {
+      "uz": "Ma'lumot kutilgan shaklda `pages` va/yoki `phrases` bo'lishi kerak.",
+      "uzc": "Маълумот кутилган шаклда `pages` ва/ёки `phrases` бўлиши керак.",
+      "ru": "Данные должны содержать `pages` и/или `phrases` в ожидаемом формате.",
+      "en": "The payload must contain `pages` and/or `phrases` in the expected shape."
+    },
+    "system.i18n_import_empty": {
+      "uz": "Import qilish uchun hech narsa yo'q: kamida bitta sahifa yoki ibora bering.",
+      "uzc": "Импорт қилиш учун ҳеч нарса йўқ: камида битта саҳифа ёки ибора беринг.",
+      "ru": "Импортировать нечего: укажите хотя бы одну страницу или фразу.",
+      "en": "Nothing to import: provide at least one page or phrase."
+    },
+    "system.i18n_import_dry_notice": {
+      "uz": "Sinov rejimi tugadi — hech narsa saqlanmadi.",
+      "uzc": "Синов режими тугади — ҳеч нарса сақланмади.",
+      "ru": "Пробный запуск завершён — ничего не сохранено.",
+      "en": "Dry run complete — nothing was saved."
+    },
+    "system.i18n_import_done": {
+      "uz": "Import tugadi.",
+      "uzc": "Импорт тугади.",
+      "ru": "Импорт завершён.",
+      "en": "Import complete."
+    },
+    "system.i18n_import_pages_created": {
+      "uz": "Yaratilgan sahifalar",
+      "uzc": "Яратилган саҳифалар",
+      "ru": "Создано страниц",
+      "en": "Pages created"
+    },
+    "system.i18n_import_phrases_created": {
+      "uz": "Yaratilgan iboralar",
+      "uzc": "Яратилган иборалар",
+      "ru": "Создано фраз",
+      "en": "Phrases created"
+    },
+    "system.i18n_import_inserted": {
+      "uz": "Kiritilgan qiymatlar",
+      "uzc": "Киритилган қийматлар",
+      "ru": "Добавлено значений",
+      "en": "Values inserted"
+    },
+    "system.i18n_import_updated": {
+      "uz": "Yangilangan qiymatlar",
+      "uzc": "Янгиланган қийматлар",
+      "ru": "Обновлено значений",
+      "en": "Values updated"
+    },
+    "system.i18n_import_unchanged": {
+      "uz": "O'zgarmagan qiymatlar",
+      "uzc": "Ўзгармаган қийматлар",
+      "ru": "Без изменений",
+      "en": "Values unchanged"
+    },
+    "system.i18n_import_per_language": {
+      "uz": "Til bo'yicha kiritilgan",
+      "uzc": "Тил бўйича киритилган",
+      "ru": "Добавлено по языкам",
+      "en": "Inserted per language"
+    },
+    "system.i18n_import_missing": {
+      "uz": "Til bo'yicha yetishmayotgan",
+      "uzc": "Тил бўйича етишмаётган",
+      "ru": "Отсутствует по языкам",
+      "en": "Missing per language"
+    },
+    "system.i18n_import_revision": {
+      "uz": "Katalog reviziyasi",
+      "uzc": "Каталог ревизияси",
+      "ru": "Ревизия каталога",
+      "en": "Catalog revision"
+    },
+    "system.i18n_import_conflicts": {
+      "uz": "Ziddiyatlar ({count})",
+      "uzc": "Зиддиятлар ({count})",
+      "ru": "Конфликты ({count})",
+      "en": "Conflicts ({count})"
+    },
+    "system.i18n_import_no_conflicts": {
+      "uz": "Ziddiyatlar yo'q.",
+      "uzc": "Зиддиятлар йўқ.",
+      "ru": "Конфликтов нет.",
+      "en": "No conflicts."
+    },
+    "system.i18n_error_default_required": {
+      "uz": "Asosiy til har doim belgilangan bo'lishi kerak.",
+      "uzc": "Асосий тил ҳар доим белгиланган бўлиши керак.",
+      "ru": "Основной язык должен быть задан всегда.",
+      "en": "A default language must always be set."
+    },
+    "system.i18n_error_last_active": {
+      "uz": "Oxirgi faol tilni o'chirib bo'lmaydi.",
+      "uzc": "Охирги фаол тилни ўчириб бўлмайди.",
+      "ru": "Последний активный язык нельзя деактивировать.",
+      "en": "The last active language cannot be deactivated."
+    },
+    "system.i18n_error_language_not_found": {
+      "uz": "Bu til endi mavjud emas.",
+      "uzc": "Бу тил энди мавжуд эмас.",
+      "ru": "Этот язык больше не существует.",
+      "en": "This language no longer exists."
+    },
+    "system.i18n_error_page_key_taken": {
+      "uz": "Bu kalit bilan sahifa allaqachon mavjud.",
+      "uzc": "Бу калит билан саҳифа аллақачон мавжуд.",
+      "ru": "Страница с таким ключом уже существует.",
+      "en": "A page with this key already exists."
+    },
+    "system.i18n_error_page_not_empty": {
+      "uz": "Sahifani o'chirishdan oldin uning iboralarini o'chiring.",
+      "uzc": "Саҳифани ўчиришдан олдин унинг ибораларини ўчиринг.",
+      "ru": "Перед удалением страницы удалите её фразы.",
+      "en": "Delete the page's phrases before deleting the page."
+    },
+    "system.i18n_error_phrase_key_taken": {
+      "uz": "Sahifada bu kalit bilan ibora allaqachon mavjud.",
+      "uzc": "Саҳифада бу калит билан ибора аллақачон мавжуд.",
+      "ru": "Фраза с таким ключом уже существует на странице.",
+      "en": "A phrase with this key already exists on the page."
+    },
+    "system.i18n_error_phrase_not_found": {
+      "uz": "Bu ibora endi mavjud emas.",
+      "uzc": "Бу ибора энди мавжуд эмас.",
+      "ru": "Эта фраза больше не существует.",
+      "en": "This phrase no longer exists."
+    },
+    "system.i18n_error_import_too_large": {
+      "uz": "Import hajmi juda katta. Uni kichikroq qismlarga bo'ling.",
+      "uzc": "Импорт ҳажми жуда катта. Уни кичикроқ қисмларга бўлинг.",
+      "ru": "Импорт слишком большой. Разделите его на меньшие части.",
+      "en": "The import is too large. Split it into smaller batches."
+    },
+    "system.i18n_error_invalid_key": {
+      "uz": "To'g'ri nuqtali kalitdan foydalaning.",
+      "uzc": "Тўғри нуқтали калитдан фойдаланинг.",
+      "ru": "Используйте корректный ключ с точками.",
+      "en": "Use a valid dotted key."
+    },
+    "system.i18n_error_invalid_value": {
+      "uz": "Kamida bitta til qiymatini kiriting.",
+      "uzc": "Камида битта тил қийматини киритинг.",
+      "ru": "Укажите значение хотя бы для одного языка.",
+      "en": "Enter at least one language value."
+    },
+    "system.i18n_error_value_too_long": {
+      "uz": "Qiymat juda uzun.",
+      "uzc": "Қиймат жуда узун.",
+      "ru": "Значение слишком длинное.",
+      "en": "The value is too long."
+    },
+    "system.nav_i18n": {
+      "uz": "Interfeys tarjimalari",
+      "uzc": "Интерфейс таржималари",
+      "ru": "Переводы интерфейса",
+      "en": "Interface translations"
+    },
+    "system.role_label": {
+      "uz": "Rol",
+      "uzc": "Рол",
+      "ru": "Роль",
+      "en": "Role"
+    },
+    "system.role_superadmin": {
+      "uz": "Superadmin",
+      "uzc": "Супер админ",
+      "ru": "Суперадминистратор",
+      "en": "Superadmin"
+    },
+    "system.role_operator": {
+      "uz": "Operator",
+      "uzc": "Оператор",
+      "ru": "Оператор",
+      "en": "Operator"
+    },
+    "system.role_i18n_editor": {
+      "uz": "i18n menejeri",
+      "uzc": "i18n менежери",
+      "ru": "i18n-менеджер",
+      "en": "i18n Manager"
     }
   },
   "home": {

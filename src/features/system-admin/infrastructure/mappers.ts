@@ -4,7 +4,7 @@ import type { AdminIdentity } from '../domain/adminAccount'
 import type { AdminOrg, AdminOrgDetail } from '../domain/adminOrg'
 import type { AdminRoleOption } from '../domain/adminRole'
 import type { AdminMember, AdminSystemUser, AdminSystemUserPatch } from '../domain/adminUser'
-import type { AuditLogEntry } from '../domain/auditLog'
+import type { AuditLogEntry, AuditVerifyResult } from '../domain/auditLog'
 
 type Schemas = components['schemas']
 export type SystemMeDto = Schemas['SystemMeResponse']
@@ -15,6 +15,7 @@ export type SystemUserDto = Schemas['SystemUserResponse']
 export type SystemUserUpdateRequestDto = Schemas['SystemUserUpdateRequest']
 export type SystemPermissionsDto = Schemas['SystemPermissionsResponse']
 export type SystemAuditEntryDto = Schemas['SystemAuditEntryResponse']
+export type SystemAuditVerifyDto = Schemas['SystemAuditVerifyResponse']
 
 /** The staff roles/statuses the current contract allows (mirror of the DTO). */
 const SYSTEM_USER_ROLES = ['superadmin', 'operator', 'i18n_editor'] as const
@@ -30,16 +31,15 @@ export const isSystemUserStatus = (status: string): status is SystemUserStatus =
 
 /**
  * Maps the `/system/auth/me` body to the UI identity. The backend grants
- * exactly one role, so it is wrapped as a one-element list; `null` when the
- * body is absent; a missing permissions field defaults to empty so `can(...)`
- * is always safe.
+ * exactly one role, so it stays singular; `null` when the body is absent and a
+ * missing permissions field defaults to empty so `can(...)` is always safe.
  */
 export const toAdminIdentity = (dto: SystemMeDto | undefined): AdminIdentity | null => {
   if (dto === undefined) return null
   return {
     uuid: dto.id,
     email: dto.email ?? null,
-    roles: dto.role ? [dto.role] : [],
+    role: dto.role ?? null,
     permissions: dto.permissions ?? [],
   }
 }
@@ -135,4 +135,14 @@ export const toAuditEntry = (dto: SystemAuditEntryDto): AuditLogEntry => ({
   details: dto.details,
   ip: dto.ip ?? null,
   requestId: dto.request_id ?? null,
+})
+
+/** Maps the bounded chain-verification result; optional fields become null. */
+export const toAuditVerifyResult = (dto: SystemAuditVerifyDto): AuditVerifyResult => ({
+  ok: dto.ok,
+  rowsChecked: dto.rows_checked,
+  verifiedFromSeq: dto.verified_from_seq ?? null,
+  truncated: dto.truncated,
+  firstBadSeq: dto.first_bad_seq ?? null,
+  headSeq: dto.head_seq ?? null,
 })

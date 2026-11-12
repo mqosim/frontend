@@ -1,19 +1,14 @@
 import type { RouteRecordRaw } from 'vue-router'
 
-import { findSystemModule } from '../application/menu'
-
-const moduleParam = (params: Record<string, unknown>): string => {
-  const value = params.module
-  return typeof value === 'string' ? value : ''
-}
+import { ADMIN_PERMISSIONS } from '../domain/permissions'
 
 /**
  * Routes for the authenticated SYSTEM area. `principals: ['SYSTEM']` keeps a
  * PERSON/ORG session out, and the SYSTEM guard only ever authenticates via the
- * system store. The login route stays on the system-auth feature; `/system`
- * redirects to the dashboard so the bare prefix stays valid. Static segments
- * outrank the module parameter, so `/system/login` always wins over
- * `/system/:module`.
+ * system store. `systemPermission` is the exact backend grant the page needs;
+ * the guard resolves it before rendering and sends unauthorized direct visits
+ * to the in-shell access-denied view. The login route stays on the system-auth
+ * feature; `/system` redirects to the dashboard so the bare prefix stays valid.
  */
 export const systemAdminRoutes: RouteRecordRaw[] = [
   // ── Organizations ────────────────────────────────────────────────────────
@@ -27,6 +22,7 @@ export const systemAdminRoutes: RouteRecordRaw[] = [
       principals: ['SYSTEM'],
       translationPages: ['system.admin'],
       systemModule: 'organizations',
+      systemPermission: ADMIN_PERMISSIONS.tenantsRead,
     },
   },
   {
@@ -40,6 +36,7 @@ export const systemAdminRoutes: RouteRecordRaw[] = [
       principals: ['SYSTEM'],
       translationPages: ['system.admin'],
       systemModule: 'organizations',
+      systemPermission: ADMIN_PERMISSIONS.tenantsRead,
     },
   },
   // ── Staff (system users) ─────────────────────────────────────────────────
@@ -53,6 +50,7 @@ export const systemAdminRoutes: RouteRecordRaw[] = [
       principals: ['SYSTEM'],
       translationPages: ['system.admin'],
       systemModule: 'system-users',
+      systemPermission: ADMIN_PERMISSIONS.systemUsersRead,
     },
   },
   {
@@ -66,8 +64,38 @@ export const systemAdminRoutes: RouteRecordRaw[] = [
       principals: ['SYSTEM'],
       translationPages: ['system.admin'],
       systemModule: 'system-users',
+      systemPermission: ADMIN_PERMISSIONS.systemUsersRead,
     },
   },
+  // ── i18n catalog management ──────────────────────────────────────────────
+  {
+    path: '/system/i18n',
+    name: 'system-i18n',
+    component: () => import('./views/SystemI18nPage.vue'),
+    meta: {
+      layout: 'system',
+      requiresAuth: true,
+      principals: ['SYSTEM'],
+      translationPages: ['system.admin'],
+      systemModule: 'i18n',
+      systemPermission: ADMIN_PERMISSIONS.i18nRead,
+    },
+  },
+  // ── Audit chain ──────────────────────────────────────────────────────────
+  {
+    path: '/system/audit',
+    name: 'system-audit',
+    component: () => import('./components/SystemAuditLogsPage.vue'),
+    meta: {
+      layout: 'system',
+      requiresAuth: true,
+      principals: ['SYSTEM'],
+      translationPages: ['system.admin'],
+      systemModule: 'audit',
+      systemPermission: ADMIN_PERMISSIONS.auditRead,
+    },
+  },
+  // ── Neutral landing and own-account settings ─────────────────────────────
   {
     path: '/system/dashboard',
     name: 'system-dashboard',
@@ -91,21 +119,26 @@ export const systemAdminRoutes: RouteRecordRaw[] = [
       translationPages: ['system.admin', 'settings'],
     },
   },
+  // ── Access denied ────────────────────────────────────────────────────────
   {
-    path: '/system/:module',
-    name: 'system-module',
-    component: () => import('./views/SystemModulePage.vue'),
-    props: (route) => ({ moduleId: moduleParam(route.params) }),
+    path: '/system/access-denied',
+    name: 'system-access-denied',
+    component: () => import('./views/SystemAccessDeniedPage.vue'),
     meta: {
       layout: 'system',
       requiresAuth: true,
       principals: ['SYSTEM'],
       translationPages: ['system.admin'],
     },
-    // Unknown slugs go back to the dashboard instead of rendering empty.
-    beforeEnter: (to) =>
-      findSystemModule(moduleParam(to.params)) === null ? { name: 'system-dashboard' } : true,
   },
-  // ── Backward-compatible alias ────────────────────────────────────────────
+  // ── Legacy module slugs ──────────────────────────────────────────────────
+  // The former `/system/<module>` pages are either dedicated routes now or no
+  // longer exist (unbacked placeholders); keep the prefix meaningful instead of
+  // rendering an empty page.
+  {
+    path: '/system/:module',
+    name: 'system-module',
+    redirect: { name: 'system-dashboard' },
+  },
   { path: '/system', redirect: { name: 'system-dashboard' } },
 ]

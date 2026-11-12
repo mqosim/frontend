@@ -1,9 +1,9 @@
-import { computed, inject, ref } from 'vue'
+import { computed, inject, ref, shallowRef } from 'vue'
 
 import type { AppError } from '@/shared/domain/errors'
 
 import { AuditLogRepositoryKey } from '../di'
-import type { AuditLogEntry, AuditLogPage } from '../../domain/auditLog'
+import type { AuditLogEntry, AuditLogPage, AuditVerifyResult } from '../../domain/auditLog'
 
 /** Rows requested per page (the contract's `limit`). */
 export const AUDIT_PAGE_SIZE = 25
@@ -100,6 +100,27 @@ export const useAuditLogs = () => {
     await fetchPage({ ...toAuditRange(preset.value, new Date()), cursor }, true)
   }
 
+  // ── Chain verification (`audit.verify`, superadmin only) ──────────────────
+  // The page only calls `verify` when the caller holds the grant; the backend
+  // enforces it regardless. A previous result is cleared before every run.
+  const verifying = ref(false)
+  const verifyResult = shallowRef<AuditVerifyResult | null>(null)
+  const verifyError = shallowRef<AppError | null>(null)
+
+  const verify = async (): Promise<void> => {
+    if (verifying.value) return
+    verifying.value = true
+    verifyError.value = null
+    verifyResult.value = null
+    const result = await repository.verify()
+    verifying.value = false
+    if (!result.ok) {
+      verifyError.value = result.error
+      return
+    }
+    verifyResult.value = result.value
+  }
+
   return {
     status,
     errorKind,
@@ -110,5 +131,9 @@ export const useAuditLogs = () => {
     hasMore,
     total,
     entries,
+    verifying,
+    verifyResult,
+    verifyError,
+    verify,
   }
 }

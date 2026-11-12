@@ -18,13 +18,10 @@ import {
 import { usePermissions } from '../../src/features/system-admin/presentation/composables/usePermissions'
 import { useAdminPermissionsStore } from '../../src/features/system-admin/presentation/stores/adminPermissionsStore'
 
-const identity = (
-  permissions: readonly string[],
-  roles: readonly string[] = [],
-): AdminIdentity => ({
+const identity = (permissions: readonly string[], role: string | null = null): AdminIdentity => ({
   uuid: '0f8fad5b-d9cb-469f-a165-70867728950e',
   email: 'admin@example.com',
-  roles,
+  role,
   permissions,
 })
 
@@ -54,18 +51,18 @@ describe('admin permissions store', () => {
 
     expect(store.status).toBe('unknown')
     expect(store.isLoaded).toBe(false)
-    expect(store.roles).toEqual([])
+    expect(store.role).toBeNull()
     expect(store.can(ADMIN_PERMISSIONS.systemUsersRead)).toBe(false)
   })
 
   test('exposes the loaded grants and answers can()', () => {
     setActivePinia(createPinia())
     const store = useAdminPermissionsStore()
-    store.setLoaded(identity([ADMIN_PERMISSIONS.systemUsersRead], ['operator']))
+    store.setLoaded(identity([ADMIN_PERMISSIONS.systemUsersRead], 'operator'))
 
     expect(store.status).toBe('ready')
     expect(store.isLoaded).toBe(true)
-    expect(store.roles).toEqual(['operator'])
+    expect(store.role).toBe('operator')
     expect(store.can(ADMIN_PERMISSIONS.systemUsersRead)).toBe(true)
     expect(store.can(ADMIN_PERMISSIONS.systemUsersWrite)).toBe(false)
   })
@@ -90,7 +87,7 @@ describe('admin permissions store', () => {
 
     expect(store.status).toBe('unknown')
     expect(store.identity).toBeNull()
-    expect(store.roles).toEqual([])
+    expect(store.role).toBeNull()
   })
 })
 
@@ -98,8 +95,8 @@ describe('usePermissions', () => {
   test('can() and canAny() read the reactive grant set', () => {
     setActivePinia(createPinia())
     const store = useAdminPermissionsStore()
-    store.setLoaded(identity([ADMIN_PERMISSIONS.systemUsersRead]))
-    const { can, canAny, roles, isLoaded } = usePermissions()
+    store.setLoaded(identity([ADMIN_PERMISSIONS.systemUsersRead], 'operator'))
+    const { can, canAny, role, isLoaded } = usePermissions()
 
     expect(can(ADMIN_PERMISSIONS.systemUsersRead)).toBe(true)
     expect(can(ADMIN_PERMISSIONS.systemUsersWrite)).toBe(false)
@@ -107,7 +104,7 @@ describe('usePermissions', () => {
       true,
     )
     expect(canAny([ADMIN_PERMISSIONS.systemUsersWrite, ADMIN_PERMISSIONS.tenantsRead])).toBe(false)
-    expect(roles.value).toEqual([])
+    expect(role.value).toBe('operator')
     expect(isLoaded.value).toBe(true)
   })
 

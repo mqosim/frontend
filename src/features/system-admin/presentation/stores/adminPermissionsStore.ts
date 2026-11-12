@@ -22,7 +22,8 @@ export const useAdminPermissionsStore = defineStore('admin-permissions', {
     identity: null,
   }),
   getters: {
-    roles: (state): readonly string[] => state.identity?.roles ?? [],
+    /** The caller's single backend role, or `null` before `/me` resolves. */
+    role: (state): string | null => state.identity?.role ?? null,
     permissions: (state): readonly string[] => state.identity?.permissions ?? [],
     isLoaded: (state): boolean => state.status === 'ready',
   },

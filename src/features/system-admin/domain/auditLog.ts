@@ -50,6 +50,23 @@ export interface AuditLogPage {
 }
 
 /**
+ * The bounded chain-verification result (`GET /system/audit/verify`). The
+ * backend re-hashes the newest `SYSTEM_AUDIT_VERIFY_MAX_ROWS` entries and
+ * checks the chain head, so `truncated` reports a suffix-only verification.
+ */
+export interface AuditVerifyResult {
+  readonly ok: boolean
+  readonly rowsChecked: number
+  /** First verified sequence number; `null` when the chain is empty. */
+  readonly verifiedFromSeq: number | null
+  /** True when only the newest rows were verified (bounded range). */
+  readonly truncated: boolean
+  /** First inconsistent position; `null` when `ok`. */
+  readonly firstBadSeq: number | null
+  readonly headSeq: number | null
+}
+
+/**
  * Read-only audit operations. The UI never sees endpoint paths, query
  * parameters or transport details, so a changed backend contract only touches
  * the infrastructure adapter.
@@ -57,4 +74,6 @@ export interface AuditLogPage {
 export interface AuditLogRepository {
   /** One page of entries, newest first (the backend's fixed order). */
   list(query: AuditLogQuery): Promise<Result<AuditLogPage, AppError>>
+  /** Verify the newest slice of the SYSTEM audit chain (`audit.verify`). */
+  verify(): Promise<Result<AuditVerifyResult, AppError>>
 }

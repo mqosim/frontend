@@ -1,20 +1,19 @@
 import type { SystemModuleDefinition, SystemNavDefinition } from '../domain/menu'
-import { ADMIN_PERMISSIONS } from '../domain/permissions'
+import { ADMIN_PERMISSIONS, ALL_ADMIN_PERMISSIONS } from '../domain/permissions'
 
 /**
- * The SYSTEM module menu, in display order. Adding a module is a one-line
- * change here plus its phrase key; the route and the icon follow from the id.
- * Entries backed by a real endpoint name the permission that reveals them; the
- * placeholder pages (subscriptions/products/reports) stay visible until they
- * gain a backend surface.
+ * The SYSTEM module menu, in display order. Every module is backed by real
+ * endpoints and names the permission that reveals it; there are no placeholder
+ * entries, because a fake administration area would grant the wrong impression
+ * of access.
  */
 export const SYSTEM_MODULES: readonly SystemModuleDefinition[] = [
   {
     id: 'organizations',
     labelKey: 'system.nav_organizations',
     // Tenant (organization) rows: GET /system/tenants requires `tenants.read`.
-    // Their members live on the detail page (the contract has no global
-    // user directory).
+    // Their members live on the detail page (the contract has no global user
+    // directory).
     permission: ADMIN_PERMISSIONS.tenantsRead,
     to: { name: 'system-organizations' },
   },
@@ -26,17 +25,54 @@ export const SYSTEM_MODULES: readonly SystemModuleDefinition[] = [
     permission: ADMIN_PERMISSIONS.systemUsersRead,
     to: { name: 'system-system-users' },
   },
-  { id: 'subscriptions', labelKey: 'system.nav_subscriptions' },
-  { id: 'products', labelKey: 'system.nav_products' },
-  { id: 'reports', labelKey: 'system.nav_reports' },
-  { id: 'audit', labelKey: 'system.nav_audit', permission: ADMIN_PERMISSIONS.auditRead },
+  {
+    id: 'i18n',
+    labelKey: 'system.nav_i18n',
+    // Catalog reads require `i18n.read`; mutations require `i18n.manage`.
+    permission: ADMIN_PERMISSIONS.i18nRead,
+    to: { name: 'system-i18n' },
+  },
+  {
+    id: 'audit',
+    labelKey: 'system.nav_audit',
+    // GET /system/audit/entries requires `audit.read`; chain verification
+    // requires the narrower `audit.verify` and is gated inside the page.
+    permission: ADMIN_PERMISSIONS.auditRead,
+    to: { name: 'system-audit' },
+  },
 ]
 
 /** The sidebar, in display order: the Dashboard first, then the modules. */
 export const SYSTEM_MENU: readonly SystemNavDefinition[] = [
-  { id: 'dashboard', labelKey: 'system.nav_dashboard', to: { name: 'system-dashboard' } },
+  {
+    id: 'dashboard',
+    labelKey: 'system.nav_dashboard',
+    to: { name: 'system-dashboard' },
+    // No backend endpoint backs the dashboard; it is a neutral landing shown to
+    // any account that holds at least one admin capability. Its sections are
+    // gated individually by the permissions that own their data.
+    permissions: ALL_ADMIN_PERMISSIONS,
+  },
   ...SYSTEM_MODULES,
 ]
 
 export const findSystemModule = (id: string): SystemModuleDefinition | null =>
   SYSTEM_MODULES.find((module) => module.id === id) ?? null
+
+/** True when the caller may see `entry` with the given grant set. */
+export const canSeeNavEntry = (entry: SystemNavDefinition, grants: readonly string[]): boolean => {
+  if (entry.permission !== undefined) return grants.includes(entry.permission)
+  if (entry.permissions !== undefined) {
+    return entry.permissions.some((permission) => grants.includes(permission))
+  }
+  return true
+}
+
+/** The sidebar entries the caller may see, in display order. */
+export const visibleSystemMenu = (grants: readonly string[]): readonly SystemNavDefinition[] =>
+  SYSTEM_MENU.filter((entry) => canSeeNavEntry(entry, grants))
+
+/** The caller's first permitted destination, or `null` when they hold nothing. */
+export const firstAllowedSystemRoute = (
+  grants: readonly string[],
+): { readonly name: string } | null => visibleSystemMenu(grants)[0]?.to ?? null

@@ -1,26 +1,75 @@
 <script setup lang="ts">
+import { computed } from 'vue'
 import { useI18n } from 'vue-i18n'
+import type { RouteLocationRaw } from 'vue-router'
 
 import ModuleIcon from '@/shared/presentation/components/ModuleIcon.vue'
 
-import { formatSystemCount, formatSystemDate } from '../../domain/format'
-import { SYSTEM_ACTIVITY, SYSTEM_REGISTRATIONS, SYSTEM_STATS } from '../../domain/systemSampleData'
+import { ADMIN_PERMISSIONS } from '../../domain/permissions'
+import type { AdminPermissionCode } from '../../domain/permissions'
+import { usePermissions } from '../composables/usePermissions'
 
 /**
- * The SYSTEM (Superadmin) platform Dashboard. All figures, organization names
- * and activity entries come from `systemSampleData.ts` — a development
- * placeholder until the management services exist; the page presents them as
- * sample data and reads only the exported types, so real services can replace
- * the module without touching this file.
+ * The SYSTEM landing page. It shows NO platform statistics: the backend has no
+ * dashboard aggregate endpoint, and invented figures would misrepresent access.
+ * Instead it offers navigation cards for exactly the areas the caller's
+ * permissions open — organization data needs `tenants.read`, staff data needs
+ * `system.users.read`, catalog data needs `i18n.read` and the audit chain needs
+ * `audit.read`, each evaluated independently.
  */
-const { t, locale } = useI18n()
+const { t } = useI18n()
+const { can } = usePermissions()
 
-const statCards: readonly { id: string; value: number; iconId: string }[] = [
-  { id: 'organizations', value: SYSTEM_STATS.organizations, iconId: 'organizations' },
-  { id: 'users', value: SYSTEM_STATS.users, iconId: 'users' },
-  { id: 'subs', value: SYSTEM_STATS.activeSubscriptions, iconId: 'subscriptions' },
-  { id: 'new-orgs', value: SYSTEM_STATS.newOrganizations30d, iconId: 'reports' },
+interface DashboardCard {
+  readonly id: string
+  readonly labelKey: string
+  readonly hintKey: string
+  readonly permission: AdminPermissionCode
+  readonly to: RouteLocationRaw
+}
+
+const ALL_CARDS: readonly DashboardCard[] = [
+  {
+    id: 'organizations',
+    labelKey: 'system.nav_organizations',
+    hintKey: 'system.dash_hint_organizations',
+    permission: ADMIN_PERMISSIONS.tenantsRead,
+    to: { name: 'system-organizations' },
+  },
+  {
+    id: 'system-users',
+    labelKey: 'system.nav_system_users',
+    hintKey: 'system.dash_hint_system_users',
+    permission: ADMIN_PERMISSIONS.systemUsersRead,
+    to: { name: 'system-system-users' },
+  },
+  {
+    id: 'i18n',
+    labelKey: 'system.nav_i18n',
+    hintKey: 'system.dash_hint_i18n',
+    permission: ADMIN_PERMISSIONS.i18nRead,
+    to: { name: 'system-i18n' },
+  },
+  {
+    id: 'audit',
+    labelKey: 'system.nav_audit',
+    hintKey: 'system.dash_hint_audit',
+    permission: ADMIN_PERMISSIONS.auditRead,
+    to: { name: 'system-audit' },
+  },
 ]
+
+const cards = computed(() => ALL_CARDS.filter((card) => can(card.permission)))
+
+// A catalog-only administrator (the i18n Manager role) gets a minimal welcome
+// and the catalog card, rather than empty organization/staff panels.
+const catalogOnly = computed(
+  () =>
+    can(ADMIN_PERMISSIONS.i18nRead) &&
+    !can(ADMIN_PERMISSIONS.tenantsRead) &&
+    !can(ADMIN_PERMISSIONS.systemUsersRead) &&
+    !can(ADMIN_PERMISSIONS.auditRead),
+)
 </script>
 
 <template>
@@ -31,78 +80,20 @@ const statCards: readonly { id: string; value: number; iconId: string }[] = [
       </p>
       <h1 class="sdash__title">{{ t('system.dash_title') }}</h1>
       <p class="sdash__subtitle">{{ t('system.dash_subtitle') }}</p>
-      <p class="sdash__notice">{{ t('system.dash_sample_notice') }}</p>
+      <p v-if="catalogOnly" class="sdash__notice">{{ t('system.dash_i18n_welcome') }}</p>
     </header>
 
     <div class="sdash__cards">
-      <article v-for="card in statCards" :key="card.id" class="sdash-card sdash-sumcard">
-        <span class="sdash-sumcard__icon" aria-hidden="true">
-          <ModuleIcon :id="card.iconId" :size="20" />
+      <RouterLink v-for="card in cards" :key="card.id" class="sdash-card sdash-link" :to="card.to">
+        <span class="sdash-link__icon" aria-hidden="true">
+          <ModuleIcon :id="card.id" :size="20" />
         </span>
-        <p class="sdash-sumcard__label">{{ t(`system.dash_card_${card.id}`) }}</p>
-        <p class="sdash-sumcard__amount">{{ formatSystemCount(card.value, locale) }}</p>
-      </article>
-    </div>
-
-    <div class="sdash__panels">
-      <article class="sdash-card">
-        <h2 class="sdash-card__title">{{ t('system.dash_registrations_title') }}</h2>
-        <div
-          class="sdash-table-wrap"
-          role="region"
-          tabindex="0"
-          :aria-label="t('system.dash_registrations_title')"
-        >
-          <table class="sdash-table">
-            <thead>
-              <tr>
-                <th scope="col">{{ t('system.dash_reg_name') }}</th>
-                <th scope="col">{{ t('system.dash_reg_plan') }}</th>
-                <th scope="col">{{ t('system.dash_reg_date') }}</th>
-                <th scope="col">{{ t('system.dash_reg_status') }}</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-for="registration in SYSTEM_REGISTRATIONS" :key="registration.id">
-                <td>
-                  <span class="sdash-table__desc">{{ registration.name }}</span>
-                </td>
-                <td class="sdash-table__muted">{{ t(registration.planKey) }}</td>
-                <td class="sdash-table__muted">
-                  {{ formatSystemDate(registration.date, locale) }}
-                </td>
-                <td>
-                  <span
-                    class="sdash-badge"
-                    :class="
-                      registration.statusKey === 'system.dash_status_active'
-                        ? 'sdash-badge--success'
-                        : 'sdash-badge--info'
-                    "
-                  >
-                    {{ t(registration.statusKey) }}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-      </article>
-
-      <article class="sdash-card">
-        <h2 class="sdash-card__title">{{ t('system.dash_activity_title') }}</h2>
-        <ul class="sdash-activity">
-          <li v-for="event in SYSTEM_ACTIVITY" :key="event.id" class="sdash-activity__item">
-            <span class="sdash-activity__dot" aria-hidden="true"></span>
-            <span class="sdash-activity__body">
-              <span class="sdash-activity__action">{{ t(event.actionKey) }}</span>
-              <span class="sdash-activity__meta">
-                {{ event.actor }} · {{ formatSystemDate(event.date, locale) }}
-              </span>
-            </span>
-          </li>
-        </ul>
-      </article>
+        <span class="sdash-link__body">
+          <span class="sdash-link__label">{{ t(card.labelKey) }}</span>
+          <span class="sdash-link__hint">{{ t(card.hintKey) }}</span>
+        </span>
+        <span class="sdash-link__arrow" aria-hidden="true">→</span>
+      </RouterLink>
     </div>
   </section>
 </template>
@@ -152,11 +143,16 @@ const statCards: readonly { id: string; value: number; iconId: string }[] = [
 
 .sdash__notice {
   margin: 0;
-  font-size: var(--font-size-sm);
   color: var(--color-text-muted);
 }
 
-/* ── Shared card surface (org Dashboard's design language) ──────────────── */
+/* ── Navigation cards (the org Dashboard's card design language) ─────────── */
+.sdash__cards {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--space-4);
+}
+
 .sdash-card {
   padding: var(--space-4);
   border: 1px solid var(--color-border);
@@ -164,27 +160,26 @@ const statCards: readonly { id: string; value: number; iconId: string }[] = [
   background-color: var(--color-surface);
 }
 
-.sdash-card__title {
-  margin: 0;
-  font-size: var(--font-size-md);
-  font-weight: 600;
-}
-
-/* ── Platform stat cards ────────────────────────────────────────────────── */
-.sdash__cards {
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: var(--space-4);
-}
-
-.sdash-sumcard {
+.sdash-link {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-2);
+  gap: var(--space-3);
+  align-items: center;
+  color: var(--color-text);
+  text-decoration: none;
 }
 
-.sdash-sumcard__icon {
+.sdash-link:hover {
+  background-color: var(--color-bg);
+}
+
+.sdash-link:focus-visible {
+  outline: 2px solid var(--color-focus-ring);
+  outline-offset: 2px;
+}
+
+.sdash-link__icon {
   display: inline-flex;
+  flex: none;
   align-items: center;
   justify-content: center;
   width: 2.5rem;
@@ -194,147 +189,29 @@ const statCards: readonly { id: string; value: number; iconId: string }[] = [
   color: var(--color-info);
 }
 
-.sdash-sumcard__label {
-  margin: 0;
-  font-size: var(--font-size-sm);
-  color: var(--color-text-muted);
-}
-
-.sdash-sumcard__amount {
-  overflow-wrap: anywhere;
-  margin: 0;
-  font-size: var(--font-size-lg);
-  font-weight: 650;
-  font-variant-numeric: tabular-nums;
-}
-
-/* ── Registrations and activity ─────────────────────────────────────────── */
-.sdash__panels {
-  display: grid;
-  grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-  gap: var(--space-4);
-  align-items: start;
-}
-
-.sdash-table-wrap {
-  overflow-x: auto;
-  margin-top: var(--space-3);
-}
-
-.sdash-table {
-  width: 100%;
-  min-width: 26rem;
-  border-collapse: collapse;
-  font-size: var(--font-size-sm);
-}
-
-.sdash-table th {
-  padding: var(--space-2) var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-  color: var(--color-text-muted);
-  font-weight: 600;
-  text-align: left;
-  white-space: nowrap;
-}
-
-.sdash-table td {
-  padding: var(--space-3);
-  border-bottom: 1px solid var(--color-border);
-  vertical-align: top;
-}
-
-.sdash-table tbody tr:last-child td {
-  border-bottom: 0;
-}
-
-.sdash-table__desc {
-  display: block;
-  font-weight: 500;
-}
-
-.sdash-table__muted {
-  color: var(--color-text-muted);
-  white-space: nowrap;
-}
-
-.sdash-badge {
-  display: inline-flex;
-  padding: 0.125rem var(--space-2);
-  border-radius: 999px;
-  font-size: var(--font-size-sm);
-  white-space: nowrap;
-}
-
-.sdash-badge--success {
-  background-color: var(--color-success-surface);
-  color: var(--color-success);
-}
-
-.sdash-badge--info {
-  background-color: var(--color-info-surface);
-  color: var(--color-info);
-}
-
-.sdash-table-wrap:focus-visible {
-  outline: 2px solid var(--color-focus-ring);
-  outline-offset: 2px;
-}
-
-.sdash-activity {
+.sdash-link__body {
   display: flex;
-  flex-direction: column;
-  gap: var(--space-3);
-  margin: var(--space-3) 0 0;
-  padding: 0;
-  list-style: none;
-}
-
-.sdash-activity__item {
-  display: flex;
-  gap: var(--space-3);
-  align-items: baseline;
-}
-
-.sdash-activity__dot {
-  flex: none;
-  width: 0.5rem;
-  height: 0.5rem;
-  border-radius: 50%;
-  background-color: var(--color-info);
-}
-
-.sdash-activity__body {
-  display: flex;
+  flex: 1;
   flex-direction: column;
   gap: 2px;
   min-width: 0;
 }
 
-.sdash-activity__action {
-  font-size: var(--font-size-sm);
-  font-weight: 500;
+.sdash-link__label {
+  font-weight: 650;
 }
 
-.sdash-activity__meta {
-  overflow: hidden;
-  text-overflow: ellipsis;
-  white-space: nowrap;
+.sdash-link__hint {
+  color: var(--color-text-muted);
   font-size: var(--font-size-sm);
+}
+
+.sdash-link__arrow {
+  flex: none;
   color: var(--color-text-muted);
 }
 
-/* ── Responsive ─────────────────────────────────────────────────────────── */
-@media (max-width: 64rem) {
-  .sdash__cards {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-  }
-
-  .sdash__panels {
-    grid-template-columns: minmax(0, 1fr);
-  }
-}
-
-@media (max-width: 40rem) {
+@media (max-width: 48rem) {
   .sdash__cards {
     grid-template-columns: minmax(0, 1fr);
   }

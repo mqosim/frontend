@@ -36,6 +36,9 @@ const { pending, busy, errorKey, reason, ask, cancel, confirm, dismiss } = useAd
 )
 
 const canManage = computed(() => can(ADMIN_PERMISSIONS.tenantsManage))
+// Member contacts are their own permission (`tenants.users.read`), independent
+// of tenant metadata access (`tenants.read`) that opens this page.
+const canReadMembers = computed(() => can(ADMIN_PERMISSIONS.tenantsUsersRead))
 const loadErrorKey = computed(() =>
   error.value === null ? 'errors.generic' : adminLoadErrorKey(error.value),
 )
@@ -75,7 +78,7 @@ const membersErrorKey = computed(() =>
 
 const loadDetailAndMembers = async (): Promise<void> => {
   await loadDetail()
-  await loadMembers()
+  if (canReadMembers.value) await loadMembers()
 }
 
 onMounted(() => void loadDetailAndMembers())
@@ -190,7 +193,7 @@ const askReactivate = (org: AdminOrg): void => {
         </div>
       </dl>
 
-      <section class="admin-members" aria-labelledby="org-members-title">
+      <section v-if="canReadMembers" class="admin-members" aria-labelledby="org-members-title">
         <h2 id="org-members-title" class="admin-members__title">
           {{ t('system.orgs_members_title') }}
         </h2>

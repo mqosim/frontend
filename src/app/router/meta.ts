@@ -1,4 +1,5 @@
 import type { PrincipalType } from '@/shared/domain'
+import type { AdminPermissionCode } from '@/features/system-admin'
 
 /**
  * Route metadata contract. Every field is declarative data the guard reads, so
@@ -25,6 +26,12 @@ declare module 'vue-router' {
     translationPages?: readonly string[]
     /** Which SYSTEM sidebar module a (list/detail) route belongs to. */
     systemModule?: string
+    /**
+     * The exact SYSTEM permission a route requires. Resolved before the page
+     * renders; a missing grant (or an unresolved `/system/auth/me`) sends the
+     * caller to the in-shell access-denied view. The backend still enforces.
+     */
+    systemPermission?: AdminPermissionCode
   }
 }
 

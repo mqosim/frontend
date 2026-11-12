@@ -10,8 +10,17 @@ export { AuditLogRepositoryKey, AdminUseCasesKey } from './presentation/di'
 export { createAuditLogRepository } from './infrastructure/auditLogRepository'
 export { createAdminRepository } from './infrastructure/adminRepository'
 export { createAdminUseCases } from './application/useCases'
-export { ADMIN_PERMISSIONS } from './domain/permissions'
+export { ADMIN_PERMISSIONS, ALL_ADMIN_PERMISSIONS } from './domain/permissions'
 export type { AdminPermissionCode } from './domain/permissions'
+export { ADMIN_ROLES, adminRoleLabelKey, isAdminRole } from './domain/adminRole'
+export type { AdminRole, AdminRoleOption } from './domain/adminRole'
+export { grantsGate } from './application/access'
+export type { PermissionGate } from './application/access'
 export type { AdminIdentity } from './domain/adminAccount'
-export type { AuditLogEntry, AuditLogQuery, AuditLogPage, AuditLogRepository } from './domain/auditLog'
+export type {
+  AuditLogEntry,
+  AuditLogQuery,
+  AuditLogPage,
+  AuditLogRepository,
+} from './domain/auditLog'
 export type { AdminUseCases } from './application/useCases'
