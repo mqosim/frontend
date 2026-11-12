@@ -107,4 +107,15 @@
 
 - Migration work stays on `main`. The AGENTS.md rule requiring an `api-migration` branch is obsolete for this work (explicit user decision).
 - Always browse the dev app at `http://localhost:5173`. The backend's `CORS_ALLOW_ORIGINS` and `SYSTEM_CORS_ALLOW_ORIGINS` must include `http://localhost:5173`, because Origin is checked on refresh, logout and switch-tenant.
-- Authoritative typecheck is the Node-based `vue-tsc` run by the user. `bun run typecheck` here is only a quick pre-check and does not cover `.vue` files; never claim `.vue` coverage from it. The 6 `.vue` errors from out-of-scope slices (E-IMZO panels, change email/password, language settings) are accepted; no Phase 3b fix is needed for the migrated auth/guard/runtime files.
+- Authoritative typecheck is the Node-based `vue-tsc`: `bun run typecheck` (and `build`) already execute `node node_modules/vue-tsc/bin/vue-tsc.js …`, so they **do** cover `.vue` files. Node IS installed on this machine (`v26.13.0`); only a Bun-invoked `vue-tsc` (e.g. `bun node_modules/vue-tsc/bin/vue-tsc.js`) silently skips SFCs and must never be used as evidence. The historical out-of-scope `.vue` errors are gone — the tree is at 0 errors.
+
+## SYSTEM i18n Manager and permission gating (2026-11-12)
+
+- The permission set is the only UI gate; a page's own grant is never inferred from a broader one (`tenants.read` must never stand in for `system.users.read`). Routes declare `systemPermission`, the guard resolves `/system/auth/me` before deciding, and an unauthorized direct visit renders the in-shell `/system/access-denied` view instead of redirecting.
+- `AdminIdentity` carries the backend's single `role` (`string | null`, mirroring `SystemMeResponse.role`); authorization still reads the returned `permissions[]` array, never the role name, and an unknown role grants nothing.
+- The catalog is `i18n.read` to open and `i18n.manage` to mutate; the Import tab is manage-only. Languages are the four fixed backend codes (activate / make default only) because there is no create/delete; pages are deletable only when empty (409 `page_not_empty` mapped to copy).
+- The dashboard is navigation only. `domain/systemSampleData.ts` was deleted rather than adapted: fake statistics cannot be served by the new contract, and no aggregate endpoints are consumed yet.
+- Phrase keys must exist in BOTH `fallbackMessages.ts` and `docs/phrases-to-seed.json` with identical English values (`tests/i18n/phrasesSeed.test.ts`), and every message must compile under vue-i18n (`tests/i18n/messageCompilation.test.ts`). Seed values containing literal JSON braces are written with vue-i18n escapes (`{'{'}`) — raw braces throw at `t()` time.
+- Admin table controls that belong together ("Edit"/"Delete") use the additive `.admin-table__actions--nowrap` modifier rather than changing the shared base class, so other admin tables keep their existing wrapping behaviour.
+- `admin-toolbar__input` carries `flex: 1 1 14rem` for horizontal toolbars; reusing it inside a column-flow field resolves to a 14 rem **height**. i18n fields therefore reset it locally (`.i18n-field .admin-toolbar__input { flex: none }`); do not reuse the row-toolbar class inside a column field.
+- Wide pages opt in: `AdminPage` gained a `wide` prop using the existing 60 rem `--content-max-width-settings`, instead of widening the shared page frame globally.
